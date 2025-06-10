@@ -121,6 +121,7 @@ if (currentName === defaultName) {
             formData={formData}
             setFormData={wrappedSetFormData}
             imageFieldRef={imageFieldRef}
+            imageFieldAProposRef={imageFieldAProposRef}
             imageFieldServicesRef={imageFieldServicesRef}
             imageFieldBgRef={imageFieldBgRef}
             handleSave={handleSave}
