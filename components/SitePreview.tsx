@@ -31,7 +31,6 @@ export default function SitePreview({ formData }: Props) {
         ref={iframeRef}
         src="/?admin=true"
          className="w-full border-0"
-         sandbox=""
         style={{ height: '100vh' }}
       />
     </div>
