@@ -106,7 +106,7 @@ Vous souhaitez mieux comprendre ma méthode, ma posture d’écoute ou ma philos
           <button className=' py-3 px-6 rounded-full text-lg shadow' style={{ backgroundColor: 'var(--color-primary)' , color: 'var(--color-text-button)'}}>{data.accueil.SectionAProposCTA || '➤ Découvrez mon approche en détail'}</button>
           </Link>
         </p>
-        <img src={data.aPropos.image || DEFAULT_IMAGE} alt="Illustration bien-être" className="mx-auto rounded-xl shadow-xl max-w-[300px]" />
+        <img src={data.accueil.image || DEFAULT_IMAGE} alt="Illustration bien-être" className="mx-auto rounded-xl shadow-xl max-w-[300px]" />
       </section>
 
       {/* Section Services */}

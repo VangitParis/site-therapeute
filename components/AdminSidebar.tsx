@@ -7,11 +7,13 @@ import TestimonialsEditor from './TestimonialsEditor';
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
 import LayoutEditor from './LayoutEditor';
 import AccordionSection from './AccordionSection';
+import PasswordChanger from './PassWordChanger';
 
 type Props = {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
   imageFieldRef: React.RefObject<ImageUploadRef>;
+  imageFieldAProposRef: React.RefObject<ImageUploadRef>;
   imageFieldServicesRef: React.RefObject<ImageUploadRef>;
   imageFieldBgRef: React.RefObject<ImageUploadRef>;
   handleSave: () => void;
@@ -23,6 +25,7 @@ export default function AdminSidebar({
   formData,
   setFormData,
   imageFieldRef,
+  imageFieldAProposRef,
   imageFieldServicesRef,
   imageFieldBgRef,
   handleSave,
@@ -59,11 +62,11 @@ export default function AdminSidebar({
 </AccordionSection>
 
       <AccordionSection title="🏠 Page d’accueil">
-        <HomeContentEditor formData={formData} setFormData={setFormData} imageFieldRef={imageFieldRef}/>
+        <HomeContentEditor formData={formData} setFormData={setFormData} imageFieldRef={imageFieldRef} />
       </AccordionSection>
 
       <AccordionSection title="🏠 Page à Propos">
-        <AboutContentEditor formData={formData} setFormData={setFormData} imageFieldRef={imageFieldRef}/>
+        <AboutContentEditor formData={formData} setFormData={setFormData} imageFieldAProposRef={imageFieldAProposRef}/>
       </AccordionSection>
 
       <AccordionSection title="🧘 Page Services">
@@ -92,6 +95,9 @@ export default function AdminSidebar({
         </button>
         {message && <p className="text-center text-green-600 mt-2 text-sm">{message}</p>}
       </div>
+      <PasswordChanger />
     </div>
+    
+
   );
 }

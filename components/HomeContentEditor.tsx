@@ -1,14 +1,15 @@
 // components/HomeContentEditor.tsx
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
 import { useRef } from 'react';
+
 type Props = {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
   imageFieldRef: React.RefObject<ImageUploadRef>;
 };
-export default function HomeContentEditor({ formData, setFormData, imageFieldRef }) {
+export default function HomeContentEditor({ formData, setFormData, imageFieldRef }: Props) {
   const accueil = formData.accueil || {};
-  const aPropos = formData.aPropos || {};
+
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({
@@ -87,12 +88,12 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
       <ImageUploadField
         ref={imageFieldRef}
         label="🖼️ Image de la section À propos"
-        value={aPropos.image || ''}
+        value={accueil.image || ''}
         folderName={formData.layout?.nom || 'default'}
         onUpload={(url) =>
           setFormData((prev) => ({
             ...prev,
-            aPropos: { ...prev.aPropos, image: url },
+            accueil: { ...prev.accueil, image: url },
           }))
         }
       />

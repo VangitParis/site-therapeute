@@ -3,6 +3,7 @@ import { ImageUploadRef } from '../../components/ImageUploadField';
 import { db } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
+import AdminAuth from '../../components/AdminAuth'
 import SitePreview from '../../components/SitePreview';
 
 const DEFAULT_THEME = {
@@ -13,7 +14,8 @@ const DEFAULT_THEME = {
   titreH1 : '',
   titreH2 : '',
   titreH3 : '',
-  texte : ''
+  texte : '',
+  textButton : ''
 };
 
 export default function Live() {
@@ -23,6 +25,7 @@ export default function Live() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const defaultName = 'Marie Dupont';
   const imageFieldRef = useRef<ImageUploadRef>(null);
+  const imageFieldAProposRef = useRef<ImageUploadRef>(null);
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
@@ -76,6 +79,10 @@ if (currentName === defaultName) {
       const uploaded = await imageFieldRef.current.upload();
       if (uploaded) updatedFormData.accueil.image = uploaded;
     }
+    if (imageFieldAProposRef.current?.hasPendingUpload()) {
+      const uploaded = await imageFieldAProposRef.current.upload();
+      if (uploaded) updatedFormData.aPropos.image = uploaded;
+    }
 
     if (imageFieldServicesRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldServicesRef.current.upload();
@@ -106,6 +113,7 @@ if (currentName === defaultName) {
     setFormData(fn);
   };
   return (
+    <AdminAuth>
     <div className="flex h-screen">
       {sidebarVisible && (
         <div className="w-[30%] min-w-[320px] border-r overflow-y-scroll relative">
@@ -141,5 +149,6 @@ if (currentName === defaultName) {
         </div>
       </div>
     </div>
+    </AdminAuth>
   );
 }

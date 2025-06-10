@@ -5,10 +5,10 @@ import { useRef } from 'react';
 type Props = {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
-  imageFieldRef: React.RefObject<ImageUploadRef>;
+  imageFieldAProposRef: React.RefObject<ImageUploadRef>;
 };
 
-export default function AboutContentEditor({ formData, setFormData, imageFieldRef }: Props) {
+export default function AboutContentEditor({ formData, setFormData, imageFieldAProposRef }: Props) {
   const aPropos = formData.aPropos || {};
 
   const handleChange = (key: string, value: string) => {
@@ -44,7 +44,7 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldRe
       </label>
 
       <ImageUploadField
-        ref={imageFieldRef}
+        ref={imageFieldAProposRef}
         label="🖼️ Image de la section À propos"
         value={aPropos.image || ''}
         folderName={formData.layout?.nom || 'default'}

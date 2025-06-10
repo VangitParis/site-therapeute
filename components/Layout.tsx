@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Head from 'next/head';
+
 import { ReactNode, useEffect, useState } from 'react';
 import { db } from '../lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -63,7 +64,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="font-serif text-gray-800 min-h-screen">
         {!isAdminPage && (
           <header className="bg-white shadow p-6 flex justify-between items-center sticky top-0 z-50">
-            <div className='flex'>
+            <Link href='/' className='flex'>
                   {layout.logo && (
               <img
                 src={layout.logo}
@@ -78,7 +79,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               
               <p className="text-sm italic text-gray-500">{layout.titre}</p>
               </div>
-            </div>
+            </Link>
             
             
             <nav className="space-x-4 text-sm">
@@ -102,6 +103,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           </footer>
         )}
       </div>
+      
     </>
   );
 }

@@ -121,7 +121,13 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
   data.append('file', finalFile); // ✅ correction ici
   data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
 
-  const safeName = (folderName || 'default').replace(/\s+/g, '_').toLowerCase();
+  const safeName = (folderName || 'default')
+  .normalize('NFD') // supprime les accents
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/\s+/g, '_')
+  .replace(/[^\w\d_-]/g, '')
+  .toLowerCase();
+
   const baseName = file.name
     .split('.')[0]
     .replace(/[^\w\d_-]+/g, '-')
