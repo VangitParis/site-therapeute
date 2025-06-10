@@ -29,8 +29,9 @@ export default function SitePreview({ formData }: Props) {
       {/* Iframe avec espace réservé */}
       <iframe
         ref={iframeRef}
-        src="http://localhost:3000?admin=true"
+        src="/?admin=true"
          className="w-full border-0"
+         sandbox=""
         style={{ height: '100vh' }}
       />
     </div>
