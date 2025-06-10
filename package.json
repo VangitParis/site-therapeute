@@ -1,0 +1,32 @@
+{
+  "name": "therapeute-site",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.1",
+    "firebase": "^11.9.0",
+    "formidable": "^3.5.4",
+    "framer": "^2.4.1",
+    "motion": "^12.16.0",
+    "next": "latest",
+    "node": "^22.16.0",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/react": "19.1.6",
+    "@types/react-slick": "^0.23.13",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8",
+    "typescript": "5.8.3"
+  }
+}

@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #7f5a83;
+  --color-bg: #f4f0fa;
+  --color-accent: #e6f0ff;
+  --color-texte: #333333;
+  --color-titreH1: #111111;
+  --color-titreH2: #444444;
+  --color-titreH3: #444444;
+  --color-text-button: #FFFFFF;
+  --bg-image: none;
+}
+
+body {
+  background-color: var(--color-bg);
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}

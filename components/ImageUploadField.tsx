@@ -1,0 +1,214 @@
+import { useState, forwardRef, useImperativeHandle } from 'react';
+
+const IMAGE_PAR_DEFAUT =
+  'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
+
+export type ImageUploadRef = {
+  upload: () => Promise<string | null>;
+  hasPendingUpload: () => boolean;
+};
+
+type ImageUploadFieldProps = {
+  label: string;
+  value: string;
+  onUpload: (url: string) => void;
+  folderName: string;
+};
+
+const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
+  ({ label, value, onUpload, folderName }, ref) => {
+    const [compressedFile, setCompressedFile] = useState<null | { original: File; compressed: File }>(null);
+    const [preview, setPreview] = useState('');
+    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+      async upload() {
+        if (!compressedFile) return value || IMAGE_PAR_DEFAUT;
+
+        setLoading(true);
+        const data = new FormData();
+        data.append('file', compressedFile.compressed);
+        data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
+
+        const safeName = (folderName || 'default').replace(/\s+/g, '_').toLowerCase();
+        const baseName = compressedFile.original.name
+          .split('.')[0]
+          .replace(/[^\w\d_-]+/g, '-')
+          .toLowerCase()
+          .slice(0, 50);
+
+        data.append('folder', `therapeutes/${safeName}`);
+        data.append('public_id', `therapeutes/${safeName}_${baseName}`);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+          { method: 'POST', body: data }
+        );
+        const json = await res.json();
+        setLoading(false);
+
+        if (json.secure_url) {
+          onUpload(json.secure_url);
+          setCompressedFile(null);
+          setPreview('');
+          setSuccess('✅ Image envoyée avec succès');
+          return json.secure_url;
+        } else {
+          alert('❌ Upload échoué');
+          return null;
+        }
+      },
+      hasPendingUpload() {
+        return !!compressedFile;
+      }
+    }));
+
+    const compressImage = (file: File): Promise<File> =>
+      new Promise((resolve) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          img.src = e.target?.result as string;
+          setPreview(e.target?.result as string);
+        };
+
+        img.onload = () => {
+          const MAX_WIDTH = 800;
+          const ratio = MAX_WIDTH / img.width;
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.min(MAX_WIDTH, img.width);
+          canvas.height = img.height * ratio;
+
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          canvas.toBlob((blob) => {
+            const compressed = new File([blob!], file.name.replace(/\.\w+$/, '.webp'), {
+              type: 'image/webp',
+            });
+            resolve(compressed);
+          }, 'image/webp', 0.8);
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+  const handleSelection = async (file: File) => {
+  setSuccess('');
+
+  // ✅ Validation spécifique au favicon uniquement
+  if (
+    label.toLowerCase().includes('favicon') &&
+    !file.name.match(/\.(ico|png|svg)$/i)
+  ) {
+    alert('Le favicon doit être au format .ico, .png ou .svg');
+    return;
+  }
+
+  // ✅ Compression uniquement si ce n’est PAS un favicon
+  let finalFile = file;
+  if (!label.toLowerCase().includes('favicon')) {
+    finalFile = await compressImage(file);
+  }
+
+  setCompressedFile({ original: file, compressed: finalFile });
+  setSuccess('🕓 Image prête à être sauvegardée');
+
+  // ✅ Upload immédiat pour preview
+  const data = new FormData();
+  data.append('file', finalFile); // ✅ correction ici
+  data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
+
+  const safeName = (folderName || 'default').replace(/\s+/g, '_').toLowerCase();
+  const baseName = file.name
+    .split('.')[0]
+    .replace(/[^\w\d_-]+/g, '-')
+    .toLowerCase()
+    .slice(0, 50);
+
+  data.append('folder', `therapeutes/${safeName}`);
+  data.append('public_id', `therapeutes/${safeName}_${baseName}`);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+    { method: 'POST', body: data }
+  );
+  const json = await res.json();
+
+  if (json.secure_url) {
+    setPreview(json.secure_url);
+    onUpload(json.secure_url);
+  } else {
+    alert('❌ Upload échoué');
+  }
+};
+
+
+
+    const handleDelete = async () => {
+      if (!value) return alert('Aucune image à supprimer');
+
+      try {
+        const match = value.match(/upload\/(?:v\d+\/)?(.+)\.(webp|jpg|jpeg|png|gif)/i);
+        if (!match) return alert("Impossible d'extraire le public_id");
+
+        const publicId = match[1];
+        const res = await fetch('/api/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ public_id: publicId }),
+        });
+
+        if (res.ok) {
+          onUpload(IMAGE_PAR_DEFAUT);
+          setCompressedFile(null);
+          setPreview('');
+          setSuccess('🗑 Image supprimée avec succès');
+        } else {
+          const json = await res.json();
+          alert(`❌ Échec suppression : ${json.error}`);
+        }
+      } catch (err: any) {
+        alert('❌ Erreur JS : ' + err.message);
+      }
+    };
+
+    return (
+      <div className="mb-6">
+        <label className="block font-medium mb-1">{label}</label>
+        <input type="file" accept="image/*" onChange={(e) => handleSelection(e.target.files![0])} className="block" />
+        {loading && <p className="mt-2 text-blue-600 text-sm animate-pulse">🌀 Upload en cours...</p>}
+
+        {(preview || value) && !loading && (
+          <div className="mt-4 space-y-2">
+            <img src={preview || value} alt="Image" className="w-48 rounded shadow border" />
+            {value && (
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(value)}
+                  className="text-sm text-gray-600 underline hover:text-black"
+                >
+                  📋 Copier l’URL
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="text-sm text-red-500 underline hover:text-red-700"
+                >
+                  🗑 Supprimer cette image
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {success && <p className="text-green-600 mt-2 text-sm">{success}</p>}
+      </div>
+    );
+  }
+);
+
+export default ImageUploadField;

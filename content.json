@@ -1,0 +1,63 @@
+{
+  "fr": {
+    "layout": {
+      "nom": "Marie Dupont",
+      "titre": "Sophrologue certifiée",
+      "footer": "© 2025 Marie Dupont. Tous droits réservés.",
+      "liens": [
+        {
+          "href": "/",
+          "label": "Accueil"
+        },
+        {
+          "href": "/#about",
+          "label": "À propos"
+        },
+        {
+          "href": "/#services",
+          "label": "Services"
+        },
+        {
+          "href": "/#testimonials",
+          "label": "Témoignages"
+        },
+        {
+          "href": "/#contact",
+          "label": "Contact"
+        }
+      ]
+    },
+    "accueil": {
+      "titre": "Prendre soin de soi, un pas à la fois",
+      "texte": "Découvrez des solutions naturelles pour retrouver calme, énergie et équilibre intérieur. Mon approche est centrée sur l'écoute, la bienveillance et l'harmonie du corps et de l'esprit.",
+      "bouton": "Prendre RDV",
+      "image": "https://res.cloudinary.com/dwadzodje/image/upload/v1749156789/therapeutes/marie_upont/dream-catcher-indoors-still-life.webp"
+    },
+    "aPropos": {
+      "titre": "À propos de la Sophrologie c'est une technique de respiration et de concentration sur soi ancrée",
+      "texte": "Bienvenue ! Je vous propose un accompagnement doux, humain et adapté à vos besoins. C'est une merveille a voir n'est ce pas ? Regardez ce site onctueux"
+    },
+    "services": {
+      "titre": "Services",
+      "liste": [
+        "🌿 Séances individuelles : sur mesure, en présentiel ou à distance",
+        "🧘 Thérapie de groupe : partage, soutien et progression collective",
+        "🌞 Ateliers bien-être : respiration, gestion du stress, ancrage"
+      ],
+      "image": "https://res.cloudinary.com/dwadzodje/image/upload/v1749150512/therapeutes/marie_upont/2147866342.webp"
+    },
+    "testimonials": [
+      {
+        "texte": "Grâce à ces séances, j’ai retrouvé confiance et sérénité.",
+        "auteur": "— Mary J B",
+        "stars": 5
+      },
+      {
+        "texte": "Très bien",
+        "auteur": "Teddy R.",
+        "stars": 5
+      }
+    ],
+    "nom": "Marie upont"
+  }
+}
