@@ -94,7 +94,7 @@ export default function Services({ locale = 'fr' }) {
             <img
               src={item.image || data.image || DEFAULT_IMAGE}
               alt={`Service ${i + 1}`}
-              className="mx-auto rounded-xl shadow-xl max-w-[300px]"
+              className="mx-auto rounded-xl shadow-xl w-100 max-w-[700px] h-[500px] object-cover"
             />
           </div>
         ))}

@@ -1,6 +1,6 @@
 // components/HomeContentEditor.tsx
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
-import { useRef } from 'react';
+import RichTextEditor from './RichTextEditor';
 
 type Props = {
   formData: any;
@@ -64,15 +64,23 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         />
       </label>
 
-      <label>
-        <span className="block font-medium">💬 Section À Propos : description</span>
-        <textarea
-          value={accueil.SectionAProposDescription || ''}
-          onChange={(e) => handleChange('SectionAProposDescription', e.target.value)}
-          className="w-full border px-3 py-2 rounded"
-          rows={3}
-        />
-      </label>
+      <label className="block mb-4">
+  
+  <RichTextEditor
+    label="💬 Section À Propos : Description"
+    value={formData.accueil?.SectionAProposDescription || ''}
+    onChange={(val) =>
+      setFormData((prev: any) => ({
+        ...prev,
+        accueil: {
+          ...prev.accueil,
+          SectionAProposDescription: val,
+        },
+      }))
+    }
+  />
+</label>
+
 
       <label>
         <span className="block font-medium">🔘 Section À Propos : Texte du bouton CTA</span>
@@ -90,6 +98,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         label="🖼️ Image de la section À propos"
         value={accueil.image || ''}
         folderName={formData.layout?.nom || 'default'}
+        sectionName='accueil'
         onUpload={(url) =>
           setFormData((prev) => ({
             ...prev,

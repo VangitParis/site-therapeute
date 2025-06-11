@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle, useRef } from 'react';
 
 const IMAGE_PAR_DEFAUT =
   'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
@@ -12,15 +12,17 @@ type ImageUploadFieldProps = {
   label: string;
   value: string;
   onUpload: (url: string) => void;
-  folderName: string;
+  folderName: string; // nom du thérapeute
+  sectionName: string; // accueil, services, background, favicon
 };
 
 const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
-  ({ label, value, onUpload, folderName }, ref) => {
+  ({ label, value, onUpload, folderName, sectionName }, ref) => {
     const [compressedFile, setCompressedFile] = useState<null | { original: File; compressed: File }>(null);
     const [preview, setPreview] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => ({
       async upload() {
@@ -31,15 +33,22 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
         data.append('file', compressedFile.compressed);
         data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
 
-        const safeName = (folderName || 'default').replace(/\s+/g, '_').toLowerCase();
+        const safeName = (folderName || 'default')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, '_')
+          .replace(/[^\w\d_-]/g, '')
+          .toLowerCase();
+
         const baseName = compressedFile.original.name
           .split('.')[0]
           .replace(/[^\w\d_-]+/g, '-')
           .toLowerCase()
           .slice(0, 50);
 
-        data.append('folder', `therapeutes/${safeName}`);
-        data.append('public_id', `therapeutes/${safeName}_${baseName}`);
+        const folderPath = `therapeutes/${safeName}/${sectionName}`;
+        data.append('folder', folderPath);
+        data.append('public_id', baseName);
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
@@ -95,69 +104,66 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
         reader.readAsDataURL(file);
       });
 
-  const handleSelection = async (file: File) => {
-  setSuccess('');
+    const handleSelection = async (file: File) => {
+      setSuccess('');
 
-  // ✅ Validation spécifique au favicon uniquement
-  if (
-    label.toLowerCase().includes('favicon') &&
-    !file.name.match(/\.(ico|png|svg)$/i)
-  ) {
-    alert('Le favicon doit être au format .ico, .png ou .svg');
-    return;
-  }
+      // Vérifie extension favicon
+      if (
+        label.toLowerCase().includes('favicon') &&
+        !file.name.match(/\.(ico|png|svg)$/i)
+      ) {
+        alert('Le favicon doit être au format .ico, .png ou .svg');
+        return;
+      }
 
-  // ✅ Compression uniquement si ce n’est PAS un favicon
-  let finalFile = file;
-  if (!label.toLowerCase().includes('favicon')) {
-    finalFile = await compressImage(file);
-  }
+      let finalFile = file;
+      if (!label.toLowerCase().includes('favicon')) {
+        finalFile = await compressImage(file);
+      }
 
-  setCompressedFile({ original: file, compressed: finalFile });
-  setSuccess('🕓 Image prête à être sauvegardée');
+      setCompressedFile({ original: file, compressed: finalFile });
+      setSuccess('🕓 Image prête à être sauvegardée');
 
-  // ✅ Upload immédiat pour preview
-  const data = new FormData();
-  data.append('file', finalFile); // ✅ correction ici
-  data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
+      const data = new FormData();
+      data.append('file', finalFile);
+      data.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!);
 
-  const safeName = (folderName || 'default')
-  .normalize('NFD') // supprime les accents
-  .replace(/[\u0300-\u036f]/g, '')
-  .replace(/\s+/g, '_')
-  .replace(/[^\w\d_-]/g, '')
-  .toLowerCase();
+      const safeName = (folderName || 'default')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_')
+        .replace(/[^\w\d_-]/g, '')
+        .toLowerCase();
 
-  const baseName = file.name
-    .split('.')[0]
-    .replace(/[^\w\d_-]+/g, '-')
-    .toLowerCase()
-    .slice(0, 50);
+      const baseName = file.name
+        .split('.')[0]
+        .replace(/[^\w\d_-]+/g, '-')
+        .toLowerCase()
+        .slice(0, 50);
 
-  data.append('folder', `therapeutes/${safeName}`);
-  data.append('public_id', `therapeutes/${safeName}_${baseName}`);
+      const folderPath = `therapeutes/${safeName}/${sectionName}`;
+      data.append('folder', folderPath);
+      data.append('public_id', baseName);
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
-    { method: 'POST', body: data }
-  );
-  const json = await res.json();
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+        { method: 'POST', body: data }
+      );
+      const json = await res.json();
 
-  if (json.secure_url) {
-    setPreview(json.secure_url);
-    onUpload(json.secure_url);
-  } else {
-    alert('❌ Upload échoué');
-  }
-};
-
-
+      if (json.secure_url) {
+        setPreview(json.secure_url);
+        onUpload(json.secure_url);
+      } else {
+        alert('❌ Upload échoué');
+      }
+    };
 
     const handleDelete = async () => {
       if (!value) return alert('Aucune image à supprimer');
 
       try {
-        const match = value.match(/upload\/(?:v\d+\/)?(.+)\.(webp|jpg|jpeg|png|gif)/i);
+        const match = value.match(/upload\/(?:v\d+\/)?(.+)\.(webp|jpg|jpeg|png|gif|ico|svg)/i);
         if (!match) return alert("Impossible d'extraire le public_id");
 
         const publicId = match[1];
@@ -172,6 +178,10 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
           setCompressedFile(null);
           setPreview('');
           setSuccess('🗑 Image supprimée avec succès');
+          // ✅ ici : on reset explicitement le champ file
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
         } else {
           const json = await res.json();
           alert(`❌ Échec suppression : ${json.error}`);
@@ -184,12 +194,13 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
     return (
       <div className="mb-6">
         <label className="block font-medium mb-1">{label}</label>
-        <input type="file" accept="image/*" onChange={(e) => handleSelection(e.target.files![0])} className="block" />
+        <input key={preview || value || 'input'} // ← permet de forcer un refresh
+        ref={inputRef} type="file" accept="image/*" onChange={(e) => handleSelection(e.target.files![0])} className="block" />
         {loading && <p className="mt-2 text-blue-600 text-sm animate-pulse">🌀 Upload en cours...</p>}
 
         {(preview || value) && !loading && (
           <div className="mt-4 space-y-2">
-            <img src={preview || value} alt="Image" className="w-48 rounded shadow border" />
+            <img src={preview || value} alt="Image" className="mx-auto w-[250px] h-[250px] object-fill rounded shadow border" />
             {value && (
               <div className="flex items-center gap-4">
                 <button

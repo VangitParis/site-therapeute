@@ -8,6 +8,7 @@ type Props = {
 
 const BackgroundImageUploader = forwardRef<ImageUploadRef, Props>(
   ({ formData, setFormData }, ref) => {
+    const safeFolderName = (formData.layout?.nom || 'default').replace(/\s+/g, '_').toLowerCase();
     const handleUpload = (url: string) => {
       setFormData((prev) => ({
         ...prev,
@@ -22,7 +23,8 @@ const BackgroundImageUploader = forwardRef<ImageUploadRef, Props>(
   ref={ref}
   label="Uploader une image"
   value={formData.theme?.bgImage || ''}
-  folderName={`therapeutes/${(formData.layout?.nom || 'default').replace(/\s+/g, '_').toLowerCase()}/background`}
+  folderName={safeFolderName}
+  sectionName='background'
   onUpload={handleUpload}
 />
 

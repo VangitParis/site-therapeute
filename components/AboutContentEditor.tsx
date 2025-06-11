@@ -48,6 +48,7 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
         label="🖼️ Image de la section À propos"
         value={aPropos.image || ''}
         folderName={formData.layout?.nom || 'default'}
+        sectionName='aPropos'
         onUpload={(url) =>
           setFormData((prev) => ({
             ...prev,

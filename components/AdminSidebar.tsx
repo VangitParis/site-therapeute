@@ -4,7 +4,7 @@ import HomeContentEditor from './HomeContentEditor';
 import AboutContentEditor from './AboutContentEditor';
 import ServicesEditor from './ServicesEditor';
 import TestimonialsEditor from './TestimonialsEditor';
-import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
+import { ImageUploadRef } from './ImageUploadField';
 import LayoutEditor from './LayoutEditor';
 import AccordionSection from './AccordionSection';
 import PasswordChanger from './PassWordChanger';

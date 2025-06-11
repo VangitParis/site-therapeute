@@ -9,6 +9,13 @@ type Props = {
 export default function LayoutEditor({ formData, setFormData }: Props) {
   const defaultName = 'Marie Dupont';
   const hasEditedName = useRef(false);
+  const safeName = (formData.layout?.nom || 'default')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/\s+/g, '_')
+  .replace(/[^\w\d_-]/g, '')
+  .toLowerCase();
+
 
   const handleChange = (key: string, value: string) => {
     setFormData((prev: any) => ({
@@ -99,6 +106,7 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
       <ImageUploadField
         label="Logo du site (optionnel)"
         folderName={formData.layout?.nom || 'default'}
+        sectionName="layout/logo"
         value={formData.layout?.logo || ''}
         onUpload={(url) =>
           setFormData((prev) => ({
@@ -110,13 +118,10 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
 
      <ImageUploadField
   label="Favicon du site (format .ico, .png ou .svg recommandé)"
-  folderName={formData.layout?.nom || 'default'}
+  folderName={safeName}
+  sectionName="layout/favicon"
   value={formData.layout?.favicon || ''}
   onUpload={(url) => {
-    if (!url.match(/\.(ico|png|svg)$/i)) {
-      alert("Le favicon doit être au format .ico, .png ou .svg");
-      return;
-    }
     setFormData((prev) => ({
       ...prev,
       layout: { ...prev.layout, favicon: url },

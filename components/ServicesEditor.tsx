@@ -77,7 +77,8 @@ export default function ServicesEditor({ formData, setFormData, imageFieldRef }:
           <ImageUploadField
   label={`🖼️ Image du service #${index + 1}`}
   value={item.image || ''} // ← important de ne pas injecter DEFAULT_IMAGE ici
-   folderName={`therapeutes/${safeFolderName}/services`}
+   folderName={safeFolderName}
+   sectionName='services'
   onUpload={(url) => handleListChange(index, 'image', url)}
 />
 
