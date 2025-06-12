@@ -23,7 +23,7 @@ export default function Testimonials() {
   }
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-12" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="max-w-4xl mx-auto px-6 py-12" style={{ backgroundColor: 'var(--color-bg)' }}>
       <h1 className="text-3xl font-bold text-prune mb-8 text-center" style={{ color: 'var(--color-titreH1)' }}>Témoignages</h1>
       <div className="grid md:grid-cols-2 gap-6">
         {items.map((item, i) => (
@@ -36,6 +36,6 @@ export default function Testimonials() {
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

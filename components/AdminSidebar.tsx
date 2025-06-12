@@ -8,6 +8,7 @@ import { ImageUploadRef } from './ImageUploadField';
 import LayoutEditor from './LayoutEditor';
 import AccordionSection from './AccordionSection';
 import PasswordChanger from './PassWordChanger';
+import ContactEditor from './ContactEditor';
 
 type Props = {
   formData: any;
@@ -82,9 +83,9 @@ export default function AdminSidebar({
         <TestimonialsEditor formData={formData} setFormData={setFormData} />
       </AccordionSection>
 
-      {/* <AccordionSection title="💬 Page Contact">
+      <AccordionSection title="💬 Page Contact">
         <ContactEditor formData={formData} setFormData={setFormData} />
-      </AccordionSection> */}
+      </AccordionSection>
 
       <div className="pt-4">
         <button

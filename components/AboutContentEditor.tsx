@@ -1,4 +1,5 @@
 // components/AboutContentEditor.tsx
+import RichTextEditor from './RichTextEditor';
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
 
 type Props = {
@@ -32,16 +33,21 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
         />
       </label>
 
-      <label>
-        <span className="block font-medium">📖 Texte de présentation</span>
-        <textarea
-          value={aPropos.texte || ''}
-          onChange={(e) => handleChange('texte', e.target.value)}
-          className="w-full border px-3 py-2 rounded"
-          rows={4}
+      <div className="block mb-4">
+      <RichTextEditor
+          label="📖 Texte de présentation"
+          value={formData.aPropos?.texte || ''}
+          onChange={(val) =>
+            setFormData((prev: any) => ({
+              ...prev,
+              aPropos: {
+                ...prev.aPropos,
+                texte : val,
+              },
+            })) 
+          }
         />
-      </label>
-
+      </div>
       <ImageUploadField
         ref={imageFieldAProposRef}
         label="🖼️ Image de la section À propos"

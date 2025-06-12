@@ -47,7 +47,7 @@ export default function Live() {
           aPropos: raw.aPropos || { titre: '', texte: '', image: ''},
           services: services,
           testimonials: raw.testimonials || [],
-          calendly: raw.calendly || ''
+          contact: raw.contact || { titre: '', texte: '', bouton: '', image : ''}
         });
       }
     };

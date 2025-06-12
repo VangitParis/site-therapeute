@@ -51,7 +51,7 @@ export default function Home({ locale = 'fr' }) {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-lavande">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 border-opacity-50"></div>
       </div>
     );
@@ -88,7 +88,7 @@ const bgImageStyle = data?.theme?.bgImage
           {data.accueil.texte || "Découvrez la sophrologie, une méthode pour mieux gérer le stress, l'anxiété et les émotions, et renforcer votre bien-être au quotidien."}
         </p>
         <div className="text-left mt-6">
-        <Link href={data.calendly} target="_blank" className="inline-block text-white py-3 px-6 rounded-full text-lg font-semibold shadow bg-color-primary hover:bg-purple-700 transition-colors duration-300"
+        <Link href={data.contact} target="_blank" className="inline-block text-white py-3 px-6 rounded-full text-lg font-semibold shadow bg-color-primary hover:bg-purple-700 transition-colors duration-300"
          style={{ backgroundColor: 'var(--color-primary)' , color: 'var(--color-text-button)'}}>
           {data.accueil.bouton || 'Réserver une séance découverte'}
         </Link>
