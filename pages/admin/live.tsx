@@ -11,11 +11,11 @@ const DEFAULT_THEME = {
   primary: '#7f5a83',
   accent: '#e6f0ff',
   bgImage: '',
-  titreH1 : '',
-  titreH2 : '',
-  titreH3 : '',
-  texte : '',
-  textButton : ''
+  titreH1 : '#000',
+  titreH2 : '#000',
+  titreH3 : '#000',
+  texte : '#000',
+  textButton : '#FFFFFF'
 };
 
 export default function Live() {

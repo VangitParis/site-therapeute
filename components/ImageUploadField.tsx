@@ -105,6 +105,7 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
       });
 
     const handleSelection = async (file: File) => {
+      if (!file) return; //
       setSuccess('');
 
       // Vérifie extension favicon
@@ -194,13 +195,21 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
     return (
       <div className="mb-6">
         <label className="block font-medium mb-1">{label}</label>
-        <input key={preview || value || 'input'} // ← permet de forcer un refresh
-        ref={inputRef} type="file" accept="image/*" onChange={(e) => handleSelection(e.target.files![0])} className="block" />
+        <label className="inline-block cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded shadow">
+  📤 Choisir une image
+  <input
+    ref={inputRef}
+    type="file"
+    accept="image/*"
+    onChange={(e) => handleSelection(e.target.files![0])}
+    className="hidden"
+  />
+</label>
         {loading && <p className="mt-2 text-blue-600 text-sm animate-pulse">🌀 Upload en cours...</p>}
 
         {(preview || value) && !loading && (
           <div className="mt-4 space-y-2">
-            <img src={preview || value} alt="Image" className="mx-auto w-[250px] h-[250px] object-fill rounded shadow border" />
+            <img src={preview || value} alt="Image" className="w-[150px] h-[150px] rounded shadow border" />
             {value && (
               <div className="flex items-center gap-4">
                 <button

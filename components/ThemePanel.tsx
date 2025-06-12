@@ -2,15 +2,32 @@
 export default function ThemePanel({ formData, setFormData }) {
   const theme = formData.theme || {};
 
-  const handleThemeChange = (key, value) => {
+  const applyThemeToDOM = (theme: any) => {
+    const root = document.documentElement;
+    if (theme?.background) root.style.setProperty('--color-bg', theme.background);
+    if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
+    if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
+    if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
+    if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
+    if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
+    if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
+    if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+  };
+
+  const handleThemeChange = (key: string, value: string) => {
+    const updatedTheme = {
+      ...theme,
+      [key]: value,
+    };
+
     setFormData((prev) => ({
       ...prev,
-      theme: {
-        ...prev.theme,
-        [key]: value,
-      },
+      theme: updatedTheme,
     }));
+
+    applyThemeToDOM(updatedTheme); // ✅ applique immédiatement
   };
+
 
   return (
     <div className="grid md:grid-cols-2 gap-4">
@@ -79,16 +96,25 @@ export default function ThemePanel({ formData, setFormData }) {
         <input
           type="color"
           value={theme.titreH2 || '#444444'}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              theme: {
-                ...prev.theme,
-                titreH2: e.target.value,
-                titreH3: e.target.value, // lié ensemble
-              },
-            }))
-          }
+          onChange={(e) => {
+  const newColor = e.target.value;
+
+  setFormData((prev) => ({
+    ...prev,
+    theme: {
+      ...prev.theme,
+      titreH2: newColor,
+      titreH3: newColor,
+    },
+  }));
+
+  applyThemeToDOM({
+    ...theme,
+    titreH2: newColor,
+    titreH3: newColor,
+  });
+}}
+
           className="w-full h-10 border rounded"
         />
       </label>

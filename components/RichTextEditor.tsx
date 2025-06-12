@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 type Props = {
   label: string;
@@ -16,6 +16,14 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
     }
   };
 
+  // Ne remplir le champ qu’une fois à l’affichage
+  useEffect(() => {
+  if (ref.current) {
+    ref.current.innerHTML = value || '';
+  }
+}, [value]);
+
+
   return (
     <div className="mb-4">
       <label className="block font-medium mb-1">{label}</label>
@@ -31,7 +39,6 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
         ref={ref}
         contentEditable
         className="border rounded p-2 min-h-[120px] whitespace-pre-wrap"
-        dangerouslySetInnerHTML={{ __html: value }}
         onInput={() => {
           if (ref.current) onChange(ref.current.innerHTML);
         }}

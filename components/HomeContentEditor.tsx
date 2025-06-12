@@ -64,7 +64,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         />
       </label>
 
-      <label className="block mb-4">
+      <div className="block mb-4">
   
   <RichTextEditor
     label="💬 Section À Propos : Description"
@@ -79,7 +79,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
       }))
     }
   />
-</label>
+</div>
 
 
       <label>

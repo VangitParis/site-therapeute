@@ -81,7 +81,7 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
         />
       </div>
 
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium">Liens de navigation</label>
         {formData.layout?.liens?.map((lien: any, i: number) => (
           <div key={i} className="flex gap-2 mb-2">
@@ -101,7 +101,7 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
             />
           </div>
         ))}
-      </div>
+      </div> */}
 
       <ImageUploadField
         label="Logo du site (optionnel)"

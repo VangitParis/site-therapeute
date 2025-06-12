@@ -9,6 +9,8 @@ export default function Home({ locale = 'fr' }) {
   const [data, setData] = useState(null);
   const router = useRouter();
   const isPreview = router.query.admin === 'true';
+  const cleaned = data?.accueil?.SectionAProposDescription?.replace(/<br\s*\/?>/gi, '').trim();
+
 
   const applyThemeToDOM = (theme: any) => {
   const root = document.documentElement;
@@ -16,7 +18,7 @@ export default function Home({ locale = 'fr' }) {
   if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
   if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
   if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
-  if (theme?.texteButton) root.style.setProperty('--color-text-button', theme.texte);
+  if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
   if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
   if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
   if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
@@ -98,8 +100,9 @@ const bgImageStyle = data?.theme?.bgImage
         <h2 className="text-3xl font-semibold text-prune mb-5" style={{ color: 'var(--color-titreH2)' }}>{data.accueil.SectionAProposTitre || "Mon approche en tant que sophrologue"}</h2>
          <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-line mb-6" style={{ color: 'var(--color-texte)' }}
      dangerouslySetInnerHTML={{
-       __html: data.accueil.SectionAProposDescription || `
-         <p>En tant que <strong>sophrologue certifié(e)</strong>, ma mission est de vous accompagner vers une meilleure connaissance de vous-même et un bien-être durable grâce à la <strong>sophrologie</strong>. Cette discipline psychocorporelle est une alliée précieuse pour naviguer les défis du quotidien, qu'ils soient liés au <strong>stress</strong>, à l'<strong>anxiété</strong>, aux <strong>troubles du sommeil</strong> ou à la <strong>gestion des émotions</strong>.</p>
+  __html: cleaned
+    ? data.accueil.SectionAProposDescription
+    : `  <p>En tant que <strong>sophrologue certifié(e)</strong>, ma mission est de vous accompagner vers une meilleure connaissance de vous-même et un bien-être durable grâce à la <strong>sophrologie</strong>. Cette discipline psychocorporelle est une alliée précieuse pour naviguer les défis du quotidien, qu'ils soient liés au <strong>stress</strong>, à l'<strong>anxiété</strong>, aux <strong>troubles du sommeil</strong> ou à la <strong>gestion des émotions</strong>.</p>
          
          <p>La sophrologie combine des exercices de <strong>respiration contrôlée</strong>, de <strong>détente musculaire</strong> et de <strong>visualisation positive</strong>. Elle vise à harmoniser le corps et l'esprit, vous permettant de retrouver un <strong>équilibre intérieur</strong> et de mobiliser vos propres ressources. Mon approche est <strong>personnalisée</strong> et respecte votre rythme, vos besoins et votre histoire unique.</p>
          

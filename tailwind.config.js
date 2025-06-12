@@ -6,12 +6,16 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        lavande: '#f4f0fa',
-        prune: '#7f5a83',
-        rosepale: '#fcecef',
-        bleulight: '#e6f0ff',
-      },
+       colors: {
+      primary: 'var(--color-primary)',
+      background: 'var(--color-bg)',
+      accent: 'var(--color-accent)',
+      texte: 'var(--color-texte)',
+      titreH1: 'var(--color-titreH1)',
+      titreH2: 'var(--color-titreH2)',
+      titreH3: 'var(--color-titreH3)',
+      textButton: 'var(--color-text-button)',
+    },
       backgroundImage: {
         'hero-pattern': "url('/images/bg.jpg')", // chemin vers ton image
         'custom-bg': "var(--custom-bg-url)", // si tu veux lier dynamiquement
