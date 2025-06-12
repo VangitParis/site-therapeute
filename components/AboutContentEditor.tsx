@@ -1,6 +1,5 @@
 // components/AboutContentEditor.tsx
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
-import { useRef } from 'react';
 
 type Props = {
   formData: any;

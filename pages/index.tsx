@@ -87,15 +87,17 @@ const bgImageStyle = data?.theme?.bgImage
           {/* Texte d'accroche sophrologie */}
           {data.accueil.texte || "Découvrez la sophrologie, une méthode pour mieux gérer le stress, l'anxiété et les émotions, et renforcer votre bien-être au quotidien."}
         </p>
-        <Link href={data.calendly} target="_blank" className="inline-block text-white py-3 px-6 rounded-full text-lg font-semibold shadow bg-color-primary hover:bg-purple-700 transition-colors duration-300 w-50"
+        <div className="text-left mt-6">
+        <Link href={data.calendly} target="_blank" className="inline-block text-white py-3 px-6 rounded-full text-lg font-semibold shadow bg-color-primary hover:bg-purple-700 transition-colors duration-300"
          style={{ backgroundColor: 'var(--color-primary)' , color: 'var(--color-text-button)'}}>
           {data.accueil.bouton || 'Réserver une séance découverte'}
         </Link>
+        </div>
 </div>
       </section>
 <div className='flex items-center flex-col'>
       {/* Section À propos (CTA) */}
-      <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl gap-4">
+      <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
         {/* Titre H2 sophrologie */}
         <h2 className="text-3xl font-semibold text-prune mb-5" style={{ color: 'var(--color-titreH2)' }}>{data.accueil.SectionAProposTitre || "Mon approche en tant que sophrologue"}</h2>
          <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-line mb-6" style={{ color: 'var(--color-texte)' }}
@@ -122,15 +124,15 @@ const bgImageStyle = data?.theme?.bgImage
        `
      }}
 />
-
+<div className="text-center mt-6">
 <Link
   href="/about"
-  className="inline-block mt-6 bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
+  className="mb-8 inline-block mt-6 text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
   style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-button)' }}
 >
   {data.accueil.SectionAProposCTA || '➤ En savoir plus sur la sophrologie'}
 </Link>
-
+</div>
         <img src={data.accueil.image || DEFAULT_IMAGE} alt="Illustration sophrologie, bien-être et relaxation" className="mx-auto rounded-xl shadow-xl w-80 h-[350px] object-fill" />
       </section>
 
@@ -161,14 +163,14 @@ const bgImageStyle = data?.theme?.bgImage
 
 
   <div className="text-center mt-6">
-    <a
+    <Link
       href="/services"
       className="inline-block bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
       style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
     >
       {/* CTA Services sophrologie */}
       ➤ Découvrir mes programmes de sophrologie
-    </a>
+    </Link>
   </div>
 </section>
 
@@ -180,8 +182,16 @@ const bgImageStyle = data?.theme?.bgImage
         <p className="text-gray-700 leading-relaxed text-lg" style={{ color: 'var(--color-texte)' }}>
           Rien n’est plus authentique que le vécu de ceux qui ont franchi le pas. Derrière chaque témoignage, il y a un parcours, une rencontre avec un **sophrologue**, un changement significatif. Les personnes accompagnées évoquent souvent un apaisement durable, une meilleure **gestion du stress**, un regain d’énergie ou encore une reconnexion profonde à leur corps et leurs ressentis grâce aux **séances de sophrologie**.<br /><br />
           Ces récits sont précieux, car ils éclairent les bienfaits concrets que la **sophrologie** peut apporter. Vous y trouverez peut-être des échos à votre propre vécu, ou simplement l’élan nécessaire pour franchir la première étape de votre **cheminement sophrologique**.<br /><br />
-          <Link href="/testimonials" className="text-prune underline font-medium" style={{ backgroundColor: 'var(--color-primary)' , color: 'var(--color-text-button)'}}>➤ Lire les témoignages sur la sophrologie</Link>
+        
         </p>
+          <div className="text-center mt-6">
+<Link
+  href="/testimonials" 
+  className="mb-8 inline-block mt-6 bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
+  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-button)' }}
+>➤ Lire les témoignages sur la sophrologie
+</Link>
+</div>
       </section>
 
       {/* Section Contact (CTA) */}

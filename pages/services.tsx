@@ -15,7 +15,7 @@ const settings = {
   autoplaySpeed: 4000,
 };
 
-const DEFAULT_IMAGE = 'https://res.cloudinary.com/dwadzodje/image/upload/v1749145353/therapeutes/default-service.webp';
+const DEFAULT_IMAGE = "https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png";
 
 export default function Services({ locale = 'fr' }) {
   const [data, setData] = useState({
