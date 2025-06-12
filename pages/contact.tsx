@@ -34,7 +34,7 @@ export default function Contact({ locale = 'fr' }) {
           titre: raw.titre || 'Contact',
           texte: raw.texte || '',
           bouton: raw.bouton || 'Réserver une séance découverte',
-          lien: raw.lien || '',
+          lien: raw.lien || 'https://calendly.com',
           image: raw.image || ''
         });
         applyThemeToDOM(raw.theme);
