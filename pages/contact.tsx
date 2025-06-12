@@ -47,7 +47,7 @@ export default function Contact({ locale = 'fr' }) {
       if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.contact) {
         
         const updated = e.data.payload;
-      setData({ ...updated.contatc}); // ⚠️ Clonage nécessaire pour forcer le re-render
+      setData({ ...updated.contact}); // ⚠️ Clonage nécessaire pour forcer le re-render
       applyThemeToDOM(updated.theme);
       }
     };
