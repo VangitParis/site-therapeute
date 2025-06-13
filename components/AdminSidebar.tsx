@@ -15,6 +15,7 @@ type Props = {
   setFormData: (fn: (prev: any) => any) => void;
   imageFieldRef: React.RefObject<ImageUploadRef>;
   imageFieldAProposRef: React.RefObject<ImageUploadRef>;
+  imageFieldTestimonialsRef: React.RefObject<ImageUploadRef>;
   imageFieldServicesRef: React.RefObject<ImageUploadRef>;
   imageFieldBgRef: React.RefObject<ImageUploadRef>;
   handleSave: () => void;
@@ -27,6 +28,7 @@ export default function AdminSidebar({
   setFormData,
   imageFieldRef,
   imageFieldAProposRef,
+  imageFieldTestimonialsRef,
   imageFieldServicesRef,
   imageFieldBgRef,
   handleSave,
@@ -80,7 +82,7 @@ export default function AdminSidebar({
       </AccordionSection>
 
       <AccordionSection title="💬 Page Témoignages">
-        <TestimonialsEditor formData={formData} setFormData={setFormData} />
+        <TestimonialsEditor formData={formData} setFormData={setFormData} imageFieldTestimonialsRef={imageFieldTestimonialsRef}/>
       </AccordionSection>
 
       <AccordionSection title="💬 Page Contact">

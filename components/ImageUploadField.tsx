@@ -177,7 +177,7 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
         if (res.ok) {
           onUpload(IMAGE_PAR_DEFAUT);
           setCompressedFile(null);
-          setPreview('');
+          setPreview(IMAGE_PAR_DEFAUT);
           setSuccess('🗑 Image supprimée avec succès');
           // ✅ ici : on reset explicitement le champ file
       if (inputRef.current) {
@@ -185,7 +185,11 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
       }
         } else {
           const json = await res.json();
-          alert(`❌ Échec suppression : ${json.error}`);
+          //alert(`❌ Échec suppression : ${json.error}`);
+          alert(`❌ OUPS ! Cette image a déjà été supprimée ou n'existe pas. Vous pouvez en charger une autre dès maintenant.`);
+          // Pas de reset de input ici : on pourra toujours charger une autre image
+          setPreview(IMAGE_PAR_DEFAUT);
+          onUpload(IMAGE_PAR_DEFAUT);
         }
       } catch (err: any) {
         alert('❌ Erreur JS : ' + err.message);

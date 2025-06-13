@@ -26,6 +26,7 @@ export default function Live() {
   const defaultName = 'Marie Dupont';
   const imageFieldRef = useRef<ImageUploadRef>(null);
   const imageFieldAProposRef = useRef<ImageUploadRef>(null);
+  const imageFieldTestimonialsRef = useRef<ImageUploadRef>(null);
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
@@ -88,6 +89,10 @@ if (currentName === defaultName) {
       const uploaded = await imageFieldServicesRef.current.upload();
       if (uploaded) updatedFormData.services.image = uploaded;
     }
+    if (imageFieldTestimonialsRef.current?.hasPendingUpload()) {
+      const uploaded = await imageFieldTestimonialsRef.current.upload();
+      if (uploaded) updatedFormData.testimonials.avatar = uploaded;
+    }
    
 
     if (imageFieldBgRef.current?.hasPendingUpload()) {
@@ -122,6 +127,7 @@ if (currentName === defaultName) {
             setFormData={wrappedSetFormData}
             imageFieldRef={imageFieldRef}
             imageFieldAProposRef={imageFieldAProposRef}
+            imageFieldTestimonialsRef={imageFieldTestimonialsRef}
             imageFieldServicesRef={imageFieldServicesRef}
             imageFieldBgRef={imageFieldBgRef}
             handleSave={handleSave}

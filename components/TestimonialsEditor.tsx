@@ -1,15 +1,19 @@
-type Props = {
+import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
+
+interface Props {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
-};
+  imageFieldTestimonialsRef: React.RefObject<ImageUploadRef>;
+}
 
-type Testimonial = {
+interface Testimonial {
   texte: string;
   auteur: string;
   stars: number;
-};
+  avatar: string;
+}
 
-export default function TestimonialsEditor({ formData, setFormData }: Props) {
+export default function TestimonialsEditor({ formData, setFormData, imageFieldTestimonialsRef }: Props) {
   const testimonials: Testimonial[] = formData.testimonials || [];
 
   const handleChange = <K extends keyof Testimonial>(
@@ -34,7 +38,7 @@ export default function TestimonialsEditor({ formData, setFormData }: Props) {
   };
 
   const addTestimonial = () => {
-    const newItem: Testimonial = { texte: '', auteur: '', stars: 5 };
+    const newItem: Testimonial = { texte: '', auteur: '', stars: 5, avatar: '' };
     setFormData((prev) => ({
       ...prev,
       testimonials: [...(prev.testimonials || []), newItem],
@@ -64,6 +68,15 @@ export default function TestimonialsEditor({ formData, setFormData }: Props) {
               className="w-full border rounded px-3 py-2"
             />
           </label>
+
+          <ImageUploadField
+            ref={imageFieldTestimonialsRef}
+            label="🖼️ Avatar du témoignage"
+            value={item.avatar}
+            folderName={formData.layout?.nom || 'default'}
+            sectionName="testimonials"
+            onUpload={(url) => handleChange(index, 'avatar', url)}
+          />
 
           <label className="block">
             <span className="font-medium">⭐ Étoiles (1 à 5)</span>
