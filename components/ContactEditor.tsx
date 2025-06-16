@@ -31,6 +31,17 @@ export default function ContactEditor({ formData, setFormData }: Props) {
       </label>
 
       <div>
+        <label htmlFor="titreH2">
+        <span className="block font-medium">📝 Titre des coordonnées</span>
+        <input
+          type='text'
+          value={contact.titreH2 || ''}
+          onChange={(e) => handleChange('titreH2', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+        </label>
+      </div>
+      <div>
         <span className="block font-medium">📝 Texte de présentation</span>
         <RichTextEditor
           label=""
@@ -38,7 +49,17 @@ export default function ContactEditor({ formData, setFormData }: Props) {
           onChange={(val) => handleChange('texte', val)}
         />
       </div>
-
+<div>
+        <label htmlFor="titreH2">
+        <span className="block font-medium">📝 Titre des Tarifs</span>
+        <input
+          type='text'
+          value={contact.titreTarifs || ''}
+          onChange={(e) => handleChange('titreTarifs', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+        </label>
+      </div>
       <label>
         <span className="block font-medium">🔗 Lien vers la prise de rendez-vous</span>
         <input

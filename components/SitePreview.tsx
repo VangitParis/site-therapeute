@@ -23,14 +23,15 @@ export default function SitePreview({ formData }: Props) {
         className="top-0 left-0 right-0 z-50 bg-yellow-100 text-yellow-800  text-sm text-center py-2 shadow"
         style={{ height: '40px' }}
       >
-        ⚠️ Ceci est un aperçu en direct du site. Les modifications non sauvegardées peuvent être perdues.
+        ⚠️ Ceci est un aperçu en direct du site. Les modifications non sauvegardées peuvent être
+        perdues.
       </div>
 
       {/* Iframe avec espace réservé */}
       <iframe
         ref={iframeRef}
         src="/?admin=true"
-         className="w-full border-0"
+        className="w-full border-0"
         style={{ height: '100vh' }}
       />
     </div>

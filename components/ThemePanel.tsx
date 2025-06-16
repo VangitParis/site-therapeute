@@ -28,7 +28,6 @@ export default function ThemePanel({ formData, setFormData }) {
     applyThemeToDOM(updatedTheme); // ✅ applique immédiatement
   };
 
-
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <label>
@@ -97,24 +96,23 @@ export default function ThemePanel({ formData, setFormData }) {
           type="color"
           value={theme.titreH2 || '#444444'}
           onChange={(e) => {
-  const newColor = e.target.value;
+            const newColor = e.target.value;
 
-  setFormData((prev) => ({
-    ...prev,
-    theme: {
-      ...prev.theme,
-      titreH2: newColor,
-      titreH3: newColor,
-    },
-  }));
+            setFormData((prev) => ({
+              ...prev,
+              theme: {
+                ...prev.theme,
+                titreH2: newColor,
+                titreH3: newColor,
+              },
+            }));
 
-  applyThemeToDOM({
-    ...theme,
-    titreH2: newColor,
-    titreH3: newColor,
-  });
-}}
-
+            applyThemeToDOM({
+              ...theme,
+              titreH2: newColor,
+              titreH3: newColor,
+            });
+          }}
           className="w-full h-10 border rounded"
         />
       </label>

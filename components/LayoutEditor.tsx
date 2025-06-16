@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import ImageUploadField from "./ImageUploadField";
+import { useState, useRef } from 'react';
+import ImageUploadField from './ImageUploadField';
 
 type Props = {
   formData: any;
@@ -10,12 +10,11 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
   const defaultName = 'Marie Dupont';
   const hasEditedName = useRef(false);
   const safeName = (formData.layout?.nom || 'default')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .replace(/\s+/g, '_')
-  .replace(/[^\w\d_-]/g, '')
-  .toLowerCase();
-
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^\w\d_-]/g, '')
+    .toLowerCase();
 
   const handleChange = (key: string, value: string) => {
     setFormData((prev: any) => ({
@@ -54,7 +53,7 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
             }
             setFormData((prev) => ({
               ...prev,
-              layout: { ...prev.layout, nom: newName }
+              layout: { ...prev.layout, nom: newName },
             }));
           }}
           className="w-full border p-2 rounded"
@@ -116,19 +115,18 @@ export default function LayoutEditor({ formData, setFormData }: Props) {
         }
       />
 
-     <ImageUploadField
-  label="Favicon du site (format .ico, .png ou .svg recommandé)"
-  folderName={safeName}
-  sectionName="layout/favicon"
-  value={formData.layout?.favicon || ''}
-  onUpload={(url) => {
-    setFormData((prev) => ({
-      ...prev,
-      layout: { ...prev.layout, favicon: url },
-    }));
-  }}
-/>
-
+      <ImageUploadField
+        label="Favicon du site (format .ico, .png ou .svg recommandé)"
+        folderName={safeName}
+        sectionName="layout/favicon"
+        value={formData.layout?.favicon || ''}
+        onUpload={(url) => {
+          setFormData((prev) => ({
+            ...prev,
+            layout: { ...prev.layout, favicon: url },
+          }));
+        }}
+      />
     </div>
   );
 }

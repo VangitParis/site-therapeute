@@ -9,6 +9,8 @@ import LayoutEditor from './LayoutEditor';
 import AccordionSection from './AccordionSection';
 import PasswordChanger from './PassWordChanger';
 import ContactEditor from './ContactEditor';
+import MentionsAdminEditor from './MentionsAdminEditor';
+import AdminTarifsEditor from './AdminTarifsEditor';
 
 type Props = {
   formData: any;
@@ -33,10 +35,8 @@ export default function AdminSidebar({
   imageFieldBgRef,
   handleSave,
   message,
-  onClose
+  onClose,
 }: Props) {
-
-
   return (
     <div className="p-4 relative">
       {onClose && (
@@ -48,7 +48,9 @@ export default function AdminSidebar({
         </button>
       )}
 
-      <p className="mb-4 text-sm text-orange-600">⚠️ N'oubliez pas de sauvegarder vos modifications.</p>
+      <p className="mb-4 text-sm text-orange-600">
+        ⚠️ N'oubliez pas de sauvegarder vos modifications.
+      </p>
 
       <h2 className="text-xl font-bold text-indigo-700 text-center">⚙️ Administration</h2>
 
@@ -61,32 +63,45 @@ export default function AdminSidebar({
         />
       </AccordionSection>
       <AccordionSection title="🧩 En-tête et navigation">
-  <LayoutEditor formData={formData} setFormData={setFormData} />
-</AccordionSection>
+        <LayoutEditor formData={formData} setFormData={setFormData} />
+        <MentionsAdminEditor formData={formData} setFormData={setFormData} />
+      </AccordionSection>
 
       <AccordionSection title="🏠 Page d’accueil">
-        <HomeContentEditor formData={formData} setFormData={setFormData} imageFieldRef={imageFieldRef} />
+        <HomeContentEditor
+          formData={formData}
+          setFormData={setFormData}
+          imageFieldRef={imageFieldRef}
+        />
       </AccordionSection>
 
       <AccordionSection title="🏠 Page à Propos">
-        <AboutContentEditor formData={formData} setFormData={setFormData} imageFieldAProposRef={imageFieldAProposRef}/>
+        <AboutContentEditor
+          formData={formData}
+          setFormData={setFormData}
+          imageFieldAProposRef={imageFieldAProposRef}
+        />
       </AccordionSection>
 
       <AccordionSection title="🧘 Page Services">
         <ServicesEditor
-  formData={formData}
-  setFormData={setFormData} 
-  imageFieldRef={imageFieldServicesRef}
-/>
-
+          formData={formData}
+          setFormData={setFormData}
+          imageFieldRef={imageFieldServicesRef}
+        />
       </AccordionSection>
 
       <AccordionSection title="💬 Page Témoignages">
-        <TestimonialsEditor formData={formData} setFormData={setFormData} imageFieldTestimonialsRef={imageFieldTestimonialsRef}/>
+        <TestimonialsEditor
+          formData={formData}
+          setFormData={setFormData}
+          imageFieldTestimonialsRef={imageFieldTestimonialsRef}
+        />
       </AccordionSection>
 
       <AccordionSection title="💬 Page Contact">
         <ContactEditor formData={formData} setFormData={setFormData} />
+        <AdminTarifsEditor />
       </AccordionSection>
 
       <div className="pt-4">
@@ -100,7 +115,5 @@ export default function AdminSidebar({
       </div>
       <PasswordChanger />
     </div>
-    
-
   );
 }

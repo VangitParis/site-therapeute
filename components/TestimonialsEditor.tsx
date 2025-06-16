@@ -13,7 +13,11 @@ interface Testimonial {
   avatar: string;
 }
 
-export default function TestimonialsEditor({ formData, setFormData, imageFieldTestimonialsRef }: Props) {
+export default function TestimonialsEditor({
+  formData,
+  setFormData,
+  imageFieldTestimonialsRef,
+}: Props) {
   const testimonials: Testimonial[] = formData.testimonials || [];
 
   const handleChange = <K extends keyof Testimonial>(

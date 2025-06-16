@@ -15,26 +15,27 @@ const settings = {
   autoplaySpeed: 4000,
 };
 
-const DEFAULT_IMAGE = "https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png";
+const DEFAULT_IMAGE =
+  'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
 
 export default function Services({ locale = 'fr' }) {
   const [data, setData] = useState({
     titre: 'Mes accompagnements',
     liste: [
       {
-        text: "Relaxation profonde et recentrage émotionnel",
-        image: "https://res.cloudinary.com/.../relaxation.webp"
+        text: 'Relaxation profonde et recentrage émotionnel',
+        image: 'https://res.cloudinary.com/.../relaxation.webp',
       },
       {
-        text: "Gestion du stress et des émotions",
-        image: "https://res.cloudinary.com/.../stress.webp"
+        text: 'Gestion du stress et des émotions',
+        image: 'https://res.cloudinary.com/.../stress.webp',
       },
       {
-        text: "Amélioration du sommeil",
-        image: ""
-      }
+        text: 'Amélioration du sommeil',
+        image: '',
+      },
     ],
-    image: ''
+    image: '',
   });
 
   const router = useRouter();
@@ -78,10 +79,7 @@ export default function Services({ locale = 'fr' }) {
       className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl mx-auto"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
-      <h2
-        className="text-3xl font-semibold mb-5"
-        style={{ color: 'var(--color-titreH2)' }}
-      >
+      <h2 className="text-3xl font-semibold mb-5" style={{ color: 'var(--color-titreH2)' }}>
         {data.titre}
       </h2>
 

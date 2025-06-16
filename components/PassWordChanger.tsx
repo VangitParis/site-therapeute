@@ -46,18 +46,17 @@ function PasswordChanger() {
 
     const newHash = await bcrypt.hash(newPwd, 10);
     try {
-  const newHash = await bcrypt.hash(newPwd, 10);
-  await updateDoc(doc(db, 'config', 'admin'), { password: newHash });
+      const newHash = await bcrypt.hash(newPwd, 10);
+      await updateDoc(doc(db, 'config', 'admin'), { password: newHash });
 
-  setOldPwd('');
-  setNewPwd('');
-  setConfirmPwd('');
-  setMessage('✅ Mot de passe modifié avec succès');
-} catch (err) {
-  console.error(err);
-  setError("Erreur lors de l'enregistrement dans Firestore ❌");
-}
-
+      setOldPwd('');
+      setNewPwd('');
+      setConfirmPwd('');
+      setMessage('✅ Mot de passe modifié avec succès');
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors de l'enregistrement dans Firestore ❌");
+    }
   };
 
   return (

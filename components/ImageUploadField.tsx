@@ -18,7 +18,10 @@ type ImageUploadFieldProps = {
 
 const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
   ({ label, value, onUpload, folderName, sectionName }, ref) => {
-    const [compressedFile, setCompressedFile] = useState<null | { original: File; compressed: File }>(null);
+    const [compressedFile, setCompressedFile] = useState<null | {
+      original: File;
+      compressed: File;
+    }>(null);
     const [preview, setPreview] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
@@ -70,7 +73,7 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
       },
       hasPendingUpload() {
         return !!compressedFile;
-      }
+      },
     }));
 
     const compressImage = (file: File): Promise<File> =>
@@ -93,12 +96,16 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
           const ctx = canvas.getContext('2d')!;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          canvas.toBlob((blob) => {
-            const compressed = new File([blob!], file.name.replace(/\.\w+$/, '.webp'), {
-              type: 'image/webp',
-            });
-            resolve(compressed);
-          }, 'image/webp', 0.8);
+          canvas.toBlob(
+            (blob) => {
+              const compressed = new File([blob!], file.name.replace(/\.\w+$/, '.webp'), {
+                type: 'image/webp',
+              });
+              resolve(compressed);
+            },
+            'image/webp',
+            0.8
+          );
         };
 
         reader.readAsDataURL(file);
@@ -109,10 +116,7 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
       setSuccess('');
 
       // Vérifie extension favicon
-      if (
-        label.toLowerCase().includes('favicon') &&
-        !file.name.match(/\.(ico|png|svg)$/i)
-      ) {
+      if (label.toLowerCase().includes('favicon') && !file.name.match(/\.(ico|png|svg)$/i)) {
         alert('Le favicon doit être au format .ico, .png ou .svg');
         return;
       }
@@ -180,13 +184,15 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
           setPreview(IMAGE_PAR_DEFAUT);
           setSuccess('🗑 Image supprimée avec succès');
           // ✅ ici : on reset explicitement le champ file
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
         } else {
           const json = await res.json();
           //alert(`❌ Échec suppression : ${json.error}`);
-          alert(`❌ OUPS ! Cette image a déjà été supprimée ou n'existe pas. Vous pouvez en charger une autre dès maintenant.`);
+          alert(
+            `❌ OUPS ! Cette image a déjà été supprimée ou n'existe pas. Vous pouvez en charger une autre dès maintenant.`
+          );
           // Pas de reset de input ici : on pourra toujours charger une autre image
           setPreview(IMAGE_PAR_DEFAUT);
           onUpload(IMAGE_PAR_DEFAUT);
@@ -200,20 +206,26 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
       <div className="mb-6">
         <label className="block font-medium mb-1">{label}</label>
         <label className="inline-block cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded shadow">
-  📤 Choisir une image
-  <input
-    ref={inputRef}
-    type="file"
-    accept="image/*"
-    onChange={(e) => handleSelection(e.target.files![0])}
-    className="hidden"
-  />
-</label>
-        {loading && <p className="mt-2 text-blue-600 text-sm animate-pulse">🌀 Upload en cours...</p>}
+          📤 Choisir une image
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleSelection(e.target.files![0])}
+            className="hidden"
+          />
+        </label>
+        {loading && (
+          <p className="mt-2 text-blue-600 text-sm animate-pulse">🌀 Upload en cours...</p>
+        )}
 
         {(preview || value) && !loading && (
           <div className="mt-4 space-y-2">
-            <img src={preview || value} alt="Image" className="w-[150px] h-[150px] rounded shadow border" />
+            <img
+              src={preview || value}
+              alt="Image"
+              className="w-[150px] h-[150px] rounded shadow border"
+            />
             {value && (
               <div className="flex items-center gap-4">
                 <button

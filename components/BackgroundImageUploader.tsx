@@ -19,15 +19,14 @@ const BackgroundImageUploader = forwardRef<ImageUploadRef, Props>(
     return (
       <div className="mt-6">
         <label className="block font-semibold mb-1">🌄 Image de fond</label>
-       <ImageUploadField
-  ref={ref}
-  label="Uploader une image"
-  value={formData.theme?.bgImage || ''}
-  folderName={safeFolderName}
-  sectionName='background'
-  onUpload={handleUpload}
-/>
-
+        <ImageUploadField
+          ref={ref}
+          label="Uploader une image"
+          value={formData.theme?.bgImage || ''}
+          folderName={safeFolderName}
+          sectionName="background"
+          onUpload={handleUpload}
+        />
       </div>
     );
   }

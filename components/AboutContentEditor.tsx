@@ -34,7 +34,7 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
       </label>
 
       <div className="block mb-4">
-      <RichTextEditor
+        <RichTextEditor
           label="📖 Texte de présentation"
           value={formData.aPropos?.texte || ''}
           onChange={(val) =>
@@ -42,9 +42,9 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
               ...prev,
               aPropos: {
                 ...prev.aPropos,
-                texte : val,
+                texte: val,
               },
-            })) 
+            }))
           }
         />
       </div>
@@ -53,7 +53,7 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
         label="🖼️ Image de la section À propos"
         value={aPropos.image || ''}
         folderName={formData.layout?.nom || 'default'}
-        sectionName='aPropos'
+        sectionName="aPropos"
         onUpload={(url) =>
           setFormData((prev) => ({
             ...prev,

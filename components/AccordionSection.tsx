@@ -1,6 +1,5 @@
 import { useState, ReactNode } from 'react';
 
-
 type Props = {
   title: string;
   children: ReactNode;

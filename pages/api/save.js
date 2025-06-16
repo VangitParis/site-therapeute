@@ -23,22 +23,22 @@ export default function handler(req, res) {
         ...req.body.fr,
         accueil: {
           ...existing.fr.accueil,
-          ...req.body.fr?.accueil
+          ...req.body.fr?.accueil,
         },
         aPropos: {
           ...existing.fr.aPropos,
-          ...req.body.fr?.aPropos
+          ...req.body.fr?.aPropos,
         },
         services: {
           ...existing.fr.services,
-          ...req.body.fr?.services
+          ...req.body.fr?.services,
         },
         layout: {
           ...existing.fr.layout,
-          ...req.body.fr?.layout
+          ...req.body.fr?.layout,
         },
         // Ajoute d’autres sections si besoin
-      }
+      },
     };
 
     fs.writeFileSync(filePath, JSON.stringify(updated, null, 2));

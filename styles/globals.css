@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,7 +11,7 @@
   --color-titreH1: #111111;
   --color-titreH2: #444444;
   --color-titreH3: #444444;
-  --color-text-button: #FFFFFF;
+  --color-text-button: #ffffff;
   --bg-image: none;
 }
 
@@ -23,6 +23,6 @@ body {
   background-position: center;
 }
 
-button{
+button {
   cursor: pointer;
 }

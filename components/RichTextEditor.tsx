@@ -26,10 +26,18 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
       <label className="block font-medium mb-2">{label}</label>
 
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <button onClick={() => format('bold')} className="px-2 py-1 border rounded font-bold">Gras</button>
-        <button onClick={() => format('italic')} className="px-2 py-1 border rounded italic">Italique</button>
-        <button onClick={() => format('underline')} className="px-2 py-1 border rounded underline">Souligné</button>
-        <button onClick={() => format('removeFormat')} className="px-2 py-1 border rounded text-sm">🧹 Effacer</button>
+        <button onClick={() => format('bold')} className="px-2 py-1 border rounded font-bold">
+          Gras
+        </button>
+        <button onClick={() => format('italic')} className="px-2 py-1 border rounded italic">
+          Italique
+        </button>
+        <button onClick={() => format('underline')} className="px-2 py-1 border rounded underline">
+          Souligné
+        </button>
+        <button onClick={() => format('removeFormat')} className="px-2 py-1 border rounded text-sm">
+          🧹 Effacer
+        </button>
 
         <select
           onChange={(e) => {
@@ -59,11 +67,22 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           className="w-8 h-8 border rounded cursor-pointer"
         />
 
-        <button onClick={() => format('justifyLeft')} className="px-2 py-1 border rounded text-sm">↤</button>
-        <button onClick={() => format('justifyCenter')} className="px-2 py-1 border rounded text-sm">↔</button>
-        <button onClick={() => format('justifyRight')} className="px-2 py-1 border rounded text-sm">↦</button>
+        <button onClick={() => format('justifyLeft')} className="px-2 py-1 border rounded text-sm">
+          ↤
+        </button>
+        <button
+          onClick={() => format('justifyCenter')}
+          className="px-2 py-1 border rounded text-sm"
+        >
+          ↔
+        </button>
+        <button onClick={() => format('justifyRight')} className="px-2 py-1 border rounded text-sm">
+          ↦
+        </button>
 
-        <span className="text-sm text-gray-500 italic ml-2">Sélectionner le texte avant d’appliquer un style</span>
+        <span className="text-sm text-gray-500 italic ml-2">
+          Sélectionner le texte avant d’appliquer un style
+        </span>
       </div>
 
       <div

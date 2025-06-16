@@ -39,24 +39,21 @@ export default function AdminAuth({ children }) {
     setError(''); // reset de l'erreur
 
     const MASTER_PWD = process.env.NEXT_PUBLIC_MASTER_PWD;
-     // Empêche bcrypt.compare sur une valeur vide
-  if (!storedHash && password !== MASTER_PWD) {
-    setError("Mot de passe non initialisé ou indisponible");
-    return;
-  }
-    
-    const isValid = password === MASTER_PWD || await bcrypt.compare(password, storedHash);
-    
+    // Empêche bcrypt.compare sur une valeur vide
+    if (!storedHash && password !== MASTER_PWD) {
+      setError('Mot de passe non initialisé ou indisponible');
+      return;
+    }
+
+    const isValid = password === MASTER_PWD || (await bcrypt.compare(password, storedHash));
+
     if (isValid) {
       sessionStorage.setItem('admin_auth', 'true');
-      
+
       setAuthenticated(true);
-      
     } else {
       setError('Mot de passe incorrect ❌');
     }
-
-
   };
 
   const handleLogout = () => {

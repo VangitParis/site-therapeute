@@ -10,7 +10,6 @@ type Props = {
 export default function HomeContentEditor({ formData, setFormData, imageFieldRef }: Props) {
   const accueil = formData.accueil || {};
 
-
   const handleChange = (key, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -50,7 +49,6 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
           value={accueil.bouton || ''}
           onChange={(e) => handleChange('bouton', e.target.value)}
           className="w-full border px-3 py-2 rounded"
-          
         />
       </label>
 
@@ -65,22 +63,20 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
       </label>
 
       <div className="block mb-4">
-  
-  <RichTextEditor
-    label="💬 Section À Propos : Description"
-    value={formData.accueil?.SectionAProposDescription || ''}
-    onChange={(val) =>
-      setFormData((prev: any) => ({
-        ...prev,
-        accueil: {
-          ...prev.accueil,
-          SectionAProposDescription: val,
-        },
-      }))
-    }
-  />
-</div>
-
+        <RichTextEditor
+          label="💬 Section À Propos : Description"
+          value={formData.accueil?.SectionAProposDescription || ''}
+          onChange={(val) =>
+            setFormData((prev: any) => ({
+              ...prev,
+              accueil: {
+                ...prev.accueil,
+                SectionAProposDescription: val,
+              },
+            }))
+          }
+        />
+      </div>
 
       <label>
         <span className="block font-medium">🔘 Section À Propos : Texte du bouton CTA</span>
@@ -89,7 +85,6 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
           value={accueil.SectionAProposCTA || ''}
           onChange={(e) => handleChange('SectionAProposCTA', e.target.value)}
           className="w-full border px-3 py-2 rounded"
-          
         />
       </label>
 
@@ -98,7 +93,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         label="🖼️ Image de la section À propos"
         value={accueil.image || ''}
         folderName={formData.layout?.nom || 'default'}
-        sectionName='accueil'
+        sectionName="accueil"
         onUpload={(url) =>
           setFormData((prev) => ({
             ...prev,

@@ -8,11 +8,9 @@ type Props = {
 };
 
 export default function ServicesEditor({ formData, setFormData, imageFieldRef }: Props) {
-  
   const services = formData.services || { titre: '', liste: [], image: '' };
   const safeFolderName = (formData.layout?.nom || 'default').replace(/\s+/g, '_').toLowerCase();
-  
-  
+
   const handleChange = (key: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -26,7 +24,9 @@ export default function ServicesEditor({ formData, setFormData, imageFieldRef }:
   const handleListChange = (index: number, key: 'text' | 'image', value: string) => {
     const updated = [...services.liste];
     updated[index] = {
-      ...(typeof updated[index] === 'string' ? { text: updated[index], image: '' } : updated[index]),
+      ...(typeof updated[index] === 'string'
+        ? { text: updated[index], image: '' }
+        : updated[index]),
       [key]: value,
     };
     setFormData((prev) => ({
@@ -75,12 +75,12 @@ export default function ServicesEditor({ formData, setFormData, imageFieldRef }:
           />
 
           <ImageUploadField
-  label={`🖼️ Image du service #${index + 1}`}
-  value={item.image || ''} // ← important de ne pas injecter DEFAULT_IMAGE ici
-   folderName={safeFolderName}
-   sectionName='services'
-  onUpload={(url) => handleListChange(index, 'image', url)}
-/>
+            label={`🖼️ Image du service #${index + 1}`}
+            value={item.image || ''} // ← important de ne pas injecter DEFAULT_IMAGE ici
+            folderName={safeFolderName}
+            sectionName="services"
+            onUpload={(url) => handleListChange(index, 'image', url)}
+          />
 
           <button
             onClick={() => removeService(index)}
@@ -91,16 +91,11 @@ export default function ServicesEditor({ formData, setFormData, imageFieldRef }:
         </div>
       ))}
 
-      <button
-        onClick={addService}
-        className="text-sm text-blue-600 underline"
-      >
+      <button onClick={addService} className="text-sm text-blue-600 underline">
         ➕ Ajouter un service
       </button>
 
       <hr className="my-4" />
-
-    
     </div>
   );
 }

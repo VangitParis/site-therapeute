@@ -14,7 +14,6 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<any>({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
     if (theme?.background) root.style.setProperty('--color-bg', theme.background);
@@ -64,77 +63,67 @@ export default function Layout({ children }: { children: ReactNode }) {
         {layout.favicon && <link rel="icon" href={layout.favicon} />}
       </Head>
 
-      <div className="font-serif text-gray-800 min-h-screen">
+      <div className="font-serif text-gray-800 min-h-screen flex flex-col">
         {!isAdminPage && (
           <header className="bg-white shadow p-4 sm:p-6 flex justify-evenly items-center sm:flex-row sm:justify-between sm:items-center sticky top-0 z-50 gap-4">
- 
-  <Link href="/" className="flex justify-center gap-4 ">
-    {layout.logo && (
-      <img
-        src={layout.logo}
-        alt="Logo"
-        className="max-h-16 object-contain rounded "
-      />
-    )}
-    <div className='flex-col'>
-     <h1 className="text-xl sm:text-2xl font-bold"style={{ color: theme.primary }}>
-        {layout.nom}
-      </h1>
-      <p className="text-xs sm:text-sm italic text-gray-500">{layout.titre}</p>
-      </div>
-  </Link>
+            <Link href="/" className="flex justify-center gap-4 ">
+              {layout.logo && (
+                <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded " />
+              )}
+              <div className="flex-col">
+                <h1 className="text-xl sm:text-2xl font-bold" style={{ color: theme.primary }}>
+                  {layout.nom}
+                </h1>
+                <p className="text-xs sm:text-sm italic text-gray-500">{layout.titre}</p>
+              </div>
+            </Link>
 
-     
-    
-  {/* Burger menu (mobile) */}
-  <div className="sm:hidden relative">
-    <button
-      onClick={() => setMenuOpen(!menuOpen)}
-      className="text-3xl focus:outline-none"
-      style={{ color: theme.primary }}
-    >
-      ☰
-    </button>
-    {menuOpen && (
-      <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
-        {layout.liens?.map((lien: any, i: number) => (
-          <div key={i} className="mb-2">
-            <Link href={lien.href}>
-              <span className="block" style={{ color: theme.primary }}>
-                {lien.label}
-              </span>
-            </Link>                                                        
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
+            {/* Burger menu (mobile) */}
+            <div className="sm:hidden relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-3xl focus:outline-none"
+                style={{ color: theme.primary }}
+              >
+                ☰
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
+                  {layout.liens?.map((lien: any, i: number) => (
+                    <div key={i} className="mb-2">
+                      <Link href={lien.href}>
+                        <span className="block" style={{ color: theme.primary }}>
+                          {lien.label}
+                        </span>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-  {/* Menu desktop */}
-  <nav className="hidden sm:flex space-x-4 text-lg">
-    {layout.liens?.map((lien: any, i: number) => (
-      <Link key={i} href={lien.href}>
-        <span style={{ color: theme.primary }}>{lien.label}</span>
-      </Link>
-    ))}
-  </nav>
-</header>
-
+            {/* Menu desktop */}
+            <nav className="hidden sm:flex space-x-4 text-lg">
+              {layout.liens?.map((lien: any, i: number) => (
+                <Link key={i} href={lien.href}>
+                  <span style={{ color: theme.primary }}>{lien.label}</span>
+                </Link>
+              ))}
+            </nav>
+          </header>
         )}
 
-        <main className="w-full">{children}</main>
-
+        <main className="flex-1 w-full">{children}</main>
 
         {!isAdminPage && (
           <footer className="bg-white border-t mt-12 text-center py-6 text-xs sm:text-sm text-gray-500">
             {layout.footer} |{' '}
-            <a href="#" className="text-prune hover:underline">
+            <a href="/mentions_legales" className="text-prune hover:underline">
               Mentions légales
             </a>
           </footer>
         )}
       </div>
-      
     </>
   );
 }

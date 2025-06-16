@@ -3,7 +3,7 @@ import { ImageUploadRef } from '../../components/ImageUploadField';
 import { db } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
-import AdminAuth from '../../components/AdminAuth'
+import AdminAuth from '../../components/AdminAuth';
 import SitePreview from '../../components/SitePreview';
 
 const DEFAULT_THEME = {
@@ -11,11 +11,11 @@ const DEFAULT_THEME = {
   primary: '#7f5a83',
   accent: '#e6f0ff',
   bgImage: '',
-  titreH1 : '#000',
-  titreH2 : '#000',
-  titreH3 : '#000',
-  texte : '#000',
-  textButton : '#FFFFFF'
+  titreH1: '#000',
+  titreH2: '#000',
+  titreH3: '#000',
+  texte: '#000',
+  textButton: '#FFFFFF',
 };
 
 export default function Live() {
@@ -36,19 +36,27 @@ export default function Live() {
       if (snap.exists()) {
         const raw = snap.data();
 
-         // 🔁 Migration live
-  const services = raw.services || { titre: '', liste: [], image: '' };
-  services.liste = services.liste.map((s: any) =>
-    typeof s === 'string' ? { text: s, image: '' } : s
-  );
+        // 🔁 Migration live
+        const services = raw.services || { titre: '', liste: [], image: '' };
+        services.liste = services.liste.map((s: any) =>
+          typeof s === 'string' ? { text: s, image: '' } : s
+        );
         setFormData({
           layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
           theme: raw.theme || DEFAULT_THEME,
-          accueil: raw.accueil || { titre: '', texte: '', bouton: '', image: '', SectionAProposTitre : '', SectionAProposDescription : '', SectionAProposCTA : '' },
-          aPropos: raw.aPropos || { titre: '', texte: '', image: ''},
+          accueil: raw.accueil || {
+            titre: '',
+            texte: '',
+            bouton: '',
+            image: '',
+            SectionAProposTitre: '',
+            SectionAProposDescription: '',
+            SectionAProposCTA: '',
+          },
+          aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
           services: services,
           testimonials: raw.testimonials || [],
-          contact: raw.contact || { titre: '', texte: '', bouton: '', image : '', lien : ''}
+          contact: raw.contact || { titre: '', texte: '', bouton: '', image: '', lien: '', titreH2: '', titreTarifs: '' },
         });
       }
     };
@@ -65,16 +73,14 @@ export default function Live() {
     return () => window.removeEventListener('beforeunload', warnIfUnsaved);
   }, [unsavedChanges]);
 
-
-
   const handleSave = async () => {
     let updatedFormData = { ...formData };
- const currentName = formData.layout?.nom?.trim().toLowerCase() || '';
+    const currentName = formData.layout?.nom?.trim().toLowerCase() || '';
 
-if (currentName === defaultName) {
-  alert("Merci de personnaliser le nom de votre site avant de sauvegarder.");
-  return;
-}
+    if (currentName === defaultName) {
+      alert('Merci de personnaliser le nom de votre site avant de sauvegarder.');
+      return;
+    }
 
     if (imageFieldRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldRef.current.upload();
@@ -93,7 +99,6 @@ if (currentName === defaultName) {
       const uploaded = await imageFieldTestimonialsRef.current.upload();
       if (uploaded) updatedFormData.testimonials.avatar = uploaded;
     }
-   
 
     if (imageFieldBgRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldBgRef.current.upload();
@@ -102,9 +107,9 @@ if (currentName === defaultName) {
       }
     }
     updatedFormData.services.liste = updatedFormData.services.liste.map((s: any) =>
-    typeof s === 'string' ? { text: s, image: '' } : s
-  );
-  
+      typeof s === 'string' ? { text: s, image: '' } : s
+    );
+
     await setDoc(doc(db, 'content', 'fr'), updatedFormData);
     setMessage('✅ Sauvegarde réussie');
     setUnsavedChanges(false);
@@ -119,43 +124,43 @@ if (currentName === defaultName) {
   };
   return (
     <AdminAuth>
-    <div className="flex h-screen">
-      {sidebarVisible && (
-        <div className="w-[30%] min-w-[320px] border-r overflow-y-scroll relative">
-          <AdminSidebar
-            formData={formData}
-            setFormData={wrappedSetFormData}
-            imageFieldRef={imageFieldRef}
-            imageFieldAProposRef={imageFieldAProposRef}
-            imageFieldTestimonialsRef={imageFieldTestimonialsRef}
-            imageFieldServicesRef={imageFieldServicesRef}
-            imageFieldBgRef={imageFieldBgRef}
-            handleSave={handleSave}
-            message={message}
-            onClose={() => setSidebarVisible(false)}
-          />
-        </div>
-      )}
-      <div className="flex-1 relative">
-        {!sidebarVisible && (
-          <button
-            onClick={() => setSidebarVisible(true)}
-            className="absolute top-8 left-4 z-10 bg-white border rounded px-3 py-1 text-sm shadow"
-          >
-            📂 Ouvrir l’administration
-          </button>
-        )}
-
-        <div className="relative">
-          <div className="absolute top-0 left-0 w-full bg-yellow-100 text-yellow-800 text-center text-sm py-1 z-20">
-            ✏️ Mode édition en direct activé.
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-[30%] min-w-[320px] border-r overflow-y-scroll relative">
+            <AdminSidebar
+              formData={formData}
+              setFormData={wrappedSetFormData}
+              imageFieldRef={imageFieldRef}
+              imageFieldAProposRef={imageFieldAProposRef}
+              imageFieldTestimonialsRef={imageFieldTestimonialsRef}
+              imageFieldServicesRef={imageFieldServicesRef}
+              imageFieldBgRef={imageFieldBgRef}
+              handleSave={handleSave}
+              message={message}
+              onClose={() => setSidebarVisible(false)}
+            />
           </div>
-          <div className="pt-6">
-            <SitePreview formData={formData} />
+        )}
+        <div className="flex-1 relative">
+          {!sidebarVisible && (
+            <button
+              onClick={() => setSidebarVisible(true)}
+              className="absolute top-8 left-4 z-10 bg-white border rounded px-3 py-1 text-sm shadow"
+            >
+              📂 Ouvrir l’administration
+            </button>
+          )}
+
+          <div className="relative">
+            <div className="absolute top-0 left-0 w-full bg-yellow-100 text-yellow-800 text-center text-sm py-1 z-20">
+              ✏️ Mode édition en direct activé.
+            </div>
+            <div className="pt-6">
+              <SitePreview formData={formData} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </AdminAuth>
   );
 }
