@@ -32,7 +32,16 @@ export default function Live() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const snap = await getDoc(doc(db, 'content', 'fr'));
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
+      const uid = isLocalhost || forceFR ? 'fr' : auth.currentUser?.uid;
+
+      if (!uid) {
+        console.error('Utilisateur non connecté et pas en mode dev');
+        return;
+      }
+
+      const snap = await getDoc(doc(db, 'content', uid));
 
       if (snap.exists()) {
         const raw = snap.data();
