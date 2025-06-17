@@ -45,18 +45,20 @@ export default function Live() {
     if (!userLoaded) return;
 
     const fetchData = async () => {
+      const uidFromQuery = router.query.uid as string | undefined;
       const isAdmin = router.query.frdev === '1';
-      let docId = 'fr';
-      console.log('docId====', docId);
-      if (!isAdmin) {
-        const user = auth.currentUser;
 
+      let docId = 'fr';
+
+      if (uidFromQuery) {
+        docId = uidFromQuery;
+      } else if (!isAdmin) {
+        const user = auth.currentUser;
         if (!user) {
           console.warn('❌ Aucun utilisateur connecté.');
           return;
         }
         docId = user.uid;
-        console.log('docId====', docId);
       }
 
       try {
