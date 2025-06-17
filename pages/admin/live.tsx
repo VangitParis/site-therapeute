@@ -47,7 +47,7 @@ export default function Live() {
     const fetchData = async () => {
       const isAdmin = router.query.frdev === '1';
       let docId = 'fr';
-
+      console.log('docId====', docId);
       if (!isAdmin) {
         const user = auth.currentUser;
         if (!user) {
@@ -55,6 +55,7 @@ export default function Live() {
           return;
         }
         docId = user.uid;
+        console.log('docId====', docId);
       }
 
       try {
@@ -106,7 +107,8 @@ export default function Live() {
 
     const isDev = sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
     const currentUser = auth.currentUser;
-    const docId = isDev ? 'fr' : currentUser?.uid;
+    const docId = isDev ? currentUser?.uid : 'fr';
+    console.log('docId====', docId);
 
     if (!docId) {
       console.error("❌ Impossible de déterminer l'UID.");
