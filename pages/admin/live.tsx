@@ -50,6 +50,7 @@ export default function Live() {
       console.log('docId====', docId);
       if (!isAdmin) {
         const user = auth.currentUser;
+
         if (!user) {
           console.warn('❌ Aucun utilisateur connecté.');
           return;
@@ -60,6 +61,8 @@ export default function Live() {
 
       try {
         const snap = await getDoc(doc(db, 'content', docId));
+        console.log(snap);
+
         if (snap.exists()) {
           const raw = snap.data();
           const services = raw.services || { titre: '', liste: [], image: '' };
