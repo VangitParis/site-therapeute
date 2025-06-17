@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import { ImageUploadRef } from '../../components/ImageUploadField';
-import { db, auth } from '../../lib/firebaseClient';
+import { db } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminAuth from '../../components/AdminAuth';
 import SitePreview from '../../components/SitePreview';
+import LiveWrapper from '../../components/LiveWrapper';
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -19,46 +21,43 @@ const DEFAULT_THEME = {
 };
 
 export default function Live() {
+  const router = useRouter();
   const [formData, setFormData] = useState(null);
   const [message, setMessage] = useState('');
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
-  const defaultName = 'Marie Dupont';
+
   const imageFieldRef = useRef<ImageUploadRef>(null);
   const imageFieldAProposRef = useRef<ImageUploadRef>(null);
   const imageFieldTestimonialsRef = useRef<ImageUploadRef>(null);
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
+  const getDocId = () => {
+    if (typeof window === 'undefined') return null;
+    const uid = new URLSearchParams(window.location.search).get('uid');
+    const frdev = new URLSearchParams(window.location.search).get('frdev');
+    if (frdev === '1') return 'fr';
+    if (uid) return uid;
+    return null;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const searchParams =
-        typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const forceFrDev = searchParams?.get('frdev') === '1';
+      const docId = getDocId();
+      if (!docId) return;
 
-      const uid = auth.currentUser?.uid;
-      const docId = forceFrDev ? 'fr' : uid;
+      try {
+        const ref = doc(db, 'content', docId);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) throw new Error('Doc inexistant');
 
-      if (!docId) return; // Pas connecté et pas en mode frdev => rien à charger
-
-      let ref = doc(db, 'content', docId);
-      let snap = await getDoc(ref);
-
-      // Si pas de doc utilisateur, on copie depuis 'fr'
-      if (!snap.exists() && uid && !forceFrDev) {
-        const fallbackSnap = await getDoc(doc(db, 'content', 'fr'));
-        if (fallbackSnap.exists()) {
-          await setDoc(ref, fallbackSnap.data());
-          snap = fallbackSnap;
-        }
-      }
-
-      if (snap.exists()) {
         const raw = snap.data();
         const services = raw.services || { titre: '', liste: [], image: '' };
         services.liste = services.liste.map((s: any) =>
           typeof s === 'string' ? { text: s, image: '' } : s
         );
+
         setFormData({
           layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
           theme: raw.theme || DEFAULT_THEME,
@@ -84,28 +83,19 @@ export default function Live() {
             titreTarifs: '',
           },
         });
+      } catch (err) {
+        console.error('🔥 Erreur chargement Firestore:', err);
       }
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const warnIfUnsaved = (e: BeforeUnloadEvent) => {
-      if (!unsavedChanges) return;
-      e.preventDefault();
-      e.returnValue = 'Vous avez des modifications non sauvegardées.';
-    };
-    window.addEventListener('beforeunload', warnIfUnsaved);
-    return () => window.removeEventListener('beforeunload', warnIfUnsaved);
-  }, [unsavedChanges]);
-
   const handleSave = async () => {
-    let updatedFormData = { ...formData };
-    const currentName = formData.layout?.nom?.trim().toLowerCase() || '';
-
-    if (currentName === defaultName) {
-      alert('Merci de personnaliser le nom de votre site avant de sauvegarder.');
+    const updatedFormData = { ...formData };
+    const nom = updatedFormData.layout?.nom?.trim().toLowerCase();
+    if (nom === 'marie dupont') {
+      alert('Merci de personnaliser le nom avant de sauvegarder.');
       return;
     }
 
@@ -134,14 +124,9 @@ export default function Live() {
       typeof s === 'string' ? { text: s, image: '' } : s
     );
 
-    const uid = auth.currentUser?.uid;
-    const forceFrDev =
-      typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).get('frdev') === '1';
-    const docId = forceFrDev ? 'fr' : uid;
-
+    const docId = getDocId();
     if (!docId) {
-      console.error('Utilisateur non connecté');
+      console.error('❌ Aucun docId pour la sauvegarde');
       return;
     }
 
@@ -151,15 +136,15 @@ export default function Live() {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  if (!formData) return <p className="p-6 text-center">Chargement…</p>;
-
   const wrappedSetFormData = (fn: (prev: any) => any) => {
     setUnsavedChanges(true);
     setFormData(fn);
   };
 
+  if (!formData) return <p className="p-6 text-center">Chargement…</p>;
+
   return (
-    <AdminAuth>
+    <LiveWrapper>
       <div className="flex h-screen">
         {sidebarVisible && (
           <div className="w-[30%] min-w-[320px] border-r overflow-y-scroll relative">
@@ -196,6 +181,6 @@ export default function Live() {
           </div>
         </div>
       </div>
-    </AdminAuth>
+    </LiveWrapper>
   );
 }
