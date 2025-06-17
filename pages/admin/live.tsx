@@ -32,21 +32,25 @@ export default function Live() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      const uid = auth.currentUser?.uid;
       const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
-      const uid = isLocalhost || forceFR ? 'fr' : auth.currentUser?.uid;
+      const docId = forceFR ? 'fr' : uid;
 
-      if (!uid) {
-        console.error('Utilisateur non connecté et pas en mode dev');
-        return;
+      if (!docId) return;
+
+      let ref = doc(db, 'content', docId);
+      let snap = await getDoc(ref);
+
+      if (!snap.exists() && uid && !forceFR) {
+        const fallbackSnap = await getDoc(doc(db, 'content', 'fr'));
+        if (fallbackSnap.exists()) {
+          await setDoc(ref, fallbackSnap.data());
+          snap = fallbackSnap;
+        }
       }
-
-      const snap = await getDoc(doc(db, 'content', uid));
 
       if (snap.exists()) {
         const raw = snap.data();
-
-        // 🔁 Migration live
         const services = raw.services || { titre: '', liste: [], image: '' };
         services.liste = services.liste.map((s: any) =>
           typeof s === 'string' ? { text: s, image: '' } : s
@@ -64,7 +68,7 @@ export default function Live() {
             SectionAProposCTA: '',
           },
           aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
-          services: services,
+          services,
           testimonials: raw.testimonials || [],
           contact: raw.contact || {
             titre: '',
@@ -108,7 +112,6 @@ export default function Live() {
       const uploaded = await imageFieldAProposRef.current.upload();
       if (uploaded) updatedFormData.aPropos.image = uploaded;
     }
-
     if (imageFieldServicesRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldServicesRef.current.upload();
       if (uploaded) updatedFormData.services.image = uploaded;
@@ -117,30 +120,25 @@ export default function Live() {
       const uploaded = await imageFieldTestimonialsRef.current.upload();
       if (uploaded) updatedFormData.testimonials.avatar = uploaded;
     }
-
     if (imageFieldBgRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldBgRef.current.upload();
-      if (uploaded) {
-        updatedFormData.theme.bgImage = uploaded;
-      }
+      if (uploaded) updatedFormData.theme.bgImage = uploaded;
     }
+
     updatedFormData.services.liste = updatedFormData.services.liste.map((s: any) =>
       typeof s === 'string' ? { text: s, image: '' } : s
     );
 
-    // await setDoc(doc(db, 'content', 'fr'), updatedFormData);
-    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const uid = auth.currentUser?.uid;
     const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
-    const uid = isLocalhost || forceFR ? 'fr' : auth.currentUser?.uid;
+    const docId = forceFR ? 'fr' : uid;
 
-    if (!uid) {
-      console.error('Utilisateur non connecté et pas en mode dev');
+    if (!docId) {
+      console.error('Utilisateur non connecté');
       return;
     }
-    await setDoc(doc(db, 'content', uid), updatedFormData);
 
-    await setDoc(doc(db, 'content', uid), updatedFormData);
-
+    await setDoc(doc(db, 'content', docId), updatedFormData);
     setMessage('✅ Sauvegarde réussie');
     setUnsavedChanges(false);
     setTimeout(() => setMessage(''), 3000);
@@ -152,6 +150,7 @@ export default function Live() {
     setUnsavedChanges(true);
     setFormData(fn);
   };
+
   return (
     <AdminAuth>
       <div className="flex h-screen">
@@ -180,7 +179,6 @@ export default function Live() {
               📂 Ouvrir l’administration
             </button>
           )}
-
           <div className="relative">
             <div className="absolute top-0 left-0 w-full bg-yellow-100 text-yellow-800 text-center text-sm py-1 z-20">
               ✏️ Mode édition en direct activé.
