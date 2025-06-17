@@ -29,18 +29,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const uidQuery = new URLSearchParams(window.location.search).get('uid');
-    const docId = uidQuery || 'fr';
+    const uidQuery = router.query.uid;
+    const docId = typeof uidQuery === 'string' ? uidQuery : 'fr';
 
     const ref = doc(db, 'content', docId);
     const unsub = onSnapshot(ref, (snap) => {
@@ -67,7 +57,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       unsub();
       window.removeEventListener('message', handler);
     };
-  }, [isPreview]);
+  }, [router.query.uid, isPreview]);
 
   if (!layout) return <p className="text-center p-6">Chargement du layout...</p>;
 
