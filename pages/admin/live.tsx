@@ -32,16 +32,20 @@ export default function Live() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const uid = auth.currentUser?.uid;
-      const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
-      const docId = forceFR ? 'fr' : uid;
+      const searchParams =
+        typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const forceFrDev = searchParams?.get('frdev') === '1';
 
-      if (!docId) return;
+      const uid = auth.currentUser?.uid;
+      const docId = forceFrDev ? 'fr' : uid;
+
+      if (!docId) return; // Pas connecté et pas en mode frdev => rien à charger
 
       let ref = doc(db, 'content', docId);
       let snap = await getDoc(ref);
 
-      if (!snap.exists() && uid && !forceFR) {
+      // Si pas de doc utilisateur, on copie depuis 'fr'
+      if (!snap.exists() && uid && !forceFrDev) {
         const fallbackSnap = await getDoc(doc(db, 'content', 'fr'));
         if (fallbackSnap.exists()) {
           await setDoc(ref, fallbackSnap.data());
@@ -82,6 +86,7 @@ export default function Live() {
         });
       }
     };
+
     fetchData();
   }, []);
 
@@ -130,8 +135,10 @@ export default function Live() {
     );
 
     const uid = auth.currentUser?.uid;
-    const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
-    const docId = forceFR ? 'fr' : uid;
+    const forceFrDev =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('frdev') === '1';
+    const docId = forceFrDev ? 'fr' : uid;
 
     if (!docId) {
       console.error('Utilisateur non connecté');

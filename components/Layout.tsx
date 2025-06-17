@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import { ReactNode, useEffect, useState } from 'react';
-import { db } from '../lib/firebaseClient';
+import { db, auth } from '../lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
@@ -10,6 +10,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const isAdminPage = router.pathname.startsWith('/admin');
   const isPreview = router.query.admin === 'true';
+  const uidParam = router.query.uid ? `?uid=${router.query.uid}` : '';
   const [layout, setLayout] = useState<any>(null);
   const [theme, setTheme] = useState<any>({});
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,7 +28,6 @@ export default function Layout({ children }: { children: ReactNode }) {
     if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
   };
 
-  // Auth Firebase
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -36,12 +36,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  // Chargement du bon document
   useEffect(() => {
-    const uidQuery =
-      typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('uid') : null;
+    if (typeof window === 'undefined') return;
 
-    const docId = uidQuery || 'fr'; // priorité à l'UID dans l'URL
+    const uidQuery = new URLSearchParams(window.location.search).get('uid');
+    const docId = uidQuery || 'fr';
 
     const ref = doc(db, 'content', docId);
     const unsub = onSnapshot(ref, (snap) => {
@@ -82,19 +81,21 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="font-serif text-gray-800 min-h-screen flex flex-col">
         {!isAdminPage && (
           <header className="bg-white shadow p-4 sm:p-6 flex justify-evenly items-center sm:flex-row sm:justify-between sm:items-center sticky top-0 z-50 gap-4">
-            <Link href="/" className="flex justify-center gap-4 ">
-              {layout.logo && (
-                <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded " />
-              )}
-              <div className="flex-col">
-                <h1 className="text-xl sm:text-2xl font-bold" style={{ color: theme.primary }}>
-                  {layout.nom}
-                </h1>
-                <p className="text-xs sm:text-sm italic text-gray-500">{layout.titre}</p>
+            <Link href={`/${uidParam}`}>
+              <div className="flex justify-center gap-4">
+                {layout.logo && (
+                  <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded" />
+                )}
+                <div className="flex-col">
+                  <h1 className="text-xl sm:text-2xl font-bold" style={{ color: theme.primary }}>
+                    {layout.nom}
+                  </h1>
+                  <p className="text-xs sm:text-sm italic text-gray-500">{layout.titre}</p>
+                </div>
               </div>
             </Link>
 
-            {/* Menu mobile */}
+            {/* Mobile */}
             <div className="sm:hidden relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -107,7 +108,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
                   {layout.liens?.map((lien: any, i: number) => (
                     <div key={i} className="mb-2">
-                      <Link href={lien.href}>
+                      <Link href={`${lien.href}${uidParam}`}>
                         <span className="block" style={{ color: theme.primary }}>
                           {lien.label}
                         </span>
@@ -118,10 +119,10 @@ export default function Layout({ children }: { children: ReactNode }) {
               )}
             </div>
 
-            {/* Menu desktop */}
+            {/* Desktop */}
             <nav className="hidden sm:flex space-x-4 text-lg">
               {layout.liens?.map((lien: any, i: number) => (
-                <Link key={i} href={lien.href}>
+                <Link key={i} href={`${lien.href}${uidParam}`}>
                   <span style={{ color: theme.primary }}>{lien.label}</span>
                 </Link>
               ))}
@@ -134,7 +135,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         {!isAdminPage && (
           <footer className="bg-white border-t mt-12 text-center py-6 text-xs sm:text-sm text-gray-500">
             {layout.footer} |{' '}
-            <a href="/mentions_legales" className="text-prune hover:underline">
+            <a href={`/mentions_legales${uidParam}`} className="text-prune hover:underline">
               Mentions légales
             </a>
           </footer>
