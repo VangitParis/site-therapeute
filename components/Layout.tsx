@@ -29,8 +29,15 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const uidQuery = router.query.uid;
-    const docId = typeof uidQuery === 'string' ? uidQuery : 'fr';
+    const isPreview = router.query.admin === 'true';
+    const currentUser = auth.currentUser;
+    let docId = 'fr';
+
+    if (isPreview && typeof router.query.uid === 'string') {
+      docId = router.query.uid;
+    } else if (currentUser?.uid) {
+      docId = currentUser.uid;
+    }
 
     const ref = doc(db, 'content', docId);
     const unsub = onSnapshot(ref, (snap) => {
