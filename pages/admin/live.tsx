@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ImageUploadRef } from '../../components/ImageUploadField';
+import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
-import AdminAuth from '../../components/AdminAuth';
-import { onAuthStateChanged } from 'firebase/auth'; // en haut
 import SitePreview from '../../components/SitePreview';
 import LiveWrapper from '../../components/LiveWrapper';
+import { ImageUploadRef } from '../../components/ImageUploadField';
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -27,6 +26,7 @@ export default function Live() {
   const [message, setMessage] = useState('');
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [userLoaded, setUserLoaded] = useState(false);
 
   const imageFieldRef = useRef<ImageUploadRef>(null);
   const imageFieldAProposRef = useRef<ImageUploadRef>(null);
@@ -34,19 +34,10 @@ export default function Live() {
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
-  const getDocId = () => {
-    if (typeof window === 'undefined') return null;
-    const uid = new URLSearchParams(window.location.search).get('uid');
-    const frdev = new URLSearchParams(window.location.search).get('frdev');
-    if (frdev === '1') return 'fr';
-    if (uid) return uid;
-    return null;
-  };
-
-  const [userLoaded, setUserLoaded] = useState(false);
-
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, () => setUserLoaded(true));
+    const unsub = onAuthStateChanged(auth, () => {
+      setUserLoaded(true);
+    });
     return () => unsub();
   }, []);
 
@@ -54,23 +45,20 @@ export default function Live() {
     if (!userLoaded) return;
 
     const fetchData = async () => {
-      const isAdminSession =
-        sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
+      const isAdmin = router.query.frdev === '1';
       let docId = 'fr';
 
-      if (!isAdminSession) {
+      if (!isAdmin) {
         const user = auth.currentUser;
         if (!user) {
-          console.warn('❌ Aucun utilisateur connecté pour fetchData');
+          console.warn('❌ Aucun utilisateur connecté.');
           return;
         }
         docId = user.uid;
       }
 
       try {
-        const ref = doc(db, 'content', docId);
-        const snap = await getDoc(ref);
-
+        const snap = await getDoc(doc(db, 'content', docId));
         if (snap.exists()) {
           const raw = snap.data();
           const services = raw.services || { titre: '', liste: [], image: '' };
@@ -104,8 +92,8 @@ export default function Live() {
             },
           });
         }
-      } catch (err) {
-        console.error('❌ Erreur lors du chargement de content :', err);
+      } catch (e) {
+        console.error('❌ Erreur de chargement :', e);
       }
     };
 
@@ -114,61 +102,21 @@ export default function Live() {
 
   const handleSave = async () => {
     if (!formData) return;
-
     const updatedFormData = { ...formData };
-    const nom = updatedFormData.layout?.nom?.trim().toLowerCase();
-    if (nom === 'marie dupont') {
-      alert('Merci de personnaliser le nom avant de sauvegarder.');
-      return;
-    }
 
-    // Upload images si nécessaire
-    if (imageFieldRef.current?.hasPendingUpload()) {
-      const uploaded = await imageFieldRef.current.upload();
-      if (uploaded) updatedFormData.accueil.image = uploaded;
-    }
-    if (imageFieldAProposRef.current?.hasPendingUpload()) {
-      const uploaded = await imageFieldAProposRef.current.upload();
-      if (uploaded) updatedFormData.aPropos.image = uploaded;
-    }
-    if (imageFieldServicesRef.current?.hasPendingUpload()) {
-      const uploaded = await imageFieldServicesRef.current.upload();
-      if (uploaded) updatedFormData.services.image = uploaded;
-    }
-    if (imageFieldTestimonialsRef.current?.hasPendingUpload()) {
-      const uploaded = await imageFieldTestimonialsRef.current.upload();
-      if (uploaded) updatedFormData.testimonials.avatar = uploaded;
-    }
-    if (imageFieldBgRef.current?.hasPendingUpload()) {
-      const uploaded = await imageFieldBgRef.current.upload();
-      if (uploaded) updatedFormData.theme.bgImage = uploaded;
-    }
-
-    updatedFormData.services.liste = updatedFormData.services.liste.map((s: any) =>
-      typeof s === 'string' ? { text: s, image: '' } : s
-    );
-
-    // Détermine docId cible : admin (content/fr) ou client (content/{uid})
-    let docId = 'fr';
     const isDev = sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
     const currentUser = auth.currentUser;
+    const docId = isDev ? 'fr' : currentUser?.uid;
 
-    if (!isDev && currentUser?.uid) {
-      docId = currentUser.uid;
-    } else if (!isDev) {
-      console.error("❌ Pas d'utilisateur connecté pour sauvegarde.");
+    if (!docId) {
+      console.error("❌ Impossible de déterminer l'UID.");
       return;
     }
 
-    try {
-      await setDoc(doc(db, 'content', docId), updatedFormData);
-      setMessage('✅ Sauvegarde réussie');
-      setUnsavedChanges(false);
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      console.error('❌ Erreur lors de la sauvegarde :', err);
-      setMessage('❌ Erreur lors de la sauvegarde');
-    }
+    await setDoc(doc(db, 'content', docId), updatedFormData);
+    setMessage('✅ Sauvegarde réussie');
+    setUnsavedChanges(false);
+    setTimeout(() => setMessage(''), 3000);
   };
 
   const wrappedSetFormData = (fn: (prev: any) => any) => {
@@ -176,7 +124,7 @@ export default function Live() {
     setFormData(fn);
   };
 
-  if (!formData) return <p className="p-6 text-center">Chargement…</p>;
+  if (!formData) return <p className="text-center p-6">Chargement…</p>;
 
   return (
     <LiveWrapper>
