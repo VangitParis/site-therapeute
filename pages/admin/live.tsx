@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ImageUploadRef } from '../../components/ImageUploadField';
-import { db } from '../../lib/firebaseClient';
+import { db, auth } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminAuth from '../../components/AdminAuth';
+import { onAuthStateChanged } from 'firebase/auth'; // en haut
 import SitePreview from '../../components/SitePreview';
 import LiveWrapper from '../../components/LiveWrapper';
 
@@ -42,56 +43,78 @@ export default function Live() {
     return null;
   };
 
+  const [userLoaded, setUserLoaded] = useState(false);
+
   useEffect(() => {
+    const unsub = onAuthStateChanged(auth, () => setUserLoaded(true));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!userLoaded) return;
+
     const fetchData = async () => {
-      const docId = getDocId();
-      if (!docId) return;
+      const isAdminSession =
+        sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
+      let docId = 'fr';
+
+      if (!isAdminSession) {
+        const user = auth.currentUser;
+        if (!user) {
+          console.warn('❌ Aucun utilisateur connecté pour fetchData');
+          return;
+        }
+        docId = user.uid;
+      }
 
       try {
         const ref = doc(db, 'content', docId);
         const snap = await getDoc(ref);
-        if (!snap.exists()) throw new Error('Doc inexistant');
 
-        const raw = snap.data();
-        const services = raw.services || { titre: '', liste: [], image: '' };
-        services.liste = services.liste.map((s: any) =>
-          typeof s === 'string' ? { text: s, image: '' } : s
-        );
+        if (snap.exists()) {
+          const raw = snap.data();
+          const services = raw.services || { titre: '', liste: [], image: '' };
+          services.liste = services.liste.map((s: any) =>
+            typeof s === 'string' ? { text: s, image: '' } : s
+          );
 
-        setFormData({
-          layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
-          theme: raw.theme || DEFAULT_THEME,
-          accueil: raw.accueil || {
-            titre: '',
-            texte: '',
-            bouton: '',
-            image: '',
-            SectionAProposTitre: '',
-            SectionAProposDescription: '',
-            SectionAProposCTA: '',
-          },
-          aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
-          services,
-          testimonials: raw.testimonials || [],
-          contact: raw.contact || {
-            titre: '',
-            texte: '',
-            bouton: '',
-            image: '',
-            lien: '',
-            titreH2: '',
-            titreTarifs: '',
-          },
-        });
+          setFormData({
+            layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
+            theme: raw.theme || DEFAULT_THEME,
+            accueil: raw.accueil || {
+              titre: '',
+              texte: '',
+              bouton: '',
+              image: '',
+              SectionAProposTitre: '',
+              SectionAProposDescription: '',
+              SectionAProposCTA: '',
+            },
+            aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
+            services,
+            testimonials: raw.testimonials || [],
+            contact: raw.contact || {
+              titre: '',
+              texte: '',
+              bouton: '',
+              image: '',
+              lien: '',
+              titreH2: '',
+              titreTarifs: '',
+            },
+          });
+        }
       } catch (err) {
-        console.error('🔥 Erreur chargement Firestore:', err);
+        console.error('❌ Erreur lors du chargement de content :', err);
       }
     };
 
     fetchData();
-  }, []);
+  }, [userLoaded, router.query]);
 
   const handleSave = async () => {
+    if (!formData) return;
+
     const updatedFormData = { ...formData };
     const nom = updatedFormData.layout?.nom?.trim().toLowerCase();
     if (nom === 'marie dupont') {
@@ -99,6 +122,7 @@ export default function Live() {
       return;
     }
 
+    // Upload images si nécessaire
     if (imageFieldRef.current?.hasPendingUpload()) {
       const uploaded = await imageFieldRef.current.upload();
       if (uploaded) updatedFormData.accueil.image = uploaded;
@@ -124,16 +148,27 @@ export default function Live() {
       typeof s === 'string' ? { text: s, image: '' } : s
     );
 
-    const docId = getDocId();
-    if (!docId) {
-      console.error('❌ Aucun docId pour la sauvegarde');
+    // Détermine docId cible : admin (content/fr) ou client (content/{uid})
+    let docId = 'fr';
+    const isDev = sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
+    const currentUser = auth.currentUser;
+
+    if (!isDev && currentUser?.uid) {
+      docId = currentUser.uid;
+    } else if (!isDev) {
+      console.error("❌ Pas d'utilisateur connecté pour sauvegarde.");
       return;
     }
 
-    await setDoc(doc(db, 'content', docId), updatedFormData);
-    setMessage('✅ Sauvegarde réussie');
-    setUnsavedChanges(false);
-    setTimeout(() => setMessage(''), 3000);
+    try {
+      await setDoc(doc(db, 'content', docId), updatedFormData);
+      setMessage('✅ Sauvegarde réussie');
+      setUnsavedChanges(false);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error('❌ Erreur lors de la sauvegarde :', err);
+      setMessage('❌ Erreur lors de la sauvegarde');
+    }
   };
 
   const wrappedSetFormData = (fn: (prev: any) => any) => {
