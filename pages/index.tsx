@@ -9,6 +9,8 @@ export default function Home({ locale = 'fr' }) {
     'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
   const [data, setData] = useState(null);
   const router = useRouter();
+  const uid = router.query.uid as string;
+
   const isPreview = router.query.admin === 'true';
   const cleaned = data?.accueil?.SectionAProposDescription?.replace(/<br\s*\/?>/gi, '').trim();
 
@@ -25,9 +27,14 @@ export default function Home({ locale = 'fr' }) {
   };
 
   useEffect(() => {
+    const uid = router.query.uid as string;
+
     const fetchData = async () => {
-      const ref = doc(db, 'content', locale);
+      if (!uid && !locale) return;
+
+      const ref = doc(db, 'content', uid || locale);
       const snap = await getDoc(ref);
+
       if (snap.exists()) {
         const d = snap.data();
         setData(d);
@@ -40,14 +47,14 @@ export default function Home({ locale = 'fr' }) {
     const handler = (e: MessageEvent) => {
       if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
         const updated = e.data.payload;
-        setData({ ...updated }); // ⚠️ Clonage nécessaire pour forcer le re-render
+        setData({ ...updated });
         applyThemeToDOM(updated.theme);
       }
     };
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [locale, isPreview]);
+  }, [locale, isPreview, router.query.uid]);
 
   if (!data) {
     return (

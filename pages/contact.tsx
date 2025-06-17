@@ -39,8 +39,8 @@ export default function Contact({ locale = 'fr' }) {
           bouton: raw.bouton || 'Réserver une séance découverte',
           lien: raw.lien || 'https://calendly.com',
           image: raw.image || '',
-          titreH2 : raw.titreH2 || '',
-          titreTarifs : raw.titreTarifs || ''
+          titreH2: raw.titreH2 || '',
+          titreTarifs: raw.titreTarifs || '',
         });
         applyThemeToDOM(raw.theme);
       }
@@ -62,15 +62,19 @@ export default function Contact({ locale = 'fr' }) {
 
   return (
     <div className="flex flex-col gap-4 items-center justify-center">
-       <h1
-          className="text-4xl font-bold text-center mb-6 text-prune"
-          style={{ color: 'var(--color-titreH1)' }}
-        >
-          {data.titre}
-        </h1>
+      <h1
+        className="text-4xl font-bold text-center mb-6 text-prune"
+        style={{ color: 'var(--color-titreH1)' }}
+      >
+        {data.titre}
+      </h1>
       <section className="max-w-4xl mx-auto px-6 py-12">
-       
-       <h2 className="text-3xl font-semibold mb-8 text-center" style={{ color: 'var(--color-titreH2)' }}>{data.titreH2 || ''}</h2>
+        <h2
+          className="text-3xl font-semibold mb-8 text-center"
+          style={{ color: 'var(--color-titreH2)' }}
+        >
+          {data.titreH2 || ''}
+        </h2>
         <div
           className="text-lg leading-relaxed text-center text-gray-700"
           style={{ color: 'var(--color-texte)' }}
@@ -85,10 +89,15 @@ export default function Contact({ locale = 'fr' }) {
             `,
           }}
         />
-         <section className="max-w-4xl mx-auto px-6 py-12">
-        <h2 className="text-3xl font-semibold mb-8 text-center" style={{ color: 'var(--color-titreH2)' }}>{data.titreTarifs || ''}</h2>
-        <TarifsCards />
-      </section>
+        <section className="max-w-4xl mx-auto px-6 py-12">
+          <h2
+            className="text-3xl font-semibold mb-8 text-center"
+            style={{ color: 'var(--color-titreH2)' }}
+          >
+            {data.titreTarifs || ''}
+          </h2>
+          <TarifsCards />
+        </section>
         {data.lien && (
           <div className="text-center mt-8">
             <Link
@@ -110,7 +119,6 @@ export default function Contact({ locale = 'fr' }) {
           />
         )}
       </section>
-      
     </div>
   );
 }

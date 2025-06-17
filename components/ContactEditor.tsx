@@ -32,13 +32,13 @@ export default function ContactEditor({ formData, setFormData }: Props) {
 
       <div>
         <label htmlFor="titreH2">
-        <span className="block font-medium">📝 Titre des coordonnées</span>
-        <input
-          type='text'
-          value={contact.titreH2 || ''}
-          onChange={(e) => handleChange('titreH2', e.target.value)}
-          className="w-full border px-3 py-2 rounded"
-        />
+          <span className="block font-medium">📝 Titre des coordonnées</span>
+          <input
+            type="text"
+            value={contact.titreH2 || ''}
+            onChange={(e) => handleChange('titreH2', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
         </label>
       </div>
       <div>
@@ -49,15 +49,15 @@ export default function ContactEditor({ formData, setFormData }: Props) {
           onChange={(val) => handleChange('texte', val)}
         />
       </div>
-<div>
+      <div>
         <label htmlFor="titreH2">
-        <span className="block font-medium">📝 Titre des Tarifs</span>
-        <input
-          type='text'
-          value={contact.titreTarifs || ''}
-          onChange={(e) => handleChange('titreTarifs', e.target.value)}
-          className="w-full border px-3 py-2 rounded"
-        />
+          <span className="block font-medium">📝 Titre des Tarifs</span>
+          <input
+            type="text"
+            value={contact.titreTarifs || ''}
+            onChange={(e) => handleChange('titreTarifs', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
         </label>
       </div>
       <label>

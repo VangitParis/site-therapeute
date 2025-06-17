@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../lib/firebaseClient";
+import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../lib/firebaseClient';
 
 export default function AdminTarifsEditor() {
   const [tarifs, setTarifs] = useState([]);
@@ -8,7 +8,7 @@ export default function AdminTarifsEditor() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const snap = await getDoc(doc(db, "content", "fr"));
+      const snap = await getDoc(doc(db, 'content', 'fr'));
       if (snap.exists()) {
         setTarifs(snap.data().tarifs || []);
       }
@@ -18,7 +18,7 @@ export default function AdminTarifsEditor() {
 
   const updateTarifs = async () => {
     setLoading(true);
-    await updateDoc(doc(db, "content", "fr"), { tarifs });
+    await updateDoc(doc(db, 'content', 'fr'), { tarifs });
     setLoading(false);
   };
 
@@ -29,7 +29,7 @@ export default function AdminTarifsEditor() {
   };
 
   const addCard = () => {
-    setTarifs([...tarifs, { titre: "", prix: "", description: "" }]);
+    setTarifs([...tarifs, { titre: '', prix: '', description: '' }]);
   };
 
   const removeCard = (index: number) => {
@@ -47,20 +47,20 @@ export default function AdminTarifsEditor() {
             type="text"
             placeholder="Titre"
             value={tarif.titre}
-            onChange={(e) => handleChange(index, "titre", e.target.value)}
+            onChange={(e) => handleChange(index, 'titre', e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
           <input
             type="text"
             placeholder="Prix"
             value={tarif.prix}
-            onChange={(e) => handleChange(index, "prix", e.target.value)}
+            onChange={(e) => handleChange(index, 'prix', e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
           <textarea
             placeholder="Description"
             value={tarif.description}
-            onChange={(e) => handleChange(index, "description", e.target.value)}
+            onChange={(e) => handleChange(index, 'description', e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
           <button
@@ -84,7 +84,7 @@ export default function AdminTarifsEditor() {
           disabled={loading}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          {loading ? "Enregistrement..." : "Enregistrer"}
+          {loading ? 'Enregistrement...' : 'Enregistrer'}
         </button>
       </div>
     </div>

@@ -59,8 +59,6 @@ export default function MentionsLegales() {
           </button>
         </div>
       </main>
-
-      
     </div>
   );
 }

@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../lib/firebaseClient";
+import { useEffect, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebaseClient';
 
 export default function TarifsCards() {
   const [tarifs, setTarifs] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, "content", "fr"), (snapshot) => {
+    const unsubscribe = onSnapshot(doc(db, 'content', 'fr'), (snapshot) => {
       if (snapshot.exists()) {
         setTarifs(snapshot.data().tarifs || []);
       }

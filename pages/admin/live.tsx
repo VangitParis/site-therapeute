@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ImageUploadRef } from '../../components/ImageUploadField';
-import { db } from '../../lib/firebaseClient';
+import { db, auth } from '../../lib/firebaseClient';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminAuth from '../../components/AdminAuth';
@@ -33,6 +33,7 @@ export default function Live() {
   useEffect(() => {
     const fetchData = async () => {
       const snap = await getDoc(doc(db, 'content', 'fr'));
+
       if (snap.exists()) {
         const raw = snap.data();
 
@@ -56,7 +57,15 @@ export default function Live() {
           aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
           services: services,
           testimonials: raw.testimonials || [],
-          contact: raw.contact || { titre: '', texte: '', bouton: '', image: '', lien: '', titreH2: '', titreTarifs: '' },
+          contact: raw.contact || {
+            titre: '',
+            texte: '',
+            bouton: '',
+            image: '',
+            lien: '',
+            titreH2: '',
+            titreTarifs: '',
+          },
         });
       }
     };
@@ -110,7 +119,14 @@ export default function Live() {
       typeof s === 'string' ? { text: s, image: '' } : s
     );
 
-    await setDoc(doc(db, 'content', 'fr'), updatedFormData);
+    // await setDoc(doc(db, 'content', 'fr'), updatedFormData);
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      console.error('Utilisateur non connecté');
+      return;
+    }
+    await setDoc(doc(db, 'content', uid), updatedFormData);
+
     setMessage('✅ Sauvegarde réussie');
     setUnsavedChanges(false);
     setTimeout(() => setMessage(''), 3000);
