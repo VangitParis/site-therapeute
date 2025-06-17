@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
   };
 
-  // 🔐 Récupération de l’utilisateur Firebase
+  // Auth Firebase
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -36,11 +36,12 @@ export default function Layout({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  // 📦 Chargement du bon document content/{uid} ou content/fr
+  // Chargement du bon document
   useEffect(() => {
-    const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
-    const docId = forceFR ? 'fr' : user?.uid;
-    if (!docId) return; // Évite l'erreur si pas encore prêt
+    const uidQuery =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('uid') : null;
+
+    const docId = uidQuery || 'fr'; // priorité à l'UID dans l'URL
 
     const ref = doc(db, 'content', docId);
     const unsub = onSnapshot(ref, (snap) => {
@@ -52,7 +53,6 @@ export default function Layout({ children }: { children: ReactNode }) {
       }
     });
 
-    // 🔄 Live update depuis l’interface admin
     const handler = (e: MessageEvent) => {
       if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
         if (e.data.payload.layout) setLayout(e.data.payload.layout);
@@ -68,7 +68,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       unsub();
       window.removeEventListener('message', handler);
     };
-  }, [user, isPreview]);
+  }, [isPreview]);
 
   if (!layout) return <p className="text-center p-6">Chargement du layout...</p>;
 
