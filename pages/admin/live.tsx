@@ -120,11 +120,16 @@ export default function Live() {
     );
 
     // await setDoc(doc(db, 'content', 'fr'), updatedFormData);
-    const uid = auth.currentUser?.uid || 'fr';
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
+    const uid = isLocalhost || forceFR ? 'fr' : auth.currentUser?.uid;
+
     if (!uid) {
-      console.error('Utilisateur non connecté');
+      console.error('Utilisateur non connecté et pas en mode dev');
       return;
     }
+    await setDoc(doc(db, 'content', uid), updatedFormData);
+
     await setDoc(doc(db, 'content', uid), updatedFormData);
 
     setMessage('✅ Sauvegarde réussie');
