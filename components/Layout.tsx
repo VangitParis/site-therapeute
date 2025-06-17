@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Head from 'next/head';
-
 import { ReactNode, useEffect, useState } from 'react';
 import { db } from '../lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/router';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [layout, setLayout] = useState<any>(null);
   const [theme, setTheme] = useState<any>({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -23,10 +24,25 @@ export default function Layout({ children }: { children: ReactNode }) {
     if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
     if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
     if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+    if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
   };
 
+  // 🔐 Récupération de l’utilisateur Firebase
   useEffect(() => {
-    const ref = doc(db, 'content', 'fr');
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 📦 Chargement du bon document content/{uid} ou content/fr
+  useEffect(() => {
+    const forceFR = typeof window !== 'undefined' && localStorage.getItem('FORCE_FR') === 'true';
+    const docId = forceFR ? 'fr' : user?.uid;
+    if (!docId) return; // Évite l'erreur si pas encore prêt
+
+    const ref = doc(db, 'content', docId);
     const unsub = onSnapshot(ref, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
@@ -36,6 +52,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       }
     });
 
+    // 🔄 Live update depuis l’interface admin
     const handler = (e: MessageEvent) => {
       if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
         if (e.data.payload.layout) setLayout(e.data.payload.layout);
@@ -51,13 +68,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       unsub();
       window.removeEventListener('message', handler);
     };
-  }, [isPreview]);
+  }, [user, isPreview]);
 
   if (!layout) return <p className="text-center p-6">Chargement du layout...</p>;
 
   return (
     <>
-      {/* Favicon dynamique */}
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {layout.favicon && <link rel="icon" href={layout.favicon} />}
@@ -78,7 +94,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </div>
             </Link>
 
-            {/* Burger menu (mobile) */}
+            {/* Menu mobile */}
             <div className="sm:hidden relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}

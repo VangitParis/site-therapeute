@@ -120,7 +120,7 @@ export default function Live() {
     );
 
     // await setDoc(doc(db, 'content', 'fr'), updatedFormData);
-    const uid = auth.currentUser?.uid;
+    const uid = auth.currentUser?.uid || 'fr';
     if (!uid) {
       console.error('Utilisateur non connecté');
       return;
