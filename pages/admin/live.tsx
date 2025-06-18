@@ -63,10 +63,11 @@ export default function Live() {
 
       try {
         const snap = await getDoc(doc(db, 'content', docId));
-        console.log(snap);
 
         if (snap.exists()) {
           const raw = snap.data();
+          console.log('data===', raw);
+
           const services = raw.services || { titre: '', liste: [], image: '' };
           services.liste = services.liste.map((s: any) =>
             typeof s === 'string' ? { text: s, image: '' } : s
@@ -110,9 +111,8 @@ export default function Live() {
     if (!formData) return;
     const updatedFormData = { ...formData };
 
-    const isDev = sessionStorage.getItem('admin_auth') === 'true' && router.query.frdev === '1';
-    const currentUser = auth.currentUser;
-    const docId = isDev ? currentUser?.uid : 'fr';
+    const isDev = router.query.frdev === '1';
+    const docId = isDev ? 'fr' : auth.currentUser?.uid;
     console.log('docId====', docId);
 
     if (!docId) {
