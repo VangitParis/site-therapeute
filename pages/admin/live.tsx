@@ -111,8 +111,10 @@ export default function Live() {
     if (!formData) return;
     const updatedFormData = { ...formData };
 
-    const isDev = router.query.frdev === '1';
-    const docId = isDev ? 'fr' : auth.currentUser?.uid;
+    const user = auth.currentUser;
+    const isDevMode = router.query.frdev === '1' && sessionStorage.getItem('admin_auth') === 'true';
+    const docId = isDevMode ? 'fr' : user?.uid;
+
     console.log('docId====', docId);
 
     if (!docId) {
