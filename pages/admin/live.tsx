@@ -20,12 +20,13 @@ const DEFAULT_THEME = {
   textButton: '#FFFFFF',
 };
 
-export default function Live() {
+export default function LivePage() {
   const router = useRouter();
   const [formData, setFormData] = useState(null);
   const [message, setMessage] = useState('');
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [docId, setDocId] = useState<string | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
 
   const imageFieldRef = useRef<ImageUploadRef>(null);
@@ -35,39 +36,30 @@ export default function Live() {
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, () => {
-      setUserLoaded(true);
-    });
+    const unsub = onAuthStateChanged(auth, () => setUserLoaded(true));
     return () => unsub();
   }, []);
 
   useEffect(() => {
     if (!userLoaded) return;
 
+    const isDev = router.query.frdev === '1';
+    const uidParam = router.query.uid as string | undefined;
+
+    let id = 'fr';
+    if (!isDev && uidParam) {
+      id = uidParam;
+    } else if (!isDev && auth.currentUser) {
+      id = auth.currentUser.uid;
+    }
+
+    setDocId(id);
+
     const fetchData = async () => {
-      const uidFromQuery = router.query.uid as string | undefined;
-      const isAdmin = router.query.frdev === '1';
-
-      let docId = 'fr';
-
-      if (uidFromQuery) {
-        docId = uidFromQuery;
-      } else if (!isAdmin) {
-        const user = auth.currentUser;
-        if (!user) {
-          console.warn('❌ Aucun utilisateur connecté.');
-          return;
-        }
-        docId = user.uid;
-      }
-
       try {
-        const snap = await getDoc(doc(db, 'content', docId));
-
+        const snap = await getDoc(doc(db, 'content', id));
         if (snap.exists()) {
           const raw = snap.data();
-          console.log('data===', raw);
-
           const services = raw.services || { titre: '', liste: [], image: '' };
           services.liste = services.liste.map((s: any) =>
             typeof s === 'string' ? { text: s, image: '' } : s
@@ -108,21 +100,9 @@ export default function Live() {
   }, [userLoaded, router.query]);
 
   const handleSave = async () => {
-    if (!formData) return;
-    const updatedFormData = { ...formData };
+    if (!formData || !docId) return;
 
-    const user = auth.currentUser;
-    const isDevMode = router.query.frdev === '1' && sessionStorage.getItem('admin_auth') === 'true';
-    const docId = isDevMode ? 'fr' : user?.uid;
-
-    console.log('docId====', docId);
-
-    if (!docId) {
-      console.error("❌ Impossible de déterminer l'UID.");
-      return;
-    }
-
-    await setDoc(doc(db, 'content', docId), updatedFormData);
+    await setDoc(doc(db, 'content', docId), formData);
     setMessage('✅ Sauvegarde réussie');
     setUnsavedChanges(false);
     setTimeout(() => setMessage(''), 3000);
