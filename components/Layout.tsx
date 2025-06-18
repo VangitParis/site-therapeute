@@ -30,17 +30,38 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (!router.isReady) return;
-
     let docId = 'fr';
     const unsubscribeFns: (() => void)[] = [];
 
+    const applyThemeToDOM = (theme: any) => {
+      const root = document.documentElement;
+      if (theme?.background) root.style.setProperty('--color-bg', theme.background);
+      if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
+      if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
+      if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
+      if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
+      if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
+      if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+      if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
+    };
+
+    const messageHandler = (e: MessageEvent) => {
+      const isPreview = router.query.admin === 'true';
+      if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
+        if (e.data.payload.layout) setLayout(e.data.payload.layout);
+        if (e.data.payload.theme) {
+          setTheme(e.data.payload.theme);
+          applyThemeToDOM(e.data.payload.theme);
+        }
+      }
+    };
+
     const init = async () => {
-      if (isAdminDev) {
-        docId = 'fr';
-      } else if (uidParam) {
+      const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
+
+      if (uidParam) {
         docId = uidParam;
-      } else {
+      } else if (router.pathname !== '/') {
         await new Promise<void>((resolve) => {
           const unsub = onAuthStateChanged(auth, (user) => {
             if (user) docId = user.uid;
@@ -59,27 +80,16 @@ export default function Layout({ children }: { children: ReactNode }) {
           applyThemeToDOM(data.theme);
         }
       });
-
       unsubscribeFns.push(unsub);
 
-      // 🔄 Écoute des messages de preview (admin)
-      const handler = (e: MessageEvent) => {
-        if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
-          if (e.data.payload.layout) setLayout(e.data.payload.layout);
-          if (e.data.payload.theme) {
-            setTheme(e.data.payload.theme);
-            applyThemeToDOM(e.data.payload.theme);
-          }
-        }
-      };
-      window.addEventListener('message', handler);
-      unsubscribeFns.push(() => window.removeEventListener('message', handler));
+      window.addEventListener('message', messageHandler);
+      unsubscribeFns.push(() => window.removeEventListener('message', messageHandler));
     };
 
     init();
 
     return () => unsubscribeFns.forEach((fn) => fn());
-  }, [router.isReady, router.query]);
+  }, [router.query]);
 
   if (!layout) return <p className="text-center p-6">Chargement du layout…</p>;
 
