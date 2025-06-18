@@ -27,12 +27,14 @@ export default function Home({ locale = 'fr' }) {
   };
 
   useEffect(() => {
-    const uid = router.query.uid as string;
+    const isDev = router.query.frdev === '1';
+    const uidParam = router.query.uid as string | undefined;
 
     const fetchData = async () => {
-      if (!uid && !locale) return;
+      const docId = isDev ? 'fr' : uidParam || locale;
+      if (!docId) return;
 
-      const ref = doc(db, 'content', uid || locale);
+      const ref = doc(db, 'content', docId);
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
@@ -54,7 +56,7 @@ export default function Home({ locale = 'fr' }) {
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [locale, isPreview, router.query.uid]);
+  }, [locale, isPreview, router.query.frdev, router.query.uid]);
 
   if (!data) {
     return (

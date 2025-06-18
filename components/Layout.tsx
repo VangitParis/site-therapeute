@@ -4,17 +4,18 @@ import { ReactNode, useEffect, useState } from 'react';
 import { db, auth } from '../lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const isAdminPage = router.pathname.startsWith('/admin');
-  const isPreview = router.query.admin === 'true';
-  const uidParam = router.query.uid ? `?uid=${router.query.uid}` : '';
   const [layout, setLayout] = useState<any>(null);
   const [theme, setTheme] = useState<any>({});
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+
+  const isAdminPage = router.pathname.startsWith('/admin');
+  const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
+  const isPreview = router.query.admin === 'true';
+  const isAdminDev = router.query.frdev === '1';
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -29,44 +30,60 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const isPreview = router.query.admin === 'true';
-    const currentUser = auth.currentUser;
+    if (!router.isReady) return;
+
     let docId = 'fr';
+    const unsubscribeFns: (() => void)[] = [];
 
-    if (isPreview && typeof router.query.uid === 'string') {
-      docId = router.query.uid;
-    } else if (currentUser?.uid) {
-      docId = currentUser.uid;
-    }
-
-    const ref = doc(db, 'content', docId);
-    const unsub = onSnapshot(ref, (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        setLayout(data.layout || {});
-        setTheme(data.theme || {});
-        applyThemeToDOM(data.theme);
+    const init = async () => {
+      if (isAdminDev) {
+        docId = 'fr';
+      } else if (uidParam) {
+        docId = uidParam;
+      } else {
+        await new Promise<void>((resolve) => {
+          const unsub = onAuthStateChanged(auth, (user) => {
+            if (user) docId = user.uid;
+            unsub();
+            resolve();
+          });
+        });
       }
-    });
 
-    const handler = (e: MessageEvent) => {
-      if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
-        if (e.data.payload.layout) setLayout(e.data.payload.layout);
-        if (e.data.payload.theme) {
-          setTheme(e.data.payload.theme);
-          applyThemeToDOM(e.data.payload.theme);
+      const ref = doc(db, 'content', docId);
+      const unsub = onSnapshot(ref, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          setLayout(data.layout || {});
+          setTheme(data.theme || {});
+          applyThemeToDOM(data.theme);
         }
-      }
+      });
+
+      unsubscribeFns.push(unsub);
+
+      // 🔄 Écoute des messages de preview (admin)
+      const handler = (e: MessageEvent) => {
+        if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
+          if (e.data.payload.layout) setLayout(e.data.payload.layout);
+          if (e.data.payload.theme) {
+            setTheme(e.data.payload.theme);
+            applyThemeToDOM(e.data.payload.theme);
+          }
+        }
+      };
+      window.addEventListener('message', handler);
+      unsubscribeFns.push(() => window.removeEventListener('message', handler));
     };
 
-    window.addEventListener('message', handler);
-    return () => {
-      unsub();
-      window.removeEventListener('message', handler);
-    };
-  }, [router.query.uid, isPreview]);
+    init();
 
-  if (!layout) return <p className="text-center p-6">Chargement du layout...</p>;
+    return () => unsubscribeFns.forEach((fn) => fn());
+  }, [router.isReady, router.query]);
+
+  if (!layout) return <p className="text-center p-6">Chargement du layout…</p>;
+
+  const finalUidParam = uidParam ? `?uid=${uidParam}` : isAdminDev ? '?frdev=1' : '';
 
   return (
     <>
@@ -77,22 +94,22 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <div className="font-serif text-gray-800 min-h-screen flex flex-col">
         {!isAdminPage && (
-          <header className="bg-white shadow p-4 sm:p-6 flex justify-evenly items-center sm:flex-row sm:justify-between sm:items-center sticky top-0 z-50 gap-4">
-            <Link href={`/${uidParam}`}>
-              <div className="flex justify-center gap-4">
+          <header className="bg-white shadow p-4 sm:p-6 flex justify-between items-center sticky top-0 z-50 gap-4">
+            <Link href={`/${finalUidParam}`}>
+              <div className="flex gap-4 items-center">
                 {layout.logo && (
                   <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded" />
                 )}
-                <div className="flex-col">
+                <div>
                   <h1 className="text-xl sm:text-2xl font-bold" style={{ color: theme.primary }}>
                     {layout.nom}
                   </h1>
-                  <p className="text-xs sm:text-sm italic text-gray-500">{layout.titre}</p>
+                  <p className="text-xs italic text-gray-500">{layout.titre}</p>
                 </div>
               </div>
             </Link>
 
-            {/* Mobile */}
+            {/* Navigation mobile */}
             <div className="sm:hidden relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -105,7 +122,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
                   {layout.liens?.map((lien: any, i: number) => (
                     <div key={i} className="mb-2">
-                      <Link href={`${lien.href}${uidParam}`}>
+                      <Link href={`${lien.href}${finalUidParam}`}>
                         <span className="block" style={{ color: theme.primary }}>
                           {lien.label}
                         </span>
@@ -116,10 +133,10 @@ export default function Layout({ children }: { children: ReactNode }) {
               )}
             </div>
 
-            {/* Desktop */}
+            {/* Desktop nav */}
             <nav className="hidden sm:flex space-x-4 text-lg">
               {layout.liens?.map((lien: any, i: number) => (
-                <Link key={i} href={`${lien.href}${uidParam}`}>
+                <Link key={i} href={`${lien.href}${finalUidParam}`}>
                   <span style={{ color: theme.primary }}>{lien.label}</span>
                 </Link>
               ))}
@@ -132,7 +149,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         {!isAdminPage && (
           <footer className="bg-white border-t mt-12 text-center py-6 text-xs sm:text-sm text-gray-500">
             {layout.footer} |{' '}
-            <a href={`/mentions_legales${uidParam}`} className="text-prune hover:underline">
+            <a href={`/mentions_legales${finalUidParam}`} className="text-prune hover:underline">
               Mentions légales
             </a>
           </footer>

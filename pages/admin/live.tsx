@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../../lib/firebaseClient';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import AdminSidebar from '../../components/AdminSidebar';
 import SitePreview from '../../components/SitePreview';
 import LiveWrapper from '../../components/LiveWrapper';
@@ -20,14 +20,14 @@ const DEFAULT_THEME = {
   textButton: '#FFFFFF',
 };
 
-export default function LivePage() {
+export default function Live() {
   const router = useRouter();
   const [formData, setFormData] = useState(null);
   const [message, setMessage] = useState('');
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
-  const [docId, setDocId] = useState<string | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
+  const [docId, setDocId] = useState<string | null>(null);
 
   const imageFieldRef = useRef<ImageUploadRef>(null);
   const imageFieldAProposRef = useRef<ImageUploadRef>(null);
@@ -36,28 +36,38 @@ export default function LivePage() {
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, () => setUserLoaded(true));
+    const unsub = onAuthStateChanged(auth, () => {
+      setUserLoaded(true);
+    });
     return () => unsub();
   }, []);
 
   useEffect(() => {
     if (!userLoaded) return;
 
-    const isDev = router.query.frdev === '1';
-    const uidParam = router.query.uid as string | undefined;
-
-    let id = 'fr';
-    if (!isDev && uidParam) {
-      id = uidParam;
-    } else if (!isDev && auth.currentUser) {
-      id = auth.currentUser.uid;
-    }
-
-    setDocId(id);
-
     const fetchData = async () => {
+      const isDev = router.query.frdev === '1';
+      const uidFromQuery = router.query.uid as string | undefined;
+
+      let resolvedDocId = 'fr';
+
+      if (isDev) {
+        resolvedDocId = 'fr';
+      } else if (uidFromQuery) {
+        resolvedDocId = uidFromQuery;
+      } else {
+        const user = auth.currentUser;
+        if (!user) {
+          console.warn('❌ Aucun utilisateur connecté.');
+          return;
+        }
+        resolvedDocId = user.uid;
+      }
+
+      setDocId(resolvedDocId);
+
       try {
-        const snap = await getDoc(doc(db, 'content', id));
+        const snap = await getDoc(doc(db, 'content', resolvedDocId));
         if (snap.exists()) {
           const raw = snap.data();
           const services = raw.services || { titre: '', liste: [], image: '' };
@@ -100,12 +110,31 @@ export default function LivePage() {
   }, [userLoaded, router.query]);
 
   const handleSave = async () => {
-    if (!formData || !docId) return;
+    const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
+    const isAdminDev = router.query.frdev === '1';
+    console.log('🧠 Utilisateur connecté:', auth.currentUser?.email);
+    console.log('🔍 UID dans URL:', router.query.uid);
+    console.log('🔍 isAdmin:', isAdminDev);
 
-    await setDoc(doc(db, 'content', docId), formData);
-    setMessage('✅ Sauvegarde réussie');
-    setUnsavedChanges(false);
-    setTimeout(() => setMessage(''), 3000);
+    let docId = 'fr';
+
+    if (isAdminDev && !uidParam) {
+      docId = 'fr';
+    } else if (!isAdminDev && uidParam) {
+      docId = uidParam;
+    } else if (!isAdminDev && !uidParam) {
+      await new Promise<void>((resolve) => {
+        const unsub = onAuthStateChanged(auth, (user) => {
+          if (user) docId = user.uid;
+          unsub();
+          resolve();
+        });
+      });
+    }
+
+    const ref = doc(db, 'content', docId);
+    await updateDoc(ref, { ...formData, adminToken: 'admin' });
+    setMessage('✅ Modifications enregistrées.');
   };
 
   const wrappedSetFormData = (fn: (prev: any) => any) => {
@@ -148,7 +177,7 @@ export default function LivePage() {
               ✏️ Mode édition en direct activé.
             </div>
             <div className="pt-6">
-              <SitePreview formData={formData} />
+              <SitePreview formData={formData} uid={docId} />
             </div>
           </div>
         </div>
