@@ -65,8 +65,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       const unsub = onSnapshot(ref, (snap) => {
         if (snap.exists()) {
           const data = snap.data();
-          setLayout(data.layout || {});
           setTheme(data.theme || {});
+          setLayout(data.layout || {});
           applyThemeToDOM(data.theme);
         }
       });
@@ -95,8 +95,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="font-serif text-gray-800 min-h-screen flex flex-col">
         {!isAdminPage && (
           <header className="bg-white shadow p-4 sm:p-6 flex justify-between items-center sticky top-0 z-50 gap-4">
-            {/* <Link href={`/${finalUidParam}`}> */}
-            <Link href={`/${querySuffix}`}>
+            <Link href={`/${finalUidParam}`}>
+              {/* <Link href={`/${querySuffix}`}> */}
               <div className="flex gap-4 items-center">
                 {layout.logo && (
                   <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded" />
@@ -123,8 +123,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
                   {layout.liens?.map((lien: any, i: number) => (
                     <div key={i} className="mb-2">
-                      {/* <Link href={`${lien.href}${finalUidParam}`}> */}
-                      <Link href={`${lien.href}${querySuffix}`}>
+                      <Link href={`${lien.href}${finalUidParam}`}>
                         <span className="block" style={{ color: theme.primary }}>
                           {lien.label}
                         </span>

@@ -1,15 +1,36 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function Testimonials({ locale = 'fr' }) {
   const [items, setItems] = useState([]);
+  const router = useRouter();
+  const uid = router.query.uid as string;
+  const isDev = router.query.frdev === '1';
+
+  const applyThemeToDOM = (theme: any) => {
+    const root = document.documentElement;
+    if (theme?.background) root.style.setProperty('--color-bg', theme.background);
+    if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
+    if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
+    if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
+    if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
+    if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
+    if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
+    if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const ref = doc(db, 'content', locale);
+      const docId = isDev ? 'fr' : uid || locale;
+      const ref = doc(db, 'content', docId);
       const snap = await getDoc(ref);
-      if (snap.exists()) setItems(snap.data().testimonials || []);
+      if (snap.exists()) {
+        const raw = snap.data();
+        setItems(raw.testimonials || []);
+        applyThemeToDOM(raw.theme);
+      }
     };
 
     fetchData();
@@ -17,12 +38,13 @@ export default function Testimonials({ locale = 'fr' }) {
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.testimonials) {
         setItems(e.data.payload.testimonials);
+        applyThemeToDOM(e.data.payload.theme);
       }
     };
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [locale]);
+  }, [locale, isDev, uid]);
 
   if (!items.length) {
     return (

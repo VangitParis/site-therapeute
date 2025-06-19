@@ -43,71 +43,99 @@ export default function Live() {
   }, []);
 
   useEffect(() => {
-    if (!userLoaded) return;
+    let unsubAuth: () => void;
 
-    const fetchData = async () => {
-      const isDev = router.query.frdev === '1';
-      const uidFromQuery = router.query.uid as string | undefined;
+    const init = async () => {
+      unsubAuth = onAuthStateChanged(auth, async (user) => {
+        setUserLoaded(true);
 
-      let resolvedDocId = 'fr';
+        const isDev = router.query.frdev === '1';
+        const uidFromQuery = router.query.uid as string | undefined;
 
-      if (isDev) {
-        resolvedDocId = 'fr';
-      } else if (uidFromQuery) {
-        resolvedDocId = uidFromQuery;
-      } else {
-        const user = auth.currentUser;
-        if (!user) {
+        let resolvedDocId = 'fr';
+
+        if (isDev) {
+          resolvedDocId = 'fr';
+        } else if (uidFromQuery) {
+          resolvedDocId = uidFromQuery;
+        } else if (user) {
+          resolvedDocId = user.uid;
+        } else {
           console.warn('❌ Aucun utilisateur connecté.');
           return;
         }
-        resolvedDocId = user.uid;
-      }
 
-      setDocId(resolvedDocId);
+        setDocId(resolvedDocId);
 
-      try {
-        const snap = await getDoc(doc(db, 'content', resolvedDocId));
-        if (snap.exists()) {
-          const raw = snap.data();
-          const services = raw.services || { titre: '', liste: [], image: '' };
-          services.liste = services.liste.map((s: any) =>
-            typeof s === 'string' ? { text: s, image: '' } : s
-          );
+        try {
+          const snap = await getDoc(doc(db, 'content', resolvedDocId));
+          if (snap.exists()) {
+            const raw = snap.data();
+            const services = raw.services || { titre: '', liste: [], image: '' };
+            services.liste = services.liste.map((s: any) =>
+              typeof s === 'string' ? { text: s, image: '' } : s
+            );
 
-          setFormData({
-            layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
-            theme: raw.theme || DEFAULT_THEME,
-            accueil: raw.accueil || {
-              titre: '',
-              texte: '',
-              bouton: '',
-              image: '',
-              SectionAProposTitre: '',
-              SectionAProposDescription: '',
-              SectionAProposCTA: '',
-            },
-            aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
-            services,
-            testimonials: raw.testimonials || [],
-            contact: raw.contact || {
-              titre: '',
-              texte: '',
-              bouton: '',
-              image: '',
-              lien: '',
-              titreH2: '',
-              titreTarifs: '',
-            },
-          });
+            setFormData({
+              layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
+              theme: raw.theme || DEFAULT_THEME,
+              accueil: raw.accueil || {
+                titre: '',
+                texte: '',
+                bouton: '',
+                image: '',
+                SectionAProposTitre: '',
+                SectionAProposDescription: '',
+                SectionAProposCTA: '',
+              },
+              aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
+              services,
+              testimonials: raw.testimonials || [],
+              contact: raw.contact || {
+                titre: '',
+                texte: '',
+                bouton: '',
+                image: '',
+                lien: '',
+                titreH2: '',
+                titreTarifs: '',
+              },
+            });
+          }
+        } catch (e) {
+          console.error('❌ Erreur de chargement :', e);
         }
-      } catch (e) {
-        console.error('❌ Erreur de chargement :', e);
+      });
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (unsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
       }
     };
 
-    fetchData();
-  }, [userLoaded, router.query]);
+    const handleRouteChangeStart = (url: string) => {
+      if (
+        unsavedChanges &&
+        !window.confirm(
+          '⚠️ Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter cette page ?'
+        )
+      ) {
+        throw 'Changement de route annulé pour éviter la perte de données.';
+      }
+    };
+
+    init();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+
+    return () => {
+      if (unsubAuth) unsubAuth();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+    };
+  }, [unsavedChanges, router.query]);
 
   const handleSave = async () => {
     const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
