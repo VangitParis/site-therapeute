@@ -1,19 +1,25 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebaseClient';
 
 export default function TarifsCards() {
   const [tarifs, setTarifs] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, 'content', 'fr'), (snapshot) => {
+    const isDev = router.query.frdev === '1';
+    const uid = router.query.uid as string | undefined;
+    const docId = isDev ? 'fr' : uid || 'fr';
+
+    const unsubscribe = onSnapshot(doc(db, 'content', docId), (snapshot) => {
       if (snapshot.exists()) {
         setTarifs(snapshot.data().tarifs || []);
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router.query]);
 
   return (
     <section className="py-12 px-6 md:px-12">

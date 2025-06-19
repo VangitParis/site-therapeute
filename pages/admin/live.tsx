@@ -112,9 +112,6 @@ export default function Live() {
   const handleSave = async () => {
     const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
     const isAdminDev = router.query.frdev === '1';
-    console.log('🧠 Utilisateur connecté:', auth.currentUser?.email);
-    console.log('🔍 UID dans URL:', router.query.uid);
-    console.log('🔍 isAdmin:', isAdminDev);
 
     let docId = 'fr';
 

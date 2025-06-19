@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function About({ locale = 'fr' }) {
   const [data, setData] = useState<{ titre: string; texte: string; image: string } | null>(null);
-  const cleaned = data?.texte?.replace(/<br\s*\/?>/gi, '').trim();
+  const router = useRouter();
+  const uid = router.query.uid as string;
+  const isDev = router.query.frdev === '1';
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -20,12 +23,12 @@ export default function About({ locale = 'fr' }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const ref = doc(db, 'content', locale);
+      const docId = isDev ? 'fr' : uid || locale;
+      const ref = doc(db, 'content', docId);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const raw = snap.data();
         const aPropos = raw.aPropos || { titre: '', texte: '', image: '' };
-
         setData({ ...aPropos });
         applyThemeToDOM(raw.theme);
       }
@@ -37,13 +40,15 @@ export default function About({ locale = 'fr' }) {
       if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.aPropos) {
         const updated = e.data.payload;
         setData({ ...updated.aPropos });
-        applyThemeToDOM(updated.theme); // ✅ Là, theme est bien transmis
+        applyThemeToDOM(updated.theme);
       }
     };
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [locale]);
+  }, [locale, isDev, uid]);
+
+  const cleaned = data?.texte?.replace(/<br\s*\/?>/gi, '').trim();
 
   if (!data) {
     return (

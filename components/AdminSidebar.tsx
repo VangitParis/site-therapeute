@@ -87,7 +87,7 @@ export default function AdminSidebar({
         <ServicesEditor
           formData={formData}
           setFormData={setFormData}
-          imageFieldRef={imageFieldServicesRef}
+          imageFieldServicesRef={imageFieldServicesRef}
         />
       </AccordionSection>
 

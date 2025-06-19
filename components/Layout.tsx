@@ -13,9 +13,11 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isAdminPage = router.pathname.startsWith('/admin');
-  const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
   const isPreview = router.query.admin === 'true';
+  const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
   const isAdminDev = router.query.frdev === '1';
+  const querySuffix =
+    isPreview && auth.currentUser ? `?uid=${auth.currentUser.uid}&admin=true` : '';
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -33,18 +35,6 @@ export default function Layout({ children }: { children: ReactNode }) {
     let docId = 'fr';
     const unsubscribeFns: (() => void)[] = [];
 
-    const applyThemeToDOM = (theme: any) => {
-      const root = document.documentElement;
-      if (theme?.background) root.style.setProperty('--color-bg', theme.background);
-      if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
-      if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
-      if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
-      if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
-      if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
-      if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
-      if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
-    };
-
     const messageHandler = (e: MessageEvent) => {
       const isPreview = router.query.admin === 'true';
       if (isPreview && e.data?.type === 'UPDATE_FORMDATA') {
@@ -61,10 +51,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       if (uidParam) {
         docId = uidParam;
-      } else if (router.pathname !== '/') {
+      } else if (isPreview) {
         await new Promise<void>((resolve) => {
           const unsub = onAuthStateChanged(auth, (user) => {
-            if (user) docId = user.uid;
+            if (user) docId = user.uid; // ✅ Chaque thérapeute voit son contenu
             unsub();
             resolve();
           });
@@ -105,7 +95,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="font-serif text-gray-800 min-h-screen flex flex-col">
         {!isAdminPage && (
           <header className="bg-white shadow p-4 sm:p-6 flex justify-between items-center sticky top-0 z-50 gap-4">
-            <Link href={`/${finalUidParam}`}>
+            {/* <Link href={`/${finalUidParam}`}> */}
+            <Link href={`/${querySuffix}`}>
               <div className="flex gap-4 items-center">
                 {layout.logo && (
                   <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded" />
@@ -132,7 +123,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <div className="absolute right-0 mt-2 bg-white border rounded shadow p-4 text-sm z-50">
                   {layout.liens?.map((lien: any, i: number) => (
                     <div key={i} className="mb-2">
-                      <Link href={`${lien.href}${finalUidParam}`}>
+                      {/* <Link href={`${lien.href}${finalUidParam}`}> */}
+                      <Link href={`${lien.href}${querySuffix}`}>
                         <span className="block" style={{ color: theme.primary }}>
                           {lien.label}
                         </span>
@@ -147,6 +139,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <nav className="hidden sm:flex space-x-4 text-lg">
               {layout.liens?.map((lien: any, i: number) => (
                 <Link key={i} href={`${lien.href}${finalUidParam}`}>
+                  {/* <Link href={`${lien.href}${querySuffix}`}> */}
                   <span style={{ color: theme.primary }}>{lien.label}</span>
                 </Link>
               ))}

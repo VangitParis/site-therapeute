@@ -17,6 +17,10 @@ module.exports = {
         'hero-pattern': "url('/images/bg.jpg')", // chemin vers ton image
         'custom-bg': 'var(--custom-bg-url)', // si tu veux lier dynamiquement
       },
+      backgroundPosition: {
+        'custom-mobile': '55% 0',
+        'custom-desktop': '0 12%',
+      },
     },
   },
   plugins: [],

@@ -1,24 +1,30 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebaseClient';
+import { useRouter } from 'next/router';
 
 export default function AdminTarifsEditor() {
   const [tarifs, setTarifs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const isDev = router.query.frdev === '1';
+  const uid = router.query.uid as string | undefined;
+  const docId = isDev ? 'fr' : uid || 'fr';
 
   useEffect(() => {
     const fetchData = async () => {
-      const snap = await getDoc(doc(db, 'content', 'fr'));
+      const snap = await getDoc(doc(db, 'content', docId));
       if (snap.exists()) {
         setTarifs(snap.data().tarifs || []);
       }
     };
     fetchData();
-  }, []);
+  }, [docId]);
 
   const updateTarifs = async () => {
     setLoading(true);
-    await updateDoc(doc(db, 'content', 'fr'), { tarifs });
+    await updateDoc(doc(db, 'content', docId), { tarifs });
     setLoading(false);
   };
 

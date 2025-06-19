@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 export default function Home({ locale = 'fr' }) {
   const DEFAULT_IMAGE =
-    'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
+    'https://res.cloudinary.com/dwadzodje/image/upload/v1749631226/ChatGPT_Image_5_juin_2025_13_25_10_rvgbgf.png';
   const [data, setData] = useState(null);
   const router = useRouter();
   const uid = router.query.uid as string;
@@ -70,7 +70,7 @@ export default function Home({ locale = 'fr' }) {
     ? {
         backgroundImage: `url(${data.theme.bgImage})`,
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: '0 12%',
+        // backgroundPosition: '0 12%',
         backgroundSize: 'cover',
       }
     : {};
@@ -78,7 +78,7 @@ export default function Home({ locale = 'fr' }) {
     <>
       {/* Section Accueil (inchangée) */}
       <section
-        className="relative overflow-hidden py-24 px-6 md:px-24 mb-16"
+        className="relative overflow-hidden py-24 px-6 md:px-24 mb-16 bg-cover bg-no-repeat bg-custom-desktop sm:bg-custom-mobile"
         style={{
           ...bgImageStyle,
           height: '700px',

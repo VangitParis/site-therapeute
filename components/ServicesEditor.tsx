@@ -1,13 +1,14 @@
 import ImageUploadField, { ImageUploadRef } from './ImageUploadField';
+
 import { useRef } from 'react';
 
 type Props = {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
-  imageFieldRef: React.RefObject<ImageUploadRef>;
+  imageFieldServicesRef: React.RefObject<ImageUploadRef>;
 };
 
-export default function ServicesEditor({ formData, setFormData, imageFieldRef }: Props) {
+export default function ServicesEditor({ formData, setFormData, imageFieldServicesRef }: Props) {
   const services = formData.services || { titre: '', liste: [], image: '' };
   const safeFolderName = (formData.layout?.nom || 'default').replace(/\s+/g, '_').toLowerCase();
 
