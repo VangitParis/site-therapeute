@@ -36,7 +36,7 @@ export default function Testimonials({ locale = 'fr' }) {
     fetchData();
 
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.testimonials) {
+      if (e.data?.type === 'UPDATE_FORMDATA') {
         setItems(e.data.payload.testimonials);
         applyThemeToDOM(e.data.payload.theme);
       }

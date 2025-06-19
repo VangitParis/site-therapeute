@@ -17,7 +17,7 @@ export default function SitePreview({ formData, uid }: Props) {
     );
   }, [formData]);
 
-  const iframeSrc = `/?admin=true&uid=${uid}`;
+  const iframeSrc = `/?admin=true&uid=${uid}` || `/?admin=true`;
 
   return (
     <div className="relative w-full h-full">

@@ -60,7 +60,7 @@ export default function Contact({ locale = 'fr' }) {
     fetchData();
 
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.contact) {
+      if (e.data?.type === 'UPDATE_FORMDATA') {
         const updated = e.data.payload;
         setData({ ...updated.contact }); // ⚠️ Clonage nécessaire pour forcer le re-render
         applyThemeToDOM(updated.theme);

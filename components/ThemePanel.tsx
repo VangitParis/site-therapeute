@@ -19,6 +19,7 @@ export default function ThemePanel({ formData, setFormData }) {
       ...theme,
       [key]: value,
     };
+    console.log('ici le theme est modifié ===', updatedTheme);
 
     setFormData((prev) => ({
       ...prev,

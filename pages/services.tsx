@@ -35,6 +35,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
     if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
     if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
     if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+    console.log('[Live] 🎨 Thème appliqué', theme);
   };
 
   useEffect(() => {

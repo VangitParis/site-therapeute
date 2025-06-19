@@ -37,10 +37,13 @@ export default function About({ locale = 'fr' }) {
     fetchData();
 
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'UPDATE_FORMDATA' && e.data.payload?.aPropos) {
-        const updated = e.data.payload;
-        setData({ ...updated.aPropos });
-        applyThemeToDOM(updated.theme);
+      if (e.data?.type === 'UPDATE_FORMDATA') {
+        if (e.data.payload?.aPropos) {
+          setData({ ...e.data.payload.aPropos });
+        }
+        if (e.data.payload?.theme) {
+          applyThemeToDOM(e.data.payload.theme);
+        }
       }
     };
 
