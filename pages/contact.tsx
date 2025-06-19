@@ -85,6 +85,15 @@ export default function Contact({ locale = 'fr' }) {
             className="text-3xl font-semibold mb-8 text-center"
             style={{ color: 'var(--color-titreH2)' }}
           >
+            {data.titreTarifs || ''}
+          </h2>
+          <TarifsCards />
+        </section>
+        <section className="max-w-4xl mx-auto px-6 py-12">
+          <h2
+            className="text-3xl font-semibold mb-8 text-center"
+            style={{ color: 'var(--color-titreH2)' }}
+          >
             {data.titreH2 || ''}
           </h2>
           <div
@@ -101,36 +110,98 @@ export default function Contact({ locale = 'fr' }) {
             `,
             }}
           />
-        </section>
-        <section className="max-w-4xl mx-auto px-6 py-12">
-          <h2
-            className="text-3xl font-semibold mb-8 text-center"
-            style={{ color: 'var(--color-titreH2)' }}
-          >
-            {data.titreTarifs || ''}
-          </h2>
-          <TarifsCards />
-        </section>
-        {data.lien && (
-          <div className="text-center mt-8">
-            <Link
-              href={data.lien}
-              target="_blank"
-              className="inline-block bg-prune text-white py-3 px-6 rounded-full font-semibold shadow hover:bg-purple-700 transition"
-              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-button)' }}
-            >
-              {data.bouton}
-            </Link>
-          </div>
-        )}
+          {data.lien && (
+            <div className="text-center mt-8">
+              <Link
+                href={data.lien}
+                target="_blank"
+                className="inline-block bg-prune text-white py-3 px-6 rounded-full font-semibold shadow hover:bg-purple-700 transition"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-text-button)',
+                }}
+              >
+                {data.bouton}
+              </Link>
+            </div>
+          )}
 
-        {data.image && (
-          <img
-            src={data.image}
-            alt="Contact illustration"
-            className="mx-auto mt-8 max-w-xs rounded shadow"
-          />
-        )}
+          {data.image && (
+            <img
+              src={data.image}
+              alt="Contact illustration"
+              className="mx-auto mt-8 max-w-xs rounded shadow"
+            />
+          )}
+          <label>Laissez-moi un message </label>
+          <form
+            className="max-w-xl mx-auto grid gap-4 text-left"
+            style={{ color: 'var(--color-texte)' }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const form = e.currentTarget;
+              if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+              }
+              alert('✅ Formulaire soumis (à connecter à un service réel)');
+              form.reset();
+            }}
+          >
+            <div>
+              <label htmlFor="prenom" className="block font-semibold mb-1">
+                Prénom *
+              </label>
+              <input
+                type="text"
+                id="prenom"
+                name="prenom"
+                required
+                pattern="^[A-Za-zÀ-ÿ' -]{2,30}$"
+                title="Veuillez entrer un prénom valide (lettres uniquement)"
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block font-semibold mb-1">
+                Email *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="message" className="block font-semibold mb-1">
+                Message *
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                required
+                minLength={10}
+                maxLength={1000}
+                className="w-full p-2 border rounded h-32"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-prune text-white py-2 px-6 rounded font-semibold hover:opacity-90 transition"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-text-button)',
+              }}
+            >
+              Envoyer
+            </button>
+          </form>
+        </section>
       </section>
     </div>
   );
