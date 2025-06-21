@@ -1,7 +1,7 @@
 import { useState, forwardRef, useImperativeHandle, useRef } from 'react';
 
 const IMAGE_PAR_DEFAUT =
-  'https://res.cloudinary.com/dwadzodje/image/upload/v1749122784/ChatGPT_Image_5_juin_2025_13_25_10_qhgpa1.png';
+  'https://res.cloudinary.com/dwadzodje/image/upload/v1750498500/assets/image_defaut.png';
 
 export type ImageUploadRef = {
   upload: () => Promise<string | null>;
@@ -166,7 +166,13 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
 
     const handleDelete = async () => {
       if (!value) return alert('Aucune image à supprimer');
-
+      // 🔒 Bloquer les images par défaut
+      if (value.includes('/assets/')) {
+        alert(
+          'Cette image est protégée et ne peut pas être supprimée, vous pouvez simplement en charger une autre par dessus.'
+        );
+        return;
+      }
       try {
         const match = value.match(/upload\/(?:v\d+\/)?(.+)\.(webp|jpg|jpeg|png|gif|ico|svg)/i);
         if (!match) return alert("Impossible d'extraire le public_id");
@@ -181,7 +187,7 @@ const ImageUploadField = forwardRef<ImageUploadRef, ImageUploadFieldProps>(
         if (res.ok) {
           onUpload(IMAGE_PAR_DEFAUT);
           setCompressedFile(null);
-          setPreview(IMAGE_PAR_DEFAUT);
+          setPreview('');
           setSuccess('🗑 Image supprimée avec succès');
           // ✅ ici : on reset explicitement le champ file
           if (inputRef.current) {

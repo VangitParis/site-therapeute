@@ -16,7 +16,7 @@ const settings = {
 };
 
 const DEFAULT_IMAGE =
-  'https://res.cloudinary.com/dwadzodje/image/upload/v1749631226/ChatGPT_Image_5_juin_2025_13_25_10_rvgbgf.png';
+  'https://res.cloudinary.com/dwadzodje/image/upload/v1750498096/assets/image_defaut_services.png';
 
 export default function Services({ locale = 'fr' }: { locale?: string }) {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
   return (
     <section
       id="services"
-      className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl mx-auto"
+      className="mb-16 bg-white p-8 rounded-xl  max-w-7xl mx-auto"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <h1
@@ -106,7 +106,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
               <img
                 src={item.image?.trim() || DEFAULT_IMAGE}
                 alt={`Service ${i + 1}`}
-                className="mx-auto rounded-xl shadow-xl w-100 max-w-[700px] h-[500px] object-cover"
+                className="mx-auto rounded-xl shadow-xl w-full max-w-[90%] sm:max-w-[600px] h-auto aspect-video object-cover object-[75%_15%]"
               />
             </div>
           ))}

@@ -6,7 +6,7 @@ type Props = {
   defaultOpen?: boolean;
 };
 
-export default function AccordionSection({ title, children, defaultOpen = true }: Props) {
+export default function AccordionSection({ title, children, defaultOpen = false }: Props) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (

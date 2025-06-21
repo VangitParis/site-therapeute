@@ -22,13 +22,14 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
 
   return (
     <div className="space-y-4">
+      {/* HERO HOMEPAGE */}
       <label>
         <span className="block font-medium">📝 Titre d’accueil</span>
-        <input
-          type="text"
+        <textarea
           value={accueil.titre || ''}
           onChange={(e) => handleChange('titre', e.target.value)}
-          className="w-full border px-3 py-2 rounded"
+          className="w-full border px-3 py-2 rounded resize-none"
+          rows={2}
         />
       </label>
 
@@ -51,7 +52,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
           className="w-full border px-3 py-2 rounded"
         />
       </label>
-
+      {/* A PROPOS HOMEPAGE*/}
       <label>
         <span className="block font-medium">📝 Section À Propos : Titre</span>
         <input
@@ -101,6 +102,111 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
           }))
         }
       />
+      {/* SERVICES HOMEPAGE*/}
+      <label>
+        <span className="block font-medium">📝 Section Service : Titre</span>
+        <input
+          type="text"
+          value={accueil.SectionServicesTitre || ''}
+          onChange={(e) => handleChange('SectionServicesTitre', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
+      <div className="block mb-4">
+        <RichTextEditor
+          label="💬 Section Services : Description"
+          value={formData.accueil?.SectionServicesDescription || ''}
+          onChange={(val) =>
+            setFormData((prev: any) => ({
+              ...prev,
+              accueil: {
+                ...prev.accueil,
+                SectionServicesDescription: val,
+              },
+            }))
+          }
+        />
+      </div>
+
+      <label>
+        <span className="block font-medium">🔘 Section Services : Texte du bouton CTA</span>
+        <input
+          type="text"
+          value={accueil.SectionServicesCTA || ''}
+          onChange={(e) => handleChange('SectionServicesCTA', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
+      {/* Temoignages HomePage */}
+      <label>
+        <span className="block font-medium">📝 Section Témoignages : Titre</span>
+        <input
+          type="text"
+          value={accueil.SectionTestimonialsTitre || ''}
+          onChange={(e) => handleChange('SectionTestimonialsTitre', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
+      <div className="block mb-4">
+        <RichTextEditor
+          label="💬 Section Témoignages : Description"
+          value={formData.accueil?.SectionTestimonialsDescription || ''}
+          onChange={(val) =>
+            setFormData((prev: any) => ({
+              ...prev,
+              accueil: {
+                ...prev.accueil,
+                SectionTestimonialsDescription: val,
+              },
+            }))
+          }
+        />
+      </div>
+
+      <label>
+        <span className="block font-medium">🔘 Section Témoignages : Texte du bouton CTA</span>
+        <input
+          type="text"
+          value={accueil.SectionTestimonialsCTA || ''}
+          onChange={(e) => handleChange('SectionTestimonialsCTA', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
+      {/* Contact Homepage */}
+      <label>
+        <span className="block font-medium">📝 Section Contact : Titre</span>
+        <input
+          type="text"
+          value={accueil.SectionContactTitre || ''}
+          onChange={(e) => handleChange('SectionContactTitre', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
+      <div className="block mb-4">
+        <RichTextEditor
+          label="💬 Section Contact : Description"
+          value={formData.accueil?.SectionContactDescription || ''}
+          onChange={(val) =>
+            setFormData((prev: any) => ({
+              ...prev,
+              accueil: {
+                ...prev.accueil,
+                SectionContactDescription: val,
+              },
+            }))
+          }
+        />
+      </div>
+
+      <label>
+        <span className="block font-medium">🔘 Section Contact : Texte du bouton CTA</span>
+        <input
+          type="text"
+          value={accueil.SectionContactCTA || ''}
+          onChange={(e) => handleChange('SectionContactCTA', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
     </div>
   );
 }

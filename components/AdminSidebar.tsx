@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ThemePanel from './ThemePanel';
 import BackgroundImageUploader from './BackgroundImageUploader';
 import HomeContentEditor from './HomeContentEditor';
@@ -37,6 +38,15 @@ export default function AdminSidebar({
   message,
   onClose,
 }: Props) {
+  function InfoPreviewNote({ page }: { page: string }) {
+    return (
+      <p className="text-xs text-gray-600 mb-2">
+        🔄 Pour voir l’aperçu de la page <strong>{page}</strong>, cliquez sur le lien correspondant
+        dans la prévisualisation du site à droite.
+      </p>
+    );
+  }
+
   return (
     <div className="p-4 relative">
       {onClose && (
@@ -76,6 +86,7 @@ export default function AdminSidebar({
       </AccordionSection>
 
       <AccordionSection title="🏠 Page à Propos">
+        <InfoPreviewNote page="À propos" />
         <AboutContentEditor
           formData={formData}
           setFormData={setFormData}
@@ -84,6 +95,7 @@ export default function AdminSidebar({
       </AccordionSection>
 
       <AccordionSection title="🧘 Page Services">
+        <InfoPreviewNote page="Services" />
         <ServicesEditor
           formData={formData}
           setFormData={setFormData}
@@ -92,6 +104,7 @@ export default function AdminSidebar({
       </AccordionSection>
 
       <AccordionSection title="💬 Page Témoignages">
+        <InfoPreviewNote page="Témoignages" />
         <TestimonialsEditor
           formData={formData}
           setFormData={setFormData}
@@ -99,7 +112,8 @@ export default function AdminSidebar({
         />
       </AccordionSection>
 
-      <AccordionSection title="💬 Page Contact">
+      <AccordionSection title="💬 Page Contact & Tarifs">
+        <InfoPreviewNote page="Contact" />
         <ContactEditor formData={formData} setFormData={setFormData} />
         <AdminTarifsEditor />
       </AccordionSection>
@@ -113,7 +127,7 @@ export default function AdminSidebar({
         </button>
         {message && <p className="text-center text-green-600 mt-2 text-sm">{message}</p>}
       </div>
-      <PasswordChanger />
+      {/* <PasswordChanger /> */}
     </div>
   );
 }

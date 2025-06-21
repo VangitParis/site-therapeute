@@ -70,7 +70,7 @@ export default function About({ locale = 'fr' }) {
         className="text-4xl font-bold text-prune mb-6 text-center"
         style={{ color: 'var(--color-titreH1)' }}
       >
-        {data.titre}
+        {data.titre || ''}
       </h1>
       <div
         className="text-gray-700 text-lg leading-relaxed text-center"

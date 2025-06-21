@@ -25,6 +25,7 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
     <div className="mb-6">
       <label className="block font-medium mb-2">{label}</label>
 
+      {/* Barre d'outils */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <button onClick={() => format('bold')} className="px-2 py-1 border rounded font-bold">
           Gras
@@ -39,12 +40,14 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           🧹 Effacer
         </button>
 
+        {/* Sélecteur taille */}
         <select
           onChange={(e) => {
-            format('fontSize', '7');
+            const size = e.target.value;
+            document.execCommand('fontSize', false, '7'); // hack pour forcer remplacement
             document.querySelectorAll('font[size="7"]').forEach((el) => {
               el.removeAttribute('size');
-              (el as HTMLElement).style.fontSize = e.target.value;
+              (el as HTMLElement).style.fontSize = size;
             });
           }}
           className="border rounded px-2 py-1 text-sm"
@@ -57,6 +60,7 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           <option value="24px">24px</option>
         </select>
 
+        {/* Couleur texte */}
         <input
           type="color"
           value={color}
@@ -67,6 +71,7 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           className="w-8 h-8 border rounded cursor-pointer"
         />
 
+        {/* Alignement */}
         <button onClick={() => format('justifyLeft')} className="px-2 py-1 border rounded text-sm">
           ↤
         </button>
@@ -81,14 +86,16 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
         </button>
 
         <span className="text-sm text-gray-500 italic ml-2">
-          Sélectionner le texte avant d’appliquer un style
+          Sélectionner du texte avant d’appliquer un style
         </span>
       </div>
 
+      {/* Zone éditable */}
       <div
         ref={ref}
         contentEditable
-        className="border rounded p-3 min-h-[120px] bg-white whitespace-pre-wrap focus:outline focus:outline-indigo-400"
+        className="mx-auto border rounded p-3 min-h-[120px] bg-white focus:outline 
+        focus:outline-indigo-400 overflow-hidden break-normal flex flex-wrap w-full"
         onInput={() => {
           if (ref.current) onChange(ref.current.innerHTML);
         }}

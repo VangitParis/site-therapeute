@@ -3,16 +3,30 @@ import Link from 'next/link';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
+import TitreMultiligne from '../components/TitreMultiligne';
 
 export default function Home({ locale = 'fr' }) {
   const DEFAULT_IMAGE =
     'https://res.cloudinary.com/dwadzodje/image/upload/v1749631226/ChatGPT_Image_5_juin_2025_13_25_10_rvgbgf.png';
+
   const [data, setData] = useState(null);
+
   const router = useRouter();
   const uid = router.query.uid as string;
 
   const isPreview = router.query.admin === 'true';
-  const cleaned = data?.accueil?.SectionAProposDescription?.replace(/<br\s*\/?>/gi, '').trim();
+
+  const cleanedAPropos =
+    data?.accueil?.SectionAProposDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
+
+  const cleanedServices =
+    data?.accueil?.SectionServicesDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
+
+  const cleanedTestimonials =
+    data?.accueil?.SectionTestimonialsDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
+
+  const cleanedContact =
+    data?.accueil?.SectionContactDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -74,6 +88,7 @@ export default function Home({ locale = 'fr' }) {
         backgroundSize: 'cover',
       }
     : {};
+
   return (
     <>
       {/* Section Accueil (inchangée) */}
@@ -84,19 +99,24 @@ export default function Home({ locale = 'fr' }) {
           height: '700px',
         }}
       >
-        <div className="flex flex-col m-8 sm:m-4 gap-15 max-w-2xl">
-          <h1
-            className="text-2xl lg:text-6xl font-bold text-prune tracking-tight leading-tight"
+        <div className="flex flex-col m-3 sm:m-4 gap-15 max-w-2xl">
+          {/* Titre H1 optimisé pour la sophrologie */}
+
+          <TitreMultiligne
+            text={
+              data.accueil.titre ||
+              'Sophrologie : Retrouvez Sérénité intérieure et Équilibre au quotidien'
+            }
+            className="text-3xl lg:text-6xl font-bold text-prune tracking-tight leading-tight"
             style={{ color: 'var(--color-titreH1)' }}
-          >
-            {/* Titre H1 optimisé pour la sophrologie */}
-            {data.accueil.titre ||
-              'Sophrologie : Retrouvez votre sérénité intérieure et votre équilibre'}
-          </h1>
-          <p className="text-lg text-gray-700 max-w-2xl" style={{ color: 'var(--color-texte)' }}>
+            tag="h1"
+          />
+
+          <p className="text-xl l text-gray-700 max-w-2xl" style={{ color: 'var(--color-texte)' }}>
             {/* Texte d'accroche sophrologie */}
             {data.accueil.texte ||
-              "Découvrez la sophrologie, une méthode pour mieux gérer le stress, l'anxiété et les émotions, et renforcer votre bien-être au quotidien."}
+              `Découvrez la sophrologie, une méthode pour mieux gérer le stress,
+              l'anxiété et les émotions, et renforcer votre bien-être au quotidien.`}
           </p>
           <div className="text-left mt-6">
             <Link
@@ -114,17 +134,18 @@ export default function Home({ locale = 'fr' }) {
         {/* Section À propos (CTA) */}
         <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
           {/* Titre H2 sophrologie */}
-          <h2
-            className="text-3xl font-semibold text-prune mb-5"
+
+          <TitreMultiligne
+            text={data.accueil.SectionAProposTitre || 'Mon approche en tant que sophrologue'}
+            className="text-3xl font-semibold mb-5 text-center"
             style={{ color: 'var(--color-titreH2)' }}
-          >
-            {data.accueil.SectionAProposTitre || 'Mon approche en tant que sophrologue'}
-          </h2>
+            tag="h2"
+          />
           <p
             className="text-gray-700 leading-relaxed text-lg whitespace-pre-line mb-6"
             style={{ color: 'var(--color-texte)' }}
             dangerouslySetInnerHTML={{
-              __html: cleaned
+              __html: cleanedAPropos
                 ? data.accueil.SectionAProposDescription
                 : `  <p>En tant que <strong>sophrologue certifié(e)</strong>, ma mission est de vous accompagner vers une meilleure connaissance de vous-même et un bien-être durable grâce à la <strong>sophrologie</strong>. Cette discipline psychocorporelle est une alliée précieuse pour naviguer les défis du quotidien, qu'ils soient liés au <strong>stress</strong>, à l'<strong>anxiété</strong>, aux <strong>troubles du sommeil</strong> ou à la <strong>gestion des émotions</strong>.</p>
          
@@ -142,7 +163,8 @@ export default function Home({ locale = 'fr' }) {
            </ul>
          </p>
          
-         <p>Chaque séance est un moment privilégié pour vous recentrer et vous reconnecter à vos sensations. Les techniques sont simples, accessibles à tous et peuvent être facilement intégrées à votre quotidien.</p>
+         <p>Chaque séance est un moment privilégié pour vous recentrer et vous reconnecter à vos sensations. Les techniques sont simples,
+          accessibles à tous et peuvent être facilement intégrées à votre quotidien.</p>
        `,
             }}
           />
@@ -155,35 +177,41 @@ export default function Home({ locale = 'fr' }) {
               {data.accueil.SectionAProposCTA || '➤ En savoir plus sur la sophrologie'}
             </Link>
           </div>
-          <img
-            src={data.accueil.image || DEFAULT_IMAGE}
-            alt="Illustration sophrologie, bien-être et relaxation"
-            className="mx-auto rounded-xl shadow-xl w-80 h-[350px] object-fill"
-          />
+
+          {data?.accueil?.image !== null && (
+            <img
+              src={data.accueil.image !== '' ? data.accueil.image : DEFAULT_IMAGE}
+              alt="Illustration sophrologie, bien-être et relaxation"
+              className="mx-auto rounded-xl shadow-xl w-80 h-[350px] object-fill"
+            />
+          )}
         </section>
 
         {/* Section Services */}
         <section id="services" className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
           {/* Titre H2 sophrologie */}
-          <h2
-            className="text-3xl font-semibold text-prune mb-5"
+
+          <TitreMultiligne
+            text={data.accueil.SectionServicesTitre || 'Mes accompagnements en sophrologie'}
+            className="text-3xl font-semibold mb-5 text-center"
             style={{ color: 'var(--color-titreH2)' }}
-          >
-            Mes accompagnements en sophrologie
-          </h2>
+            tag="h2"
+          />
           <p
             className="text-gray-700 text-lg leading-relaxed space-y-4 mb-6"
             style={{ color: 'var(--color-texte)' }}
-          >
-            Prendre soin de soi est un acte essentiel, mais souvent négligé. Dans un quotidien
-            rythmé par le stress, les exigences professionnelles et la charge mentale, il devient
-            crucial de se reconnecter à son corps, à son souffle et à ses besoins profonds. C’est
-            précisément ce que je vous propose à travers mes **séances de sophrologie**. Que vous
+            dangerouslySetInnerHTML={{
+              __html: cleanedServices
+                ? data.accueil.SectionServicesDescription
+                : ` <p> Prendre soin de soi est un acte essentiel, mais souvent négligé.
+                <br/>Dans un quotidien rythmé par le stress, les exigences professionnelles et la charge mentale, il devient
+            crucial de se reconnecter à son corps, à son souffle et à ses besoins profonds. 
+            <br/>
+            C’est précisément ce que je vous propose à travers mes **séances de sophrologie**. Que vous
             souffriez d’**anxiété**, de **troubles du sommeil**, de **fatigue chronique** ou que
             vous traversiez une période de transition personnelle, je vous offre un espace d’écoute,
             de bienveillance et de transformation par la **sophrologie**.
-            <br />
-            <br />
+            <br/>
             Mes **programmes de sophrologie** sont conçus sur mesure pour répondre à vos objectifs
             personnels. Chaque séance combine des exercices de **relaxation dynamique** (mouvements
             doux associés à la respiration) et des techniques de **sophronisation** (visualisations
@@ -193,39 +221,38 @@ export default function Home({ locale = 'fr' }) {
             **capacités personnelles** (concentration, mémoire, créativité). - Retrouver un
             **sommeil réparateur** et une meilleure énergie. - **Prendre du recul** face aux
             situations difficiles.
-            <br />
-            <br />
+            <br/>
             Parmi les thématiques fréquemment abordées dans mes accompagnements en sophrologie : la
             **préparation aux examens** ou entretiens, l'**accompagnement de la grossesse et de
             l'accouchement**, la **gestion de la douleur**, la **prévention du burn-out**,
             l'**amélioration de la performance sportive** ou artistique, et le soutien lors de
             **phases de deuil**.
-            <br />
-            <br />
+            <br/>
             Je vous accueille en ligne ou en présentiel, dans un cadre calme, apaisant et
             confidentiel. Chaque séance dure entre 45 minutes et 1 heure, et peut être ponctuelle ou
             faire partie d’un suivi plus régulier, selon vos besoins. Vous restez totalement acteur
             ou actrice de votre démarche : je suis là pour vous guider, jamais pour vous imposer.
-            <br />
-            <br />
+            <br/>
             Vous pouvez réserver un premier rendez-vous gratuit pour découvrir la sophrologie, poser
             vos questions et ressentir si le cadre vous convient. Ce premier échange est sans
             engagement. Mon objectif est de créer une relation de confiance, dans laquelle vous vous
             sentirez libre d’exprimer ce que vous vivez, sans jugement.
-            <br />
-            <br />
+          
             N’attendez pas que le stress ou l'anxiété prennent toute la place dans votre vie. La
             **sophrologie** offre des outils simples, efficaces et respectueux pour retrouver un
             équilibre durable. Ensemble, faisons le premier pas vers votre **mieux-être global**.
           </p>
-
+         `,
+            }}
+          />
           <div className="text-center mt-6">
             <Link
               href="/services"
               className="inline-block bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
               style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
             >
-              {/* CTA Services sophrologie */}➤ Découvrir mes programmes de sophrologie
+              {/* CTA Services sophrologie */}
+              {data.accueil.SectionServicesCTA || '➤ Découvrir le programme de sophrologie'}
             </Link>
           </div>
         </section>
@@ -233,16 +260,24 @@ export default function Home({ locale = 'fr' }) {
         {/* Section Témoignages (CTA) */}
         <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
           {/* Titre H2 témoignages sophrologie */}
-          <h2
-            className="text-3xl font-semibold text-prune mb-5"
+
+          <TitreMultiligne
+            text={
+              data.accueil.SectionTestimonialsTitre ||
+              'Ils ont retrouvé la sérénité grâce à la sophrologie'
+            }
+            className="text-3xl font-semibold mb-5 text-center"
             style={{ color: 'var(--color-titreH2)' }}
-          >
-            Ils ont retrouvé la sérénité grâce à la sophrologie
-          </h2>
+            tag="h2"
+          />
+
           <p
             className="text-gray-700 leading-relaxed text-lg"
             style={{ color: 'var(--color-texte)' }}
-          >
+            dangerouslySetInnerHTML={{
+              __html: cleanedTestimonials
+                ? data.accueil.SectionTestimonialsDescription
+                : `
             Rien n’est plus authentique que le vécu de ceux qui ont franchi le pas. Derrière chaque
             témoignage, il y a un parcours, une rencontre avec un **sophrologue**, un changement
             significatif. Les personnes accompagnées évoquent souvent un apaisement durable, une
@@ -256,14 +291,17 @@ export default function Home({ locale = 'fr' }) {
             sophrologique**.
             <br />
             <br />
-          </p>
+          </p>`,
+            }}
+          />
+
           <div className="text-center mt-6">
             <Link
               href="/testimonials"
               className="mb-8 inline-block mt-6 bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-button)' }}
             >
-              ➤ Lire les témoignages sur la sophrologie
+              {data.accueil.SectionTestimonialsCTA || '➤ Lire les témoignages sur la sophrologie'}
             </Link>
           </div>
         </section>
@@ -271,16 +309,22 @@ export default function Home({ locale = 'fr' }) {
         {/* Section Contact (CTA) */}
         <section className="mb-16 bg-white p-8 rounded-xl shadow text-center max-w-7xl">
           {/* Titre H2 contact sophrologie */}
-          <h2
-            className="text-3xl font-semibold text-prune mb-5"
+          <TitreMultiligne
+            text={
+              data.accueil.SectionContactTitre ||
+              'Prêt(e) à découvrir les bienfaits de la sophrologie ?'
+            }
+            className="text-3xl font-semibold mb-5 text-center"
             style={{ color: 'var(--color-titreH2)' }}
-          >
-            Prêt(e) à découvrir les bienfaits de la sophrologie ?
-          </h2>
+            tag="h2"
+          />
           <p
             className="text-gray-700 leading-relaxed text-lg max-w-3xl mx-auto"
             style={{ color: 'var(--color-texte)' }}
-          >
+            dangerouslySetInnerHTML={{
+              __html: cleanedContact
+                ? data.accueil.SectionContactDescription
+                : `
             Prendre rendez-vous, ce n’est pas s’engager à tout changer, mais simplement se donner la
             possibilité d’explorer une autre voie. Que ce soit pour une **première séance de
             découverte en sophrologie** ou pour un **accompagnement sophrologique** plus approfondi
@@ -289,13 +333,16 @@ export default function Home({ locale = 'fr' }) {
             <br />
             Parce que le bien-être n’attend pas, je vous offre la possibilité de réserver
             directement en ligne votre **séance de sophrologie**.
-          </p>
+          </p>`,
+            }}
+          />
           <Link
             href="/contact"
             className="inline-block mt-6 bg-prune text-white py-3 px-6 rounded-full text-lg font-semibold shadow hover:bg-purple-700 transition"
             style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
           >
-            {/* CTA contact sophrologie */}➤ Réserver ma séance de sophrologie maintenant
+            {/* CTA contact sophrologie */}
+            {data.accueil.SectionContactCTA || '➤ Réserver ma séance de sophrologie maintenant'}
           </Link>
         </section>
       </div>
