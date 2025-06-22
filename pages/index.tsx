@@ -17,7 +17,6 @@ export default function Home({ locale = 'fr' }) {
     'https://res.cloudinary.com/dwadzodje/image/upload/v1749631226/ChatGPT_Image_5_juin_2025_13_25_10_rvgbgf.png';
 
   const [data, setData] = useState(null);
-  console.log('data ===', data);
 
   const router = useRouter();
   const uid = router.query.uid as string;

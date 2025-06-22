@@ -112,6 +112,7 @@ export default function Live() {
               aPropos: raw.aPropos || { titre: '', texte: '', image: '', bouton: '' },
               services,
               testimonials: raw.testimonials || [],
+              testimonialsButton: raw.testimonialsButton || '',
               contact: raw.contact || {
                 titre: '',
                 texte: '',

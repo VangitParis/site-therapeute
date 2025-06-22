@@ -5,7 +5,8 @@ import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function Testimonials({ locale = 'fr' }) {
-  const [data, setData] = useState(null);
+  const [buttonText, setButtonText] = useState<string>('');
+
   const [items, setItems] = useState([]);
   const router = useRouter();
   const uid = router.query.uid as string;
@@ -30,6 +31,7 @@ export default function Testimonials({ locale = 'fr' }) {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const raw = snap.data();
+        setButtonText(raw.testimonialsButton || '');
 
         setItems(raw.testimonials || []);
         applyThemeToDOM(raw.theme);
@@ -41,6 +43,10 @@ export default function Testimonials({ locale = 'fr' }) {
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'UPDATE_FORMDATA') {
         setItems(e.data.payload.testimonials);
+        if (e.data?.payload?.testimonialsButton !== undefined) {
+          setButtonText(e.data.payload.testimonialsButton);
+        }
+
         applyThemeToDOM(e.data.payload.theme);
       }
     };
@@ -61,14 +67,17 @@ export default function Testimonials({ locale = 'fr' }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div
+      className="max-w-4xl mx-auto px-6 py-12 text-center"
+      style={{ backgroundColor: 'var(--color-bg)' }}
+    >
       <h1
         className="text-3xl font-bold text-prune mb-8 text-center"
         style={{ color: 'var(--color-titreH1)' }}
       >
         Témoignages
       </h1>
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
         {items.map((item, i) => (
           <div
             key={i}
@@ -95,14 +104,14 @@ export default function Testimonials({ locale = 'fr' }) {
         ))}
       </div>
       <Link
-        href="/contact"
+        href="/contact#form"
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
         style={{
           backgroundColor: 'var(--color-primary)',
           color: 'var(--color-text-button)',
         }}
       >
-        {items.bouton || ''}
+        {buttonText.trim() || 'Je veux essayer'}
       </Link>
     </div>
   );

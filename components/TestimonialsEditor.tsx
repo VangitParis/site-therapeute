@@ -19,7 +19,7 @@ export default function TestimonialsEditor({
   imageFieldTestimonialsRef,
 }: Props) {
   const testimonials: Testimonial[] = formData.testimonials || [];
-
+  const buttonTestimonials = formData.testimonialsButton || '';
   const handleChange = <K extends keyof Testimonial>(
     index: number,
     key: K,
@@ -30,6 +30,12 @@ export default function TestimonialsEditor({
     setFormData((prev) => ({
       ...prev,
       testimonials: updated,
+    }));
+  };
+  const handleButtonChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      testimonialsButton: value,
     }));
   };
 
@@ -115,6 +121,17 @@ export default function TestimonialsEditor({
       >
         ➕ Ajouter un témoignage
       </button>
+
+      <label>
+        <span className="block font-medium">🔘 Texte du bouton Témoignages</span>
+        <input
+          type="text"
+          value={formData.testimonialsButton || ''}
+          onChange={(e) => handleButtonChange(e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Texte du bouton affiché sur la page"
+        />
+      </label>
     </div>
   );
 }

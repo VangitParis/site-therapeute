@@ -135,6 +135,7 @@ export default function Contact({ locale = 'fr' }) {
           )}
           <label>Laissez-moi un message </label>
           <form
+            id="form"
             className="max-w-xl mx-auto grid gap-4 text-left"
             style={{ color: 'var(--color-texte)' }}
             onSubmit={(e) => {
