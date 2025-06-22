@@ -13,6 +13,7 @@
   --color-titreH3: #444444;
   --color-text-button: #ffffff;
   --bg-image: none;
+  --custom-bg-position: 75px 12%;
 }
 
 body {
@@ -20,9 +21,15 @@ body {
   background-image: var(--bg-image);
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  /* background-position: center; */
 }
 
 button {
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --custom-bg-position: center top;
+  }
 }

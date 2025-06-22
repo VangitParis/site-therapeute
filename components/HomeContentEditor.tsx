@@ -9,12 +9,23 @@ type Props = {
 };
 export default function HomeContentEditor({ formData, setFormData, imageFieldRef }: Props) {
   const accueil = formData.accueil || {};
+  const contact = formData.contact || {};
 
-  const handleChange = (key, value) => {
-    setFormData((prev) => ({
+  const handleAccueilChange = (key: string, value: string) => {
+    setFormData((prev: any) => ({
       ...prev,
       accueil: {
         ...prev.accueil,
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleContactChange = (key: string, value: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      contact: {
+        ...prev.contact,
         [key]: value,
       },
     }));
@@ -27,7 +38,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <span className="block font-medium">📝 Titre d’accueil</span>
         <textarea
           value={accueil.titre || ''}
-          onChange={(e) => handleChange('titre', e.target.value)}
+          onChange={(e) => handleAccueilChange('titre', e.target.value)}
           className="w-full border px-3 py-2 rounded resize-none"
           rows={2}
         />
@@ -37,9 +48,20 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <span className="block font-medium">💬 Texte d’introduction</span>
         <textarea
           value={accueil.texte || ''}
-          onChange={(e) => handleChange('texte', e.target.value)}
+          onChange={(e) => handleAccueilChange('texte', e.target.value)}
           className="w-full border px-3 py-2 rounded"
           rows={3}
+        />
+      </label>
+
+      <label>
+        <span className="block font-medium">🔘 Texte du bouton RDV Calendly</span>
+        <input
+          type="text"
+          value={contact.lien || ''}
+          onChange={(e) => handleContactChange('lien', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+          placeholder="https://calendly.com/votre-nom ou vide "
         />
       </label>
 
@@ -48,17 +70,18 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.bouton || ''}
-          onChange={(e) => handleChange('bouton', e.target.value)}
+          onChange={(e) => handleAccueilChange('bouton', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
+
       {/* A PROPOS HOMEPAGE*/}
       <label>
         <span className="block font-medium">📝 Section À Propos : Titre</span>
         <input
           type="text"
           value={accueil.SectionAProposTitre || ''}
-          onChange={(e) => handleChange('SectionAProposTitre', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionAProposTitre', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -84,7 +107,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionAProposCTA || ''}
-          onChange={(e) => handleChange('SectionAProposCTA', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionAProposCTA', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -108,7 +131,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionServicesTitre || ''}
-          onChange={(e) => handleChange('SectionServicesTitre', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionServicesTitre', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -133,7 +156,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionServicesCTA || ''}
-          onChange={(e) => handleChange('SectionServicesCTA', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionServicesCTA', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -143,7 +166,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionTestimonialsTitre || ''}
-          onChange={(e) => handleChange('SectionTestimonialsTitre', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionTestimonialsTitre', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -168,7 +191,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionTestimonialsCTA || ''}
-          onChange={(e) => handleChange('SectionTestimonialsCTA', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionTestimonialsCTA', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -178,7 +201,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionContactTitre || ''}
-          onChange={(e) => handleChange('SectionContactTitre', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionContactTitre', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>
@@ -203,7 +226,7 @@ export default function HomeContentEditor({ formData, setFormData, imageFieldRef
         <input
           type="text"
           value={accueil.SectionContactCTA || ''}
-          onChange={(e) => handleChange('SectionContactCTA', e.target.value)}
+          onChange={(e) => handleAccueilChange('SectionContactCTA', e.target.value)}
           className="w-full border px-3 py-2 rounded"
         />
       </label>

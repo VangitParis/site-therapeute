@@ -18,8 +18,8 @@ module.exports = {
         'custom-bg': 'var(--custom-bg-url)', // si tu veux lier dynamiquement
       },
       backgroundPosition: {
-        'custom-mobile': '55% 0',
-        'custom-desktop': '0 12%',
+        'custom-mobile': '75px 12%',
+        'custom-desktop': '75px 12%',
       },
     },
   },

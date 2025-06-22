@@ -21,11 +21,44 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
     }
   }, [value]);
 
+  // 💡 Forcer saut de ligne en <p> au lieu de <div> ou <br>
+  useEffect(() => {
+    const editor = ref.current;
+    if (!editor) return;
+
+    const handleEnter = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const p = document.createElement('p');
+        p.innerHTML = '<br>'; // paragraphe vide
+
+        range.deleteContents();
+        range.insertNode(p);
+
+        const newRange = document.createRange();
+        newRange.setStart(p, 0);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        onChange(ref.current?.innerHTML || '');
+      }
+    };
+
+    editor.addEventListener('keydown', handleEnter as any);
+    return () => editor.removeEventListener('keydown', handleEnter as any);
+  }, [onChange]);
+
   return (
     <div className="mb-6">
       <label className="block font-medium mb-2">{label}</label>
 
-      {/* Barre d'outils */}
+      {/* Outils */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <button onClick={() => format('bold')} className="px-2 py-1 border rounded font-bold">
           Gras
@@ -40,14 +73,12 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           🧹 Effacer
         </button>
 
-        {/* Sélecteur taille */}
         <select
           onChange={(e) => {
-            const size = e.target.value;
-            document.execCommand('fontSize', false, '7'); // hack pour forcer remplacement
+            document.execCommand('fontSize', false, '7');
             document.querySelectorAll('font[size="7"]').forEach((el) => {
               el.removeAttribute('size');
-              (el as HTMLElement).style.fontSize = size;
+              (el as HTMLElement).style.fontSize = e.target.value;
             });
           }}
           className="border rounded px-2 py-1 text-sm"
@@ -60,7 +91,6 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           <option value="24px">24px</option>
         </select>
 
-        {/* Couleur texte */}
         <input
           type="color"
           value={color}
@@ -71,7 +101,6 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
           className="w-8 h-8 border rounded cursor-pointer"
         />
 
-        {/* Alignement */}
         <button onClick={() => format('justifyLeft')} className="px-2 py-1 border rounded text-sm">
           ↤
         </button>
@@ -86,16 +115,15 @@ export default function RichTextEditor({ label, value, onChange }: Props) {
         </button>
 
         <span className="text-sm text-gray-500 italic ml-2">
-          Sélectionner du texte avant d’appliquer un style
+          (Sélectionne du texte avant d’appliquer un style)
         </span>
       </div>
 
-      {/* Zone éditable */}
+      {/* Zone d'édition */}
       <div
         ref={ref}
         contentEditable
-        className="mx-auto border rounded p-3 min-h-[120px] bg-white focus:outline 
-        focus:outline-indigo-400 overflow-hidden break-normal flex flex-wrap w-full"
+        className="mx-auto border rounded p-3 min-h-[120px] bg-white focus:outline focus:outline-indigo-400 break-words w-full"
         onInput={() => {
           if (ref.current) onChange(ref.current.innerHTML);
         }}

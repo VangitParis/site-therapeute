@@ -95,7 +95,15 @@ export default function ServicesEditor({ formData, setFormData, imageFieldServic
       <button onClick={addService} className="text-sm text-blue-600 underline">
         ➕ Ajouter un service
       </button>
-
+      <label>
+        <span className="block font-medium">🔘 Texte du bouton</span>
+        <input
+          type="text"
+          value={formData.services?.bouton || ''}
+          onChange={(e) => handleChange('bouton', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
       <hr className="my-4" />
     </div>
   );

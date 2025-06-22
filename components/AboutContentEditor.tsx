@@ -48,6 +48,15 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
           }
         />
       </div>
+      <label>
+        <span className="block font-medium">🔘 Texte du bouton</span>
+        <input
+          type="text"
+          value={formData.aPropos?.bouton || ''}
+          onChange={(e) => handleChange('bouton', e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+      </label>
       <ImageUploadField
         ref={imageFieldAProposRef}
         label="🖼️ Image de la section À propos"

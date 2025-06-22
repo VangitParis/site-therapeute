@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
@@ -20,7 +21,12 @@ const DEFAULT_IMAGE =
 
 export default function Services({ locale = 'fr' }: { locale?: string }) {
   const router = useRouter();
-  const [data, setData] = useState<{ titre: string; liste: any[]; image: string } | null>(null);
+  const [data, setData] = useState<{
+    titre: string;
+    liste: any[];
+    image: string;
+    bouton: string;
+  } | null>(null);
 
   const uid = router.query.uid as string;
   const isDev = router.query.frdev === '1';
@@ -45,7 +51,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const raw = snap.data();
-        const services = raw.services || { titre: '', liste: [], image: '' };
+        const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
         services.liste = services.liste.map((s: any) =>
           typeof s === 'string' ? { text: s, image: '' } : s
         );
@@ -86,7 +92,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
   return (
     <section
       id="services"
-      className="mb-16 bg-white p-8 rounded-xl  max-w-7xl mx-auto"
+      className="mb-16 bg-white p-8 rounded-xl  max-w-7xl mx-auto text-center gap-8"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <h1
@@ -97,7 +103,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
       </h1>
 
       {data.liste?.length ? (
-        <Slider {...settings}>
+        <Slider {...settings} className="mb-12">
           {data.liste.map((item, i) => (
             <div key={i} className="text-center text-lg p-6">
               <p className="italic mb-4" style={{ color: 'var(--color-texte)' }}>
@@ -114,6 +120,17 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
       ) : (
         <p className="text-center text-gray-500 italic">Aucun service défini pour le moment.</p>
       )}
+
+      <Link
+        href="/contact"
+        className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
+        style={{
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text-button)',
+        }}
+      >
+        {data.bouton || ''}
+      </Link>
     </section>
   );
 }

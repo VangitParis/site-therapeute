@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function Testimonials({ locale = 'fr' }) {
+  const [data, setData] = useState(null);
   const [items, setItems] = useState([]);
   const router = useRouter();
   const uid = router.query.uid as string;
@@ -28,6 +30,7 @@ export default function Testimonials({ locale = 'fr' }) {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const raw = snap.data();
+
         setItems(raw.testimonials || []);
         applyThemeToDOM(raw.theme);
       }
@@ -91,6 +94,16 @@ export default function Testimonials({ locale = 'fr' }) {
           </div>
         ))}
       </div>
+      <Link
+        href="/contact"
+        className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
+        style={{
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text-button)',
+        }}
+      >
+        {items.bouton || ''}
+      </Link>
     </div>
   );
 }

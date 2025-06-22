@@ -35,6 +35,18 @@ export default function Live() {
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
 
+  const applyThemeToDOM = (theme: any) => {
+    const root = document.documentElement;
+    if (theme?.background) root.style.setProperty('--color-bg', theme.background);
+    if (theme?.primary) root.style.setProperty('--color-primary', theme.primary);
+    if (theme?.accent) root.style.setProperty('--color-accent', theme.accent);
+    if (theme?.texte) root.style.setProperty('--color-texte', theme.texte);
+    if (theme?.textButton) root.style.setProperty('--color-text-button', theme.textButton);
+    if (theme?.titreH1) root.style.setProperty('--color-titreH1', theme.titreH1);
+    if (theme?.titreH2) root.style.setProperty('--color-titreH2', theme.titreH2);
+    if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
+  };
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, () => {
       setUserLoaded(true);
@@ -71,7 +83,7 @@ export default function Live() {
           const snap = await getDoc(doc(db, 'content', resolvedDocId));
           if (snap.exists()) {
             const raw = snap.data();
-            const services = raw.services || { titre: '', liste: [], image: '' };
+            const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
             services.liste = services.liste.map((s: any) =>
               typeof s === 'string' ? { text: s, image: '' } : s
             );
@@ -97,7 +109,7 @@ export default function Live() {
                 SectionContactDescription: '',
                 SectionContactCTA: '',
               },
-              aPropos: raw.aPropos || { titre: '', texte: '', image: '' },
+              aPropos: raw.aPropos || { titre: '', texte: '', image: '', bouton: '' },
               services,
               testimonials: raw.testimonials || [],
               contact: raw.contact || {
@@ -145,6 +157,12 @@ export default function Live() {
       router.events.off('routeChangeStart', handleRouteChangeStart);
     };
   }, [unsavedChanges, router.query]);
+
+  useEffect(() => {
+    if (formData?.theme) {
+      applyThemeToDOM(formData.theme);
+    }
+  }, [formData?.theme]);
 
   const handleSave = async () => {
     const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
