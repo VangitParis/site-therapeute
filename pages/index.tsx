@@ -155,7 +155,7 @@ export default function Home({ locale = 'fr' }) {
             )}
 
             <Link
-              href="/contact"
+              href="/services"
               className="flex-1 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-95 hover:scale-[1.02]"
               style={{
                 backgroundColor: 'var(--color-white)',
