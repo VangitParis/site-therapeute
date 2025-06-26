@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
+import UserLink from '../components/UserLinks';
 
 export default function Testimonials({ locale = 'fr' }) {
   const [buttonText, setButtonText] = useState<string>('');
@@ -103,8 +104,11 @@ export default function Testimonials({ locale = 'fr' }) {
           </div>
         ))}
       </div>
-      <Link
-        href="/contact#form"
+      <UserLink
+        href="/contact"
+        uid={uid}
+        isDev={isDev}
+        hash="form"
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
         style={{
           backgroundColor: 'var(--color-primary)',
@@ -112,7 +116,7 @@ export default function Testimonials({ locale = 'fr' }) {
         }}
       >
         {buttonText.trim() || 'Je veux essayer'}
-      </Link>
+      </UserLink>
     </div>
   );
 }

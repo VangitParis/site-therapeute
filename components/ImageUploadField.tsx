@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 
 const IMAGE_PAR_DEFAUT =
   'https://res.cloudinary.com/dwadzodje/image/upload/v1750498500/assets/image_defaut.png';

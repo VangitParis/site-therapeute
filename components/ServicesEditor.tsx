@@ -22,6 +22,20 @@ export default function ServicesEditor({ formData, setFormData, imageFieldServic
     }));
   };
 
+  const handleUploadAtIndex = (index: number, url: string) => {
+    setFormData((prev: any) => {
+      const newListe = [...prev.services.liste];
+      newListe[index].image = url;
+      return {
+        ...prev,
+        services: {
+          ...prev.services,
+          liste: newListe,
+        },
+      };
+    });
+  };
+
   const handleListChange = (index: number, key: 'text' | 'image', value: string) => {
     const updated = [...services.liste];
     updated[index] = {
@@ -76,9 +90,10 @@ export default function ServicesEditor({ formData, setFormData, imageFieldServic
           />
 
           <ImageUploadField
+            ref={index === 0 ? imageFieldServicesRef : undefined}
             label={`🖼️ Image du service #${index + 1}`}
-            value={item.image || ''} // ← important de ne pas injecter DEFAULT_IMAGE ici
-            folderName={safeFolderName}
+            value={item.image} // ← important de ne pas injecter DEFAULT_IMAGE ici
+            folderName={formData.layout?.nom || 'default'}
             sectionName="services"
             onUpload={(url) => handleListChange(index, 'image', url)}
           />

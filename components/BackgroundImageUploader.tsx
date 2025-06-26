@@ -22,7 +22,7 @@ const BackgroundImageUploader = forwardRef<ImageUploadRef, Props>(
         <ImageUploadField
           ref={ref}
           label="Uploader une image"
-          value={formData.theme?.bgImage || ''}
+          value={formData.theme?.bgImage}
           folderName={safeFolderName}
           sectionName="background"
           onUpload={handleUpload}

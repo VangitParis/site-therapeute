@@ -4,6 +4,8 @@ import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import TitreMultiligne from '../components/TitreMultiligne';
+
+import UserLink from '../components/UserLinks';
 import { sanitizeHTML } from '../utils/sanitizeHTML';
 import {
   DEFAULT_A_PROPOS,
@@ -14,13 +16,13 @@ import {
 
 export default function Home({ locale = 'fr' }) {
   const DEFAULT_IMAGE =
-    'https://res.cloudinary.com/dwadzodje/image/upload/v1749631226/ChatGPT_Image_5_juin_2025_13_25_10_rvgbgf.png';
+    'https://res.cloudinary.com/dwadzodje/image/upload/v1750498500/assets/image_defaut.png';
 
   const [data, setData] = useState(null);
 
   const router = useRouter();
   const uid = router.query.uid as string;
-
+  const isDev = router.query.frdev === '1';
   const isPreview = router.query.admin === 'true';
 
   //   data?.accueil?.SectionContactDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
@@ -86,7 +88,9 @@ export default function Home({ locale = 'fr' }) {
       </div>
     );
   }
+
   const lienCalendly = data.contact?.lien?.trim() || '';
+
   const isExternal = lienCalendly.length > 0;
 
   const bgImageStyle = data?.theme?.bgImage
@@ -129,8 +133,10 @@ export default function Home({ locale = 'fr' }) {
           </p>
           <div className="flex flex-col md:flex-row gap-4 text-center">
             {isExternal ? (
-              <Link
+              <UserLink
                 href={lienCalendly}
+                uid={uid}
+                isDev={isDev}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
@@ -140,10 +146,12 @@ export default function Home({ locale = 'fr' }) {
                 }}
               >
                 Prendre Rendez‑vous
-              </Link>
+              </UserLink>
             ) : (
-              <Link
-                href="/contact"
+              <UserLink
+                href="/services"
+                uid={uid}
+                isDev={isDev}
                 className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
                 style={{
                   backgroundColor: 'var(--color-primary)',
@@ -151,11 +159,13 @@ export default function Home({ locale = 'fr' }) {
                 }}
               >
                 Prendre Rendez‑vous
-              </Link>
+              </UserLink>
             )}
 
-            <Link
+            <UserLink
               href="/services"
+              uid={uid}
+              isDev={isDev}
               className="flex-1 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-95 hover:scale-[1.02]"
               style={{
                 backgroundColor: 'var(--color-white)',
@@ -163,7 +173,7 @@ export default function Home({ locale = 'fr' }) {
               }}
             >
               {data.accueil.bouton || 'Découvrir mes services'}
-            </Link>
+            </UserLink>
           </div>
         </div>
       </section>
@@ -190,8 +200,10 @@ export default function Home({ locale = 'fr' }) {
             }}
           />
           <div className="text-center mt-6">
-            <Link
+            <UserLink
               href="/about"
+              uid={uid}
+              isDev={isDev}
               className="mb-8 inline-block mt-6 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
               style={{
                 backgroundColor: 'var(--color-primary)',
@@ -204,7 +216,7 @@ export default function Home({ locale = 'fr' }) {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
             >
               {data.accueil.SectionAProposCTA || '➤ En savoir plus sur la sophrologie'}
-            </Link>
+            </UserLink>
           </div>
 
           {data?.accueil?.image !== null && (
@@ -238,8 +250,10 @@ export default function Home({ locale = 'fr' }) {
             }}
           />
           <div className="text-center mt-6">
-            <Link
+            <UserLink
               href="/services"
+              uid={uid}
+              isDev={isDev}
               className="inline-block py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
               style={{
                 backgroundColor: 'var(--color-primary)',
@@ -252,7 +266,7 @@ export default function Home({ locale = 'fr' }) {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
             >
               {data.accueil.SectionServicesCTA || '➤ Découvrir le programme de sophrologie'}
-            </Link>
+            </UserLink>
           </div>
         </section>
 
@@ -283,8 +297,10 @@ export default function Home({ locale = 'fr' }) {
           />
 
           <div className="text-center mt-6">
-            <Link
+            <UserLink
               href="/testimonials"
+              uid={uid}
+              isDev={isDev}
               className="mb-8 inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
               style={{
                 backgroundColor: 'var(--color-primary)',
@@ -297,7 +313,7 @@ export default function Home({ locale = 'fr' }) {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
             >
               {data.accueil.SectionTestimonialsCTA || '➤ Lire les témoignages sur la sophrologie'}
-            </Link>
+            </UserLink>
           </div>
         </section>
 
@@ -324,8 +340,10 @@ export default function Home({ locale = 'fr' }) {
               ),
             }}
           />
-          <Link
+          <UserLink
             href="/contact"
+            uid={uid}
+            isDev={isDev}
             className="inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
             style={{
               backgroundColor: 'var(--color-primary)',
@@ -338,7 +356,7 @@ export default function Home({ locale = 'fr' }) {
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
           >
             {data.accueil.SectionContactCTA || '➤ Réserver ma séance de sophrologie maintenant'}
-          </Link>
+          </UserLink>
         </section>
       </div>
     </>

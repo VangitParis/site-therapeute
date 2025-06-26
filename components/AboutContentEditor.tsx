@@ -59,7 +59,7 @@ export default function AboutContentEditor({ formData, setFormData, imageFieldAP
       </label>
       <ImageUploadField
         ref={imageFieldAProposRef}
-        label="🖼️ Image de la section À propos"
+        label="🖼️ Image de la page À propos"
         value={aPropos.image || ''}
         folderName={formData.layout?.nom || 'default'}
         sectionName="aPropos"

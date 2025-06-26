@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import Slider from 'react-slick';
+import UserLink from '../components/UserLinks';
 
 const settings = {
   dots: true,
@@ -17,7 +18,7 @@ const settings = {
 };
 
 const DEFAULT_IMAGE =
-  'https://res.cloudinary.com/dwadzodje/image/upload/v1750498096/assets/image_defaut_services.png';
+  'https://res.cloudinary.com/dwadzodje/image/upload/v1750498096/assets/image_defaut.png';
 
 export default function Services({ locale = 'fr' }: { locale?: string }) {
   const router = useRouter();
@@ -70,6 +71,8 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
           typeof s === 'string' ? { text: s, image: '' } : s
         );
         setData(services);
+        console.log('image recue===', services.image);
+
         applyThemeToDOM(updated.theme);
       }
     };
@@ -121,8 +124,10 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
         <p className="text-center text-gray-500 italic">Aucun service défini pour le moment.</p>
       )}
 
-      <Link
+      <UserLink
         href="/contact"
+        uid={uid}
+        isDev={isDev}
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
         style={{
           backgroundColor: 'var(--color-primary)',
@@ -130,7 +135,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
         }}
       >
         {data.bouton || ''}
-      </Link>
+      </UserLink>
     </section>
   );
 }

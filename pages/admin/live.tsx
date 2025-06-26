@@ -84,9 +84,11 @@ export default function Live() {
           if (snap.exists()) {
             const raw = snap.data();
             const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
+
             services.liste = services.liste.map((s: any) =>
               typeof s === 'string' ? { text: s, image: '' } : s
             );
+            console.log(services.liste);
 
             setFormData({
               layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },

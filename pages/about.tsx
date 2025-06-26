@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
+import { appendQueryParams } from '../utils/appendQueryParams';
+import UserLink from '../components/UserLinks';
 
 export default function About({ locale = 'fr' }) {
   const [data, setData] = useState<{
@@ -98,8 +100,10 @@ export default function About({ locale = 'fr' }) {
           }}
         />
       </div>
-      <Link
+      <UserLink
         href="/contact"
+        uid={uid}
+        isDev={isDev}
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
         style={{
           backgroundColor: 'var(--color-primary)',
@@ -107,7 +111,7 @@ export default function About({ locale = 'fr' }) {
         }}
       >
         {data.bouton || ''}
-      </Link>
+      </UserLink>
     </div>
   );
 }
