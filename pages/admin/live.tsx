@@ -79,8 +79,17 @@ export default function Live() {
 
         setDocId(resolvedDocId);
 
+        // Vérification client dans Firestore
+        const clientSnap = await getDoc(doc(db, 'clients', resolvedDocId));
+        if (clientSnap.exists() && clientSnap.data().isClient === false) {
+          setMessage('⏳ Votre compte est en attente de validation…');
+          setTimeout(() => router.push('/attente-validation'), 3000);
+          return;
+        }
+
         try {
           const snap = await getDoc(doc(db, 'content', resolvedDocId));
+
           if (snap.exists()) {
             const raw = snap.data();
             const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
