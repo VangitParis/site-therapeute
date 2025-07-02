@@ -30,7 +30,7 @@ export default function Home({ locale = 'fr' }) {
   const startBuilding = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      router.push('/login'); // Remplacez par votre route d'éditeur
+      router.push('users/login'); // Remplacez par votre route d'éditeur
     }, 500);
   };
 
@@ -115,7 +115,7 @@ export default function Home({ locale = 'fr' }) {
                   <a href="#templates">Templates</a>
                 </li>
                 <li>
-                  <a href="/login">Se connecter / S'inscrire</a>
+                  <a href="users/login">Se connecter / S'inscrire</a>
                 </li>
                 <li>
                   <a href="#contact">Contact</a>
