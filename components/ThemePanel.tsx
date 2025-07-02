@@ -14,19 +14,37 @@ export default function ThemePanel({ formData, setFormData }) {
     if (theme?.titreH3) root.style.setProperty('--color-titreH3', theme.titreH3);
   };
 
+  // Fonction pour envoyer le thème à l'iframe
+  const sendThemeToIframe = (theme: any) => {
+    // Trouve l'iframe de prévisualisation
+    const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(
+        {
+          type: 'UPDATE_THEME',
+          payload: theme,
+          timestamp: Date.now(),
+        },
+        '*'
+      );
+    }
+  };
+
   const handleThemeChange = (key: string, value: string) => {
     const updatedTheme = {
       ...theme,
       [key]: value,
     };
-    console.log('ici le theme est modifié ===', updatedTheme);
+    console.log('🎨 Thème modifié ===', updatedTheme);
 
     setFormData((prev) => ({
       ...prev,
       theme: updatedTheme,
     }));
 
-    applyThemeToDOM(updatedTheme); // ✅ applique immédiatement
+    // Applique le thème localement ET à l'iframe
+    applyThemeToDOM(updatedTheme);
+    sendThemeToIframe(updatedTheme);
   };
 
   return (
@@ -98,21 +116,20 @@ export default function ThemePanel({ formData, setFormData }) {
           value={theme.titreH2 || '#444444'}
           onChange={(e) => {
             const newColor = e.target.value;
-
-            setFormData((prev) => ({
-              ...prev,
-              theme: {
-                ...prev.theme,
-                titreH2: newColor,
-                titreH3: newColor,
-              },
-            }));
-
-            applyThemeToDOM({
+            const updatedTheme = {
               ...theme,
               titreH2: newColor,
               titreH3: newColor,
-            });
+            };
+
+            setFormData((prev) => ({
+              ...prev,
+              theme: updatedTheme,
+            }));
+
+            applyThemeToDOM(updatedTheme);
+
+            sendThemeToIframe(updatedTheme);
           }}
           className="w-full h-10 border rounded"
         />

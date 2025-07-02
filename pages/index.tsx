@@ -1,39 +1,46 @@
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+
 import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import TitreMultiligne from '../components/TitreMultiligne';
-
-import UserLink from '../components/UserLinks';
-import { sanitizeHTML } from '../utils/sanitizeHTML';
-import {
-  DEFAULT_A_PROPOS,
-  DEFAULT_CONTACT,
-  DEFAULT_SERVICES,
-  DEFAULT_TESTIMONIALS,
-} from '../utils/default';
+import Head from 'next/head';
 
 export default function Home({ locale = 'fr' }) {
   const DEFAULT_IMAGE =
     'https://res.cloudinary.com/dwadzodje/image/upload/v1750498500/assets/image_defaut.png';
 
   const [data, setData] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const router = useRouter();
   const uid = router.query.uid as string;
   const isDev = router.query.frdev === '1';
   const isPreview = router.query.admin === 'true';
 
-  //   data?.accueil?.SectionContactDescription?.replace(/<br\s*\/?>/gi, '').trim() || '';
+  // Vérifier si on est côté client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Si aucun UID n'est présent ET qu'on n'est pas en mode dev, afficher la landing page
+  const shouldShowLanding = isClient && !uid && !isDev && !isPreview;
+
+  // Fonction pour démarrer la création
+  const startBuilding = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      router.push('/login'); // Remplacez par votre route d'éditeur
+    }, 500);
+  };
+
   function isContentEmpty(html: string): boolean {
     const cleaned = html
-      .replace(/<br\s*\/?>/gi, '') // supprime tous les <br>
-      .replace(/&nbsp;/gi, '') // supprime les espaces insécables
-      .replace(/\s+/g, '') // supprime tous les espaces
-      .replace(/<[^>]*>/g, '') // supprime toutes les balises HTML
+      .replace(/<br\s*\/?>/gi, '')
+      .replace(/&nbsp;/gi, '')
+      .replace(/\s+/g, '')
+      .replace(/<[^>]*>/g, '')
       .trim();
-
     return cleaned.length === 0;
   }
 
@@ -50,11 +57,10 @@ export default function Home({ locale = 'fr' }) {
   };
 
   useEffect(() => {
-    const isDev = router.query.frdev === '1';
-    const uidParam = router.query.uid as string | undefined;
+    if (shouldShowLanding) return; // Ne pas charger de données pour la landing page
 
     const fetchData = async () => {
-      const docId = isDev ? 'fr' : uidParam || locale;
+      const docId = isDev ? 'fr' : uid || locale;
       if (!docId) return;
 
       const ref = doc(db, 'content', docId);
@@ -79,286 +85,195 @@ export default function Home({ locale = 'fr' }) {
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [locale, isPreview, router.query.frdev, router.query.uid]);
+  }, [locale, isPreview, isDev, uid, shouldShowLanding]);
 
-  if (!data) {
+  // AFFICHER LA LANDING PAGE
+  if (shouldShowLanding) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 border-opacity-50"></div>
-      </div>
+      <>
+        <Head>
+          <title>SiteBuilder - Créez votre site de thérapeute en quelques clics</title>
+          <meta
+            name="description"
+            content="Créez des sites web magnifiques pour thérapeutes et praticiens en quelques minutes avec notre éditeur intuitif"
+          />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+
+        <div className={`app ${isTransitioning ? 'transitioning' : ''}`}>
+          {/* Header */}
+          <header className="header">
+            <nav className="nav container">
+              <a href="/" className="logo">
+                🌿 TherapyBuilder
+              </a>
+              <ul className="nav-links">
+                <li>
+                  <a href="#features">Fonctionnalités</a>
+                </li>
+                <li>
+                  <a href="#templates">Templates</a>
+                </li>
+                <li>
+                  <a href="/login">Se connecter / S'inscrire</a>
+                </li>
+                <li>
+                  <a href="#contact">Contact</a>
+                </li>
+              </ul>
+            </nav>
+          </header>
+
+          {/* Hero Section */}
+          <section className="hero">
+            <div className="floating-elements">
+              <div className="floating-element"></div>
+              <div className="floating-element"></div>
+              <div className="floating-element"></div>
+            </div>
+            <div className="hero-content">
+              <h1>Créez votre site de thérapeute</h1>
+              <p>
+                Construisez un site web professionnel pour votre pratique thérapeutique en quelques
+                minutes. Parfait pour sophrologues, psychologues, coachs et tous praticiens du
+                bien-être.
+              </p>
+              <button className="cta-button" onClick={startBuilding}>
+                Créer mon site maintenant
+              </button>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section className="features" id="features">
+            <div className="container">
+              <h2>Parfait pour les thérapeutes</h2>
+              <div className="features-grid">
+                <div className="feature-card">
+                  <div className="feature-icon">🧘‍♀️</div>
+                  <h3>Templates Thérapie</h3>
+                  <p>
+                    Templates spécialement conçus pour sophrologues, psychologues, coachs et
+                    praticiens du bien-être.
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">📅</div>
+                  <h3>Prise de RDV</h3>
+                  <p>
+                    Intégration facile avec Calendly et autres systèmes de réservation en ligne.
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">🎨</div>
+                  <h3>Design Apaisant</h3>
+                  <p>
+                    Couleurs et designs pensés pour inspirer confiance et sérénité à vos clients.
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">📱</div>
+                  <h3>Mobile-First</h3>
+                  <p>
+                    Vos clients peuvent vous trouver et prendre RDV depuis leur téléphone
+                    facilement.
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">⚡</div>
+                  <h3>Création Rapide</h3>
+                  <p>
+                    Votre site professionnel prêt en moins de 30 minutes, sans compétences
+                    techniques.
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">🔒</div>
+                  <h3>Sécurisé</h3>
+                  <p>
+                    Protection des données de vos clients et conformité aux standards du secteur
+                    médical.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Templates Preview */}
+          <section className="templates" id="templates">
+            <div className="container">
+              <h2>Templates pour thérapeutes</h2>
+              <div className="templates-grid">
+                <div className="template-card">
+                  <div className="template-preview">
+                    <div className="template-mockup sophrologie">
+                      <div className="mockup-header"></div>
+                      <div className="mockup-content">
+                        <div className="mockup-title">Sophrologie</div>
+                        <div className="mockup-text"></div>
+                        <div className="mockup-button"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h3>Template Sophrologie</h3>
+                  <p>Design zen et apaisant pour les sophrologues</p>
+                </div>
+                <div className="template-card">
+                  <div className="template-preview">
+                    <div className="template-mockup psychologie">
+                      <div className="mockup-header"></div>
+                      <div className="mockup-content">
+                        <div className="mockup-title">Psychologie</div>
+                        <div className="mockup-text"></div>
+                        <div className="mockup-button"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h3>Template Psychologue</h3>
+                  <p>Professionnel et rassurant pour les psychologues</p>
+                </div>
+                <div className="template-card">
+                  <div className="template-preview">
+                    <div className="template-mockup coaching">
+                      <div className="mockup-header"></div>
+                      <div className="mockup-content">
+                        <div className="mockup-title">Coaching</div>
+                        <div className="mockup-text"></div>
+                        <div className="mockup-button"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h3>Template Coach</h3>
+                  <p>Dynamique et motivant pour les coachs de vie</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="cta-section">
+            <div className="container">
+              <h2>Prêt à lancer votre pratique en ligne ?</h2>
+              <p>
+                Rejoignez des centaines de thérapeutes qui ont déjà créé leur site professionnel
+              </p>
+              <button className="cta-button-secondary" onClick={startBuilding}>
+                Commencer gratuitement
+              </button>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="footer">
+            <div className="container">
+              <p>
+                &copy; 2025 TherapyBuilder. Créé avec ❤️ pour les thérapeutes et praticiens du
+                bien-être.
+              </p>
+            </div>
+          </footer>
+        </div>
+      </>
     );
   }
-
-  const lienCalendly = data.contact?.lien?.trim() || '';
-
-  const isExternal = lienCalendly.length > 0;
-
-  const bgImageStyle = data?.theme?.bgImage
-    ? {
-        backgroundImage: `url(${data.theme.bgImage})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'var(--custom-bg-position)',
-      }
-    : {};
-
-  return (
-    <>
-      {/* Section Accueil (inchangée) */}
-      <section
-        className="relative overflow-hidden py-24 px-6 md:px-24 mb-16"
-        style={{
-          ...bgImageStyle,
-          height: '700px',
-        }}
-      >
-        <div className="flex flex-col m-3 sm:m-4 gap-15 max-w-2xl">
-          {/* Titre H1 optimisé pour la sophrologie */}
-
-          <TitreMultiligne
-            text={
-              data.accueil.titre ||
-              'Sophrologie : Retrouvez Sérénité intérieure et Équilibre au quotidien'
-            }
-            className="text-3xl lg:text-6xl font-bold text-prune tracking-tight leading-tight"
-            style={{ color: 'var(--color-titreH1)' }}
-            tag="h1"
-          />
-
-          <p className="text-xl l text-gray-700 max-w-2xl" style={{ color: 'var(--color-texte)' }}>
-            {/* Texte d'accroche sophrologie */}
-            {data.accueil.texte ||
-              `Découvrez la sophrologie, une méthode pour mieux gérer le stress,
-              l'anxiété et les émotions, et renforcer votre bien-être au quotidien.`}
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 text-center">
-            {isExternal ? (
-              <UserLink
-                href={lienCalendly}
-                uid={uid}
-                isDev={isDev}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-text-button)',
-                }}
-              >
-                Prendre Rendez‑vous
-              </UserLink>
-            ) : (
-              <UserLink
-                href="/services"
-                uid={uid}
-                isDev={isDev}
-                className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-text-button)',
-                }}
-              >
-                Prendre Rendez‑vous
-              </UserLink>
-            )}
-
-            <UserLink
-              href="/services"
-              uid={uid}
-              isDev={isDev}
-              className="flex-1 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-95 hover:scale-[1.02]"
-              style={{
-                backgroundColor: 'var(--color-white)',
-                color: 'var(--color-text-dark)',
-              }}
-            >
-              {data.accueil.bouton || 'Découvrir mes services'}
-            </UserLink>
-          </div>
-        </div>
-      </section>
-      <div className="flex items-center flex-col">
-        {/* Section À propos (CTA) */}
-        <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
-          {/* Titre H2 sophrologie */}
-
-          <TitreMultiligne
-            text={data.accueil.SectionAProposTitre || 'Mon approche en tant que sophrologue'}
-            className="text-3xl font-semibold mb-5 text-center"
-            style={{ color: 'var(--color-titreH2)' }}
-            tag="h2"
-          />
-          <p
-            className="text-gray-700 leading-relaxed text-lg whitespace-pre-line mb-6"
-            style={{ color: 'var(--color-texte)' }}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHTML(
-                !isContentEmpty(data.accueil.SectionAProposDescription || '')
-                  ? data.accueil.SectionAProposDescription
-                  : DEFAULT_A_PROPOS
-              ),
-            }}
-          />
-          <div className="text-center mt-6">
-            <UserLink
-              href="/about"
-              uid={uid}
-              isDev={isDev}
-              className="mb-8 inline-block mt-6 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                color: 'var(--color-text-button)',
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  'color-mix(in srgb, var(--color-primary), black 15%)')
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-            >
-              {data.accueil.SectionAProposCTA || '➤ En savoir plus sur la sophrologie'}
-            </UserLink>
-          </div>
-
-          {data?.accueil?.image !== null && (
-            <img
-              src={data.accueil.image !== '' ? data.accueil.image : DEFAULT_IMAGE}
-              alt="Illustration sophrologie, bien-être et relaxation"
-              className="mx-auto rounded-xl shadow-xl w-80 h-[350px] object-fill"
-            />
-          )}
-        </section>
-
-        {/* Section Services */}
-        <section id="services" className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
-          {/* Titre H2 sophrologie */}
-
-          <TitreMultiligne
-            text={data.accueil.SectionServicesTitre || 'Mes accompagnements en sophrologie'}
-            className="text-3xl font-semibold mb-5 text-center"
-            style={{ color: 'var(--color-titreH2)' }}
-            tag="h2"
-          />
-          <p
-            className="text-gray-700 text-lg leading-relaxed space-y-4 mb-6"
-            style={{ color: 'var(--color-texte)' }}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHTML(
-                !isContentEmpty(data.accueil.SectionServicesDescription || '')
-                  ? data.accueil.SectionServicesDescription
-                  : DEFAULT_SERVICES
-              ),
-            }}
-          />
-          <div className="text-center mt-6">
-            <UserLink
-              href="/services"
-              uid={uid}
-              isDev={isDev}
-              className="inline-block py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                color: 'var(--color-text-button)',
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  'color-mix(in srgb, var(--color-primary), black 15%)')
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-            >
-              {data.accueil.SectionServicesCTA || '➤ Découvrir le programme de sophrologie'}
-            </UserLink>
-          </div>
-        </section>
-
-        {/* Section Témoignages (CTA) */}
-        <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl">
-          {/* Titre H2 témoignages sophrologie */}
-
-          <TitreMultiligne
-            text={
-              data.accueil.SectionTestimonialsTitre ||
-              'Ils ont retrouvé la sérénité grâce à la sophrologie'
-            }
-            className="text-3xl font-semibold mb-5 text-center"
-            style={{ color: 'var(--color-titreH2)' }}
-            tag="h2"
-          />
-
-          <p
-            className="text-gray-700 leading-relaxed text-lg"
-            style={{ color: 'var(--color-texte)' }}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHTML(
-                !isContentEmpty(data.accueil.SectionTestimonialsDescription || '')
-                  ? data.accueil.SectionTestimonialsDescription
-                  : DEFAULT_TESTIMONIALS
-              ),
-            }}
-          />
-
-          <div className="text-center mt-6">
-            <UserLink
-              href="/testimonials"
-              uid={uid}
-              isDev={isDev}
-              className="mb-8 inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                color: 'var(--color-text-button)',
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  'color-mix(in srgb, var(--color-primary), black 15%)')
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-            >
-              {data.accueil.SectionTestimonialsCTA || '➤ Lire les témoignages sur la sophrologie'}
-            </UserLink>
-          </div>
-        </section>
-
-        {/* Section Contact (CTA) */}
-        <section className="mb-16 bg-white p-8 rounded-xl shadow text-center max-w-7xl">
-          {/* Titre H2 contact sophrologie */}
-          <TitreMultiligne
-            text={
-              data.accueil.SectionContactTitre ||
-              'Prêt(e) à découvrir les bienfaits de la sophrologie ?'
-            }
-            className="text-3xl font-semibold mb-5 text-center"
-            style={{ color: 'var(--color-titreH2)' }}
-            tag="h2"
-          />
-          <p
-            className="text-gray-700 leading-relaxed text-lg max-w-3xl mx-auto"
-            style={{ color: 'var(--color-texte)' }}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHTML(
-                !isContentEmpty(data.accueil.SectionContactDescription || '')
-                  ? data.accueil.SectionContactDescription
-                  : DEFAULT_CONTACT
-              ),
-            }}
-          />
-          <UserLink
-            href="/contact"
-            uid={uid}
-            isDev={isDev}
-            className="inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
-            style={{
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-text-button)',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                'color-mix(in srgb, var(--color-primary), black 15%)')
-            }
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-          >
-            {data.accueil.SectionContactCTA || '➤ Réserver ma séance de sophrologie maintenant'}
-          </UserLink>
-        </section>
-      </div>
-    </>
-  );
 }

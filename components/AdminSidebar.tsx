@@ -64,6 +64,11 @@ export default function AdminSidebar({
 
       <h2 className="text-xl font-bold text-indigo-700 text-center">⚙️ Administration</h2>
 
+      <AccordionSection title="🧩 En-tête et navigation">
+        <LayoutEditor formData={formData} setFormData={setFormData} />
+        <MentionsAdminEditor formData={formData} setFormData={setFormData} />
+      </AccordionSection>
+
       <AccordionSection title="🎨 Personnalisation visuelle">
         <ThemePanel formData={formData} setFormData={setFormData} />
         <BackgroundImageUploader
@@ -71,10 +76,6 @@ export default function AdminSidebar({
           setFormData={setFormData}
           ref={imageFieldBgRef}
         />
-      </AccordionSection>
-      <AccordionSection title="🧩 En-tête et navigation">
-        <LayoutEditor formData={formData} setFormData={setFormData} />
-        <MentionsAdminEditor formData={formData} setFormData={setFormData} />
       </AccordionSection>
 
       <AccordionSection title="🏠 Page d’accueil">

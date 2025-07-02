@@ -1,3 +1,5 @@
+/* css page home site thérapeutes */
+
 @import 'tailwindcss';
 @tailwind base;
 @tailwind components;
@@ -31,5 +33,120 @@ button {
 @media (max-width: 768px) {
   :root {
     --custom-bg-position: center top;
+  }
+}
+
+/* animations home*/
+
+@layer utilities {
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.8s ease-out both;
+  }
+
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  .delay-600 {
+    animation-delay: 0.6s;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 10px rgba(127, 90, 131, 0.4);
+  }
+}
+
+@layer utilities {
+  @keyframes fadeZoom {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-80px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes rotateZoom {
+    0% {
+      opacity: 0;
+      transform: rotate(-6deg) scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+  }
+
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slideInBottom {
+    0% {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeZoom {
+    animation: fadeZoom 1.2s ease forwards;
+  }
+
+  .animate-slideInLeft {
+    animation: slideInLeft 1.2s ease forwards;
+  }
+
+  .animate-rotateZoom {
+    animation: rotateZoom 1.2s ease forwards;
+  }
+
+  .animate-bounceIn {
+    animation: bounceIn 1.2s ease forwards;
+  }
+
+  .animate-slideInBottom {
+    animation: slideInBottom 1.2s ease forwards;
   }
 }

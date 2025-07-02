@@ -12,7 +12,6 @@ const DEFAULT_THEME = {
   background: '#f4f0fa',
   primary: '#7f5a83',
   accent: '#e6f0ff',
-  bgImage: '',
   titreH1: '#000',
   titreH2: '#000',
   titreH3: '#000',
@@ -34,6 +33,9 @@ export default function Live() {
   const imageFieldTestimonialsRef = useRef<ImageUploadRef>(null);
   const imageFieldBgRef = useRef<ImageUploadRef>(null);
   const imageFieldServicesRef = useRef<ImageUploadRef>(null);
+
+  // État pour tracker les modifications non sauvegardées
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const applyThemeToDOM = (theme: any) => {
     const root = document.documentElement;
@@ -57,13 +59,16 @@ export default function Live() {
   useEffect(() => {
     let unsubAuth: () => void;
 
+    // ✅ SOLUTION : Gérer différemment selon le contexte
     const init = async () => {
       unsubAuth = onAuthStateChanged(auth, async (user) => {
         setUserLoaded(true);
 
         const isDev = router.query.frdev === '1';
         const uidFromQuery = router.query.uid as string | undefined;
-
+        console.log('Auth user:', auth.currentUser?.uid);
+        console.log('Document ID:', uidFromQuery);
+        console.log('Match?', auth.currentUser?.uid === uidFromQuery);
         let resolvedDocId = 'fr';
 
         if (isDev) {
@@ -79,12 +84,23 @@ export default function Live() {
 
         setDocId(resolvedDocId);
 
-        // Vérification client dans Firestore
-        const clientSnap = await getDoc(doc(db, 'clients', resolvedDocId));
-        if (clientSnap.exists() && clientSnap.data().isClient === false) {
-          setMessage('⏳ Votre compte est en attente de validation…');
-          setTimeout(() => router.push('/attente-validation'), 3000);
-          return;
+        // ✅ SOLUTION SAFARI-COMPATIBLE
+        // Vérifier le statut client SEULEMENT pour l'utilisateur connecté
+        if (user && resolvedDocId === user.uid) {
+          try {
+            const clientSnap = await getDoc(doc(db, 'clients', user.uid));
+            if (clientSnap.exists() && clientSnap.data().isClient === false) {
+              setMessage('⏳ Votre compte est en attente de validation…');
+              setTimeout(() => router.push('/attente-validation'), 3000);
+              return;
+            }
+          } catch (error) {
+            console.log('⚠️ Impossible de vérifier le statut client');
+            // Continuer sans bloquer l'utilisateur
+          }
+        } else if (!user && resolvedDocId !== 'fr') {
+          // Si pas connecté et pas sur la page FR, on peut pas vérifier le statut
+          console.log('👀 Visiteur non connecté - pas de vérification client');
         }
 
         try {
@@ -97,11 +113,10 @@ export default function Live() {
             services.liste = services.liste.map((s: any) =>
               typeof s === 'string' ? { text: s, image: '' } : s
             );
-            console.log(services.liste);
 
             setFormData({
               layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
-              theme: raw.theme || DEFAULT_THEME,
+              theme: { ...DEFAULT_THEME, ...raw.theme },
               accueil: raw.accueil || {
                 titre: '',
                 texte: '',
@@ -176,7 +191,15 @@ export default function Live() {
     }
   }, [formData?.theme]);
 
+  // Détecter quand formData change pour marquer comme "non sauvegardé"
+  useEffect(() => {
+    if (formData) {
+      setHasUnsavedChanges(true);
+    }
+  }, [formData]); // Se déclenche à chaque modification de formData
+
   const handleSave = async () => {
+    console.log('💾 Sauvegarde des données:', formData);
     const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
     const isAdminDev = router.query.frdev === '1';
 
@@ -197,8 +220,25 @@ export default function Live() {
     }
 
     const ref = doc(db, 'content', docId);
-    await updateDoc(ref, { ...formData, adminToken: 'admin' });
-    setMessage('✅ Modifications enregistrées.');
+
+    // Préparer les données à sauvegarder
+    let dataToSave = { ...formData };
+
+    // N'ajouter adminToken que pour le document 'fr' ou en mode dev
+    if (docId === 'fr' || isAdminDev) {
+      dataToSave.adminToken = 'admin';
+    }
+
+    try {
+      await updateDoc(ref, dataToSave);
+      // Une fois sauvegardé, marquer comme sauvé
+      setHasUnsavedChanges(false);
+      setMessage('✅ Modifications enregistrées.');
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      setMessage('❌ Erreur lors de la sauvegarde.');
+    }
+    console.log('✅ Sauvegarde terminée');
   };
 
   const wrappedSetFormData = (fn: (prev: any) => any) => {
@@ -241,7 +281,12 @@ export default function Live() {
               ✏️ Mode édition en direct activé.
             </div>
             <div className="pt-6">
-              <SitePreview formData={formData} uid={docId} />
+              <SitePreview
+                formData={formData}
+                uid={docId}
+                hasUnsavedChanges={hasUnsavedChanges}
+                onSave={handleSave}
+              />
             </div>
           </div>
         </div>

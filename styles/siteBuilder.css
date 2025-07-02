@@ -1,0 +1,350 @@
+/* css page index app  */
+
+.app {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  transition: opacity 0.5s ease;
+}
+
+.app.transitioning {
+  opacity: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 1000;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav-links a:hover {
+  opacity: 0.8;
+}
+
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 800px;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeInUp 1s ease 0.5s forwards;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeInUp 1s ease 0.7s forwards;
+}
+
+.cta-button,
+.cta-button-secondary {
+  display: inline-block;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
+  margin: 0.5rem;
+}
+
+.cta-button {
+  opacity: 0;
+  animation: fadeInUp 1s ease 0.9s forwards;
+}
+
+.cta-button:hover,
+.cta-button-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(78, 205, 196, 0.4);
+}
+
+.floating-elements {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.floating-element {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-element:nth-child(1) {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-element:nth-child(2) {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+.floating-element:nth-child(3) {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.features,
+.templates {
+  padding: 5rem 0;
+  background: white;
+}
+
+.features h2,
+.templates h2 {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.features-grid,
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card,
+.template-card {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover,
+.template-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h3,
+.template-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.template-preview {
+  margin-bottom: 1rem;
+}
+
+.template-mockup {
+  width: 200px;
+  height: 150px;
+  background: white;
+  border-radius: 10px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mockup-header {
+  height: 20px;
+  background: #f0f0f0;
+}
+
+.mockup-content {
+  padding: 10px;
+}
+
+.mockup-title {
+  height: 25px;
+  background: #4ecdc4;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.mockup-text {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+
+.mockup-button {
+  height: 20px;
+  background: #44a08d;
+  border-radius: 10px;
+  width: 60px;
+}
+
+.sophrologie .mockup-title {
+  background: #9b59b6;
+}
+.sophrologie .mockup-button {
+  background: #8e44ad;
+}
+
+.psychologie .mockup-title {
+  background: #3498db;
+}
+.psychologie .mockup-button {
+  background: #2980b9;
+}
+
+.coaching .mockup-title {
+  background: #e74c3c;
+}
+.coaching .mockup-button {
+  background: #c0392b;
+}
+
+.cta-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 2rem 0;
+}
+/* ANIMATIONS  */
+@keyframes spin-alternate {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.animate-spin-alternate {
+  animation: spin-alternate 3s linear infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .features h2,
+  .templates h2 {
+    font-size: 2rem;
+  }
+}

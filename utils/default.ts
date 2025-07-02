@@ -1,4 +1,10 @@
 // utils/defaults.ts
+export const DEFAULT_THEMEBACKGROUND = `<section 
+        className="relative overflow-hidden py-24 px-6 md:px-24 mb-16"
+        style={{
+          background:(url='https://res.cloudinary.com/dwadzodje/image/upload/v1751114341/therapeutes/karima/background/pierres-zen-empilees-art-de-fond-de-sable-du-conce.webp')
+          height: '700px',
+        }}></section>`;
 
 export const DEFAULT_A_PROPOS = `
 <p>En tant que <strong>sophrologue certifié(e)</strong>, ma mission est de vous accompagner vers une meilleure connaissance de vous-même et un bien-être durable grâce à la <strong>sophrologie</strong>. Cette discipline psychocorporelle est une alliée précieuse pour naviguer les défis du quotidien, qu'ils soient liés au <strong>stress</strong>, à l'<strong>anxiété</strong>, aux <strong>troubles du sommeil</strong> ou à la <strong>gestion des émotions</strong>.</p>

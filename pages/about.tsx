@@ -88,7 +88,7 @@ export default function About({ locale = 'fr' }) {
           <img
             src={data.image}
             alt="À propos"
-            className="mx-auto mt-6 max-w-[400px] rounded-full shadow h-[300px] w-full"
+            className="mx-auto mt-6 max-w-[250px] rounded-full shadow h-auto w-full"
           />
         )}
 

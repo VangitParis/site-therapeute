@@ -18,7 +18,16 @@ const BackgroundImageUploader = forwardRef<ImageUploadRef, Props>(
 
     return (
       <div className="mt-6">
-        <label className="block font-semibold mb-1">🌄 Image de fond</label>
+        <label className="block text-lg font-semibold text-gray-800 mb-2">🌄 Image de fond</label>
+
+        <div className="text-sm text-gray-600 mb-4 flex items-start gap-2">
+          <span className="text-blue-500 mt-0.5">ℹ️</span>
+          <p>
+            Choisissez une image de fond qui vous représente ou qui illustre votre passion. Préférez
+            une image <strong>sobre et épurée</strong> pour assurer la lisibilité du titre.
+          </p>
+        </div>
+
         <ImageUploadField
           ref={ref}
           label="Uploader une image"
