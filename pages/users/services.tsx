@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { db } from '../lib/firebaseClient';
+import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import Slider from 'react-slick';
-import UserLink from '../components/UserLinks';
+import UserLink from '../../components/UserLinks';
 
 const settings = {
   dots: true,
@@ -125,7 +125,7 @@ export default function Services({ locale = 'fr' }: { locale?: string }) {
       )}
 
       <UserLink
-        href="/contact"
+        href="/users/contact"
         uid={uid}
         isDev={isDev}
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"

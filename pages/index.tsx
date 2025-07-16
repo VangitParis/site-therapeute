@@ -105,7 +105,7 @@ export default function Home({ locale = 'fr' }) {
           <header className="header">
             <nav className="nav container">
               <a href="/" className="logo">
-                🌿 TherapyBuilder
+                🌿 SiteBuilder
               </a>
               <ul className="nav-links">
                 <li>
@@ -267,7 +267,7 @@ export default function Home({ locale = 'fr' }) {
           <footer className="footer">
             <div className="container">
               <p>
-                &copy; 2025 TherapyBuilder. Créé avec ❤️ pour les thérapeutes et praticiens du
+                &copy; 2025 SiteBuilder. Créé avec ❤️ pour les thérapeutes et praticiens du
                 bien-être.
               </p>
             </div>

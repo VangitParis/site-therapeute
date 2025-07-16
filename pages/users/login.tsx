@@ -47,8 +47,8 @@ export default function AuthInterface() {
           redirectUrl = `/admin/live?uid=${currentUser.uid}`;
         }
 
-        console.log('🔄 Redirection vers:', redirectUrl);
-        console.log('👤 UID utilisateur:', currentUser.uid);
+        // console.log('🔄 Redirection vers:', redirectUrl);
+        // console.log('👤 UID utilisateur:', currentUser.uid);
         router.push(redirectUrl);
       }
     });
@@ -100,7 +100,8 @@ export default function AuthInterface() {
         // 3. Redirection DIRECTE vers la page d'attente (évite double redirection)
         setUser(result.user);
         setError('');
-        router.push('/attente-validation');
+        router.push('/users/paiement')
+        
       }
     } catch (err) {
       console.error('Erreur auth:', err);

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { db } from '../lib/firebaseClient';
+import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
-import UserLink from '../components/UserLinks';
+import UserLink from '../../components/UserLinks';
 
 export default function Testimonials({ locale = 'fr' }) {
   const [buttonText, setButtonText] = useState<string>('');
@@ -105,7 +105,7 @@ export default function Testimonials({ locale = 'fr' }) {
         ))}
       </div>
       <UserLink
-        href="/contact"
+        href="/users/contact"
         uid={uid}
         isDev={isDev}
         hash="form"

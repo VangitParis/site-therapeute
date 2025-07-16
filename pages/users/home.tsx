@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getDoc, doc } from 'firebase/firestore';
-import { db } from '../lib/firebaseClient';
-import TitreMultiligne from '../components/TitreMultiligne';
-import UserLink from '../components/UserLinks';
-import AnimatedSection from '../components/AnimatedSection';
-import { sanitizeHTML } from '../utils/sanitizeHTML';
+import { db } from '../../lib/firebaseClient';
+import TitreMultiligne from '../../components/TitreMultiligne';
+import UserLink from '../../components/UserLinks';
+import AnimatedSection from '../../components/AnimatedSection';
+import { sanitizeHTML } from '../../utils/sanitizeHTML';
 import {
   DEFAULT_A_PROPOS,
   DEFAULT_CONTACT,
   DEFAULT_SERVICES,
   DEFAULT_TESTIMONIALS,
-} from '../utils/default';
+} from '../../utils/default';
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -333,7 +333,7 @@ export default function HomePage({ locale = 'fr' }) {
               </UserLink>
             ) : (
               <UserLink
-                href="/services"
+                href="/users/services"
                 uid={uid}
                 isDev={isDev}
                 className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"
@@ -347,7 +347,7 @@ export default function HomePage({ locale = 'fr' }) {
             )}
 
             <UserLink
-              href="/services"
+              href="/users/services"
               uid={uid}
               isDev={isDev}
               className="flex-1 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-95 hover:scale-[1.02]"
@@ -376,7 +376,7 @@ export default function HomePage({ locale = 'fr' }) {
             tag="h2"
           />
           <div className="flex flex-row items-center gap-8">
-            <UserLink href="/about" uid={uid} isDev={isDev}>
+            <UserLink href="/users/about" uid={uid} isDev={isDev}>
               {' '}
               {data?.accueil?.image !== null && (
                 <img
@@ -400,7 +400,7 @@ export default function HomePage({ locale = 'fr' }) {
           </div>
           <div className="text-center mt-6">
             <UserLink
-              href="/about"
+              href="/users/about"
               uid={uid}
               isDev={isDev}
               className="mb-8 inline-block mt-6 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
@@ -444,7 +444,7 @@ export default function HomePage({ locale = 'fr' }) {
           />
           <div className="text-center mt-6">
             <UserLink
-              href="/services"
+              href="/users/services"
               uid={uid}
               isDev={isDev}
               className="inline-block py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
@@ -492,7 +492,7 @@ export default function HomePage({ locale = 'fr' }) {
 
           <div className="text-center mt-6">
             <UserLink
-              href="/testimonials"
+              href="/users/testimonials"
               uid={uid}
               isDev={isDev}
               className="mb-8 inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300"
@@ -538,7 +538,7 @@ export default function HomePage({ locale = 'fr' }) {
           />
           <div className="text-center mt-6">
             <UserLink
-              href="/contact"
+              href="/users/contact"
               uid={uid}
               isDev={isDev}
               className="inline-block mt-6 py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-600"

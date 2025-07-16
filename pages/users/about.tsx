@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { db } from '../lib/firebaseClient';
+import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
-import { appendQueryParams } from '../utils/appendQueryParams';
-import UserLink from '../components/UserLinks';
+import { appendQueryParams } from '../../utils/appendQueryParams';
+import UserLink from '../../components/UserLinks';
 
 export default function About({ locale = 'fr' }) {
   const [data, setData] = useState<{
@@ -88,7 +88,7 @@ export default function About({ locale = 'fr' }) {
           <img
             src={data.image}
             alt="À propos"
-            className="mx-auto mt-6 max-w-[250px] rounded-full shadow h-auto w-full"
+            className="mx-auto mt-6 max-w-[450px] rounded-full shadow h-auto w-full"
           />
         )}
 
@@ -101,7 +101,7 @@ export default function About({ locale = 'fr' }) {
         />
       </div>
       <UserLink
-        href="/contact"
+        href="/users/contact"
         uid={uid}
         isDev={isDev}
         className="flex-1 text-white py-3 px-6 rounded-full text-lg font-semibold shadow transition duration-300 hover:brightness-90"

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { resolveDocId } from '../lib/resolveDocId';
+import { resolveDocId } from '../../lib/resolveDocId';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { db } from '../lib/firebaseClient';
+import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
-import TarifsCards from '../components/TarifsCards';
+import TarifsCards from '../../components/TarifsCards';
 
 export default function Contact({ locale = 'fr' }) {
   const router = useRouter();

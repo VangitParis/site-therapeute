@@ -16,7 +16,7 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
   const isPreview = router.query.admin === 'true';
 
   // Vérifier si on doit afficher la landing page
-  const shouldShowLanding = !uidParam && !isDev && !isPreview && router.pathname === '/';
+  const shouldShowLanding = !uidParam && !isDev && !isPreview && router.pathname === '/' || router.pathname === '/attente-validation';
 
   const finalUidParam = uidParam ? `?uid=${uidParam}` : isDev ? '?frdev=1' : '';
 
@@ -67,7 +67,7 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
         {/* N'afficher le header que si ce n'est pas une page admin ET pas la landing page */}
         {!isAdminPage && !shouldShowLanding && layout && (
           <header className="bg-white shadow p-4 sm:p-6 flex justify-between items-center sticky top-0 z-50 gap-4">
-            <Link href={`/home${finalUidParam}`}>
+            <Link href={`/users/home${finalUidParam}`}>
               <div className="flex gap-4 items-center">
                 {layout.logo && (
                   <img src={layout.logo} alt="Logo" className="max-h-16 object-contain rounded" />
@@ -122,7 +122,7 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
         {!isAdminPage && !shouldShowLanding && layout && (
           <footer className="bg-white border-t mt-12 text-center py-6 text-xs sm:text-sm text-gray-500">
             {layout.footer} |{' '}
-            <a href={`/mentions_legales${finalUidParam}`} className="text-prune hover:underline">
+            <a href={`/users/mentions_legales${finalUidParam}`} className="text-prune hover:underline">
               Mentions légales
             </a>
             {/* Liens sociaux */}

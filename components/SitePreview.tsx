@@ -151,7 +151,7 @@ export default function SitePreview({ formData, uid, hasUnsavedChanges, onSave }
     }
   }, []);
 
-  const iframeSrc = uid ? `/home/?admin=true&uid=${uid}` : `/home/?admin=true`;
+  const iframeSrc = uid ? `/users/home/?admin=true&uid=${uid}` : `/users/home/?admin=true`;
 
   // Envoi des données de formulaire à l'iframe
   useEffect(() => {
