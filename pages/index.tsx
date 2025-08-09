@@ -30,7 +30,7 @@ export default function Home({ locale = 'fr' }) {
   const startBuilding = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      router.push('users/login'); // Remplacez par votre route d'éditeur
+      router.push('/login'); // Remplacez par votre route d'éditeur
     }, 500);
   };
 
@@ -115,7 +115,7 @@ export default function Home({ locale = 'fr' }) {
                   <a href="#templates">Templates</a>
                 </li>
                 <li>
-                  <a href="users/login">Se connecter / S'inscrire</a>
+                  <a href="/login">Se connecter / S'inscrire</a>
                 </li>
                 <li>
                   <a href="#contact">Contact</a>
@@ -123,7 +123,7 @@ export default function Home({ locale = 'fr' }) {
               </ul>
             </nav>
           </header>
-
+          <main>
           {/* Hero Section */}
           <section className="hero">
             <div className="floating-elements">
@@ -262,7 +262,7 @@ export default function Home({ locale = 'fr' }) {
               </button>
             </div>
           </section>
-
+</main>
           {/* Footer */}
           <footer className="footer">
             <div className="container">

@@ -100,7 +100,7 @@ export default function Live() {
           }
         } else if (!user && resolvedDocId !== 'fr') {
           // Si pas connecté et pas sur la page FR, on peut pas vérifier le statut
-          console.log('👀 Visiteur non connecté - pas de vérification client');
+          // console.log('👀 Visiteur non connecté - pas de vérification client');
         }
 
         try {

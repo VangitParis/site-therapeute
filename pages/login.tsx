@@ -5,17 +5,19 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { auth, db } from '../../lib/firebaseClient';
+import { auth, db } from '../lib/firebaseClient';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { duplicateContentForUser } from '../../lib/duplicateContent';
+import { duplicateContentForUser } from '../lib/duplicateContent';
 import bcrypt from 'bcryptjs';
 import { User, Shield, Mail, Lock, Eye, EyeOff, ArrowRight, Settings } from 'lucide-react';
+import Toast from '../components/Toast';
 
 export default function AuthInterface() {
   const router = useRouter();
   const [userType, setUserType] = useState('user');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+ 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -65,51 +67,49 @@ export default function AuthInterface() {
   };
 
   const handleUserAuth = async () => {
-    try {
-      setLoading(true);
-      let result;
+  try {
+    setLoading(true);
+    let result;
 
-      if (isLogin) {
-        // Connexion utilisateur
-        result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+    if (isLogin) {
+      result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      setUser(result.user);
+      setError('');
+      router.push(`/admin/live?uid=${result.user.uid}&t=${Date.now()}`);
+    } else {
+      result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = result.user;
 
-        // Pour la connexion, on va vers /admin/live (qui gère la vérification isClient)
-        setUser(result.user);
-        setError('');
+      await duplicateContentForUser(user.uid);
+      await setDoc(doc(db, 'clients', user.uid), {
+        email: user.email,
+        nom: formData.nom,
+        isClient: false,
+        createdAt: new Date(),
+      });
 
-        // 🔥 Redirection immédiate avec l'UID pour éviter le cache
-        const redirectUrl = `/admin/live?uid=${result.user.uid}&t=${Date.now()}`;
-        console.log('🚀 Redirection immédiate vers:', redirectUrl);
-        router.push(redirectUrl);
-      } else {
-        // Inscription utilisateur
-        result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        const user = result.user;
-
-        // 1. Dupliquer le contenu par défaut pour l'utilisateur
-        await duplicateContentForUser(user.uid);
-
-        // 2. Créer le document client avec isClient: false (activation manuelle)
-        await setDoc(doc(db, 'clients', user.uid), {
-          email: user.email,
-          nom: formData.nom,
-          isClient: false,
-          createdAt: new Date(),
-        });
-
-        // 3. Redirection DIRECTE vers la page d'attente (évite double redirection)
-        setUser(result.user);
-        setError('');
-        router.push('/users/paiement')
-        
-      }
-    } catch (err) {
-      console.error('Erreur auth:', err);
-      setError(err.message || 'Erreur de connexion');
-    } finally {
-      setLoading(false);
+      setUser(user);
+      setError('');
+      router.push('/users/paiement');
     }
-  };
+  } catch (err: any) {
+    console.error('Erreur auth:', err);
+    switch (err.code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        setError("Email ou mot de passe invalide, ou compte inexistant.");
+        break;
+      case 'auth/too-many-requests':
+        setError("Trop de tentatives, réessaye plus tard.");
+        break;
+      default:
+        setError(err.message || 'Erreur de connexion.');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAdminAuth = async () => {
     setLoading(true);
@@ -217,6 +217,7 @@ export default function AuthInterface() {
     setError('');
     setIsLogin(true);
   };
+  {error && <Toast message={error} type="error" />}
 
   return (
     <div className="app min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
