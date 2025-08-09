@@ -4,6 +4,7 @@ import { db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import ContactForm from '../components/ContactForm';
 
 export default function Home({ locale = 'fr' }) {
   const DEFAULT_IMAGE =
@@ -261,6 +262,16 @@ export default function Home({ locale = 'fr' }) {
                 Commencer gratuitement
               </button>
             </div>
+          </section>
+          {/* {Contact Section} */}
+          <section className="flex flex-col items-center  bg-white" id="contact">
+            <div className="container">
+              <h2>Contactez-nous</h2>
+              <p>Si vous doutez encore n'hésitez pas à nous envoyer un message pour qu'on s'assure que votre projet est possible</p>
+            </div>
+            <div>
+              <ContactForm/>
+              </div>
           </section>
 </main>
           {/* Footer */}

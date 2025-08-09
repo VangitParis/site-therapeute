@@ -18,10 +18,13 @@
     "motion": "^12.16.0",
     "next": "latest",
     "node": "^22.16.0",
+    "nodemailer": "^7.0.5",
     "react": "latest",
     "react-dom": "latest",
+    "react-google-recaptcha": "^3.1.0",
     "react-slick": "^0.30.3",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
