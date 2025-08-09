@@ -190,9 +190,7 @@ export default function ContactForm() {
             <div className={`statusMessage text-xl ${statusClass}`}>
               {statusMessage && <p>{statusMessage}</p>}
             </div>
-          </form>
-
-         
+          </form>      
         </div>
       </div>
     </>
