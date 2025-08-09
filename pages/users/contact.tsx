@@ -140,35 +140,35 @@ export default function Contact({ locale = 'fr' }) {
             id="form"
             className="max-w-xl mx-auto grid gap-4 text-left"
             style={{ color: 'var(--color-texte)' }}
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
               }
-              
-              // Récupération des données du formulaire
               const formData = new FormData(form);
               const prenom = formData.get('prenom');
               const email = formData.get('email');
               const message = formData.get('message');
-              
-              // Construction de l'email mailto
-              const subject = encodeURIComponent(`Message de ${prenom} - Site Sophrologie`);
-              const body = encodeURIComponent(`Prénom: ${prenom}
-Email: ${email}
 
-Message:
-${message}`);
-              
-              // Ouverture du client email
-              window.location.href = `mailto:${data.emailDestination}?subject=${subject}&body=${body}`;
-              
-              // Reset du formulaire après un délai
-              setTimeout(() => {
-                form.reset();
-              }, 1000);
+              try {
+                const res = await fetch('/api/sendmail', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ prenom, email, message }),
+                });
+                const json = await res.json();
+
+                if (res.ok) {
+                  alert('Message envoyé avec succès.');
+                  form.reset();
+                } else {
+                  alert(json.error || "Erreur lors de l'envoi.");
+                }
+              } catch (err) {
+                alert('Erreur réseau ou serveur.');
+              }
             }}
           >
             <div>
