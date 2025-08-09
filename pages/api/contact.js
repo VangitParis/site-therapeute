@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    let { name, email, phone, subject, message, recaptcha } = req.body;
+    let { name, email, phone, subject, message } = req.body;
 
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
@@ -27,17 +27,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    const recaptchaResponse = await fetch(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
-      { method: 'POST' }
-    );
-    const recaptchaData = await recaptchaResponse.json();
+    // const recaptchaResponse = await fetch(
+    //   `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
+    //   { method: 'POST' }
+    // );
+    // const recaptchaData = await recaptchaResponse.json();
 
-    if (!recaptchaData.success) {
-      return res
-        .status(400)
-        .json({ message: 'Échec de la vérification reCAPTCHA.' });
-    }
+    // if (!recaptchaData.success) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: 'Échec de la vérification reCAPTCHA.' });
+    // }
 
     name = xss(name);
     email = xss(email);

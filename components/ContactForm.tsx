@@ -14,16 +14,16 @@ export default function ContactForm() {
     phone: '',
     subject: '',
     message: '',
-    recaptcha: '',
+    // recaptcha: '',
   });
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+//   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  if (!recaptchaSiteKey) {
-    console.error(
-      "La clé reCAPTCHA est manquante dans les variables d'environnement."
-    );
-  }
+//   if (!recaptchaSiteKey) {
+//     console.error(
+//       "La clé reCAPTCHA est manquante dans les variables d'environnement."
+//     );
+//   }
 
   const [statusMessage, setStatusMessage] = useState('');
   const [statusClass, setStatusClass] = useState('');
@@ -38,18 +38,19 @@ export default function ContactForm() {
   };
 
   const handleRecaptchaChange = (value: string | null) => {
-    setFormData({ ...formData, recaptcha: value || '' });
-  };
+    //   setFormData({ ...formData, recaptcha: value || '' });
+      setFormData({ ...formData});
+};
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Vérifier si reCAPTCHA est rempli
-    if (!formData.recaptcha) {
-      setStatusMessage('Veuillez vérifier que vous êtes un humain.');
-      setStatusClass('error');
-      return;
-    }
+    // if (!formData.recaptcha) {
+    //   setStatusMessage('Veuillez vérifier que vous êtes un humain.');
+    //   setStatusClass('error');
+    //   return;
+    // }
 
     // Validation du nom et du téléphone
     const nameRegex = /^[a-zA-Z\s]+$/;
@@ -91,7 +92,7 @@ export default function ContactForm() {
           phone: '',
           subject: '',
           message: '',
-          recaptcha: '',
+        //   recaptcha: '',
         });
       } else {
         setStatusMessage(result.message || "Erreur lors de l'envoi du message");
@@ -170,7 +171,7 @@ export default function ContactForm() {
                 required
               ></textarea>
             </div>
-            <div className="formGroup">
+            {/* <div className="formGroup">
               {recaptchaSiteKey ? (
                 <ReCAPTCHA
                   sitekey={recaptchaSiteKey}
@@ -182,7 +183,7 @@ export default function ContactForm() {
                   l'administrateur du site.
                 </p>
               )}
-            </div>
+            </div> */}
             <button type="submit" className="submitButton ">
               SOUMETTRE
             </button>
@@ -191,19 +192,7 @@ export default function ContactForm() {
             </div>
           </form>
 
-          <div className="mx-auto text-white">
-            <h4 className="xl:text-xl lg:text-lg text-md py-2">
-              Informations de contact de l'Agence DevFashion
-            </h4>
-            <h6 className="xl:text-xl lg:text-lg text-md py-2">E-MAIL</h6>
-            <Link href="mailto:vangitparis@gmail.com">
-              contact@devfashion.fr
-            </Link>
-            {/* <h4 className="xl:text-xl lg:text-lg text-md">Téléphone</h4>
-            <p>+33 6 09 15 61 15</p> */}
-            <h6 className="xl:text-xl lg:text-lg text-md py-2">ADRESSE</h6>
-            <p>Coubron, France</p>
-          </div>
+         
         </div>
       </div>
     </>

@@ -161,7 +161,7 @@ export default function Contact() {
               />
             </div>
 
-            <div className="mb-6">
+            {/* <div className="mb-6">
               {recaptchaSiteKey ? (
                 <ReCAPTCHA sitekey={recaptchaSiteKey} onChange={handleRecaptchaChange} />
               ) : (
@@ -169,7 +169,7 @@ export default function Contact() {
                   Erreur : Clé reCAPTCHA manquante. Veuillez contacter l'administrateur du site.
                 </p>
               )}
-            </div>
+            </div> */}
 
             <button
               type="submit"
