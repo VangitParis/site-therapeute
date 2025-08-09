@@ -53,7 +53,7 @@ export default function Contact({ locale = 'fr' }) {
           image: contact.image || '',
           titreH2: contact.titreH2 || '',
           titreTarifs: contact.titreTarifs || '',
-          emailDestination: contact.emailDestination || '',
+          emailDestination: contact.emailDestination || 'contact@masophro.fr',
         });
         applyThemeToDOM(raw.theme);
       }
@@ -106,7 +106,7 @@ export default function Contact({ locale = 'fr' }) {
                 ? data.texte
                 : `
               <p>Vous souhaitez me contacter pour en savoir plus sur mes séances de sophrologie ?</p>
-              <p>📧 Email : <a href="mailto:vangitparis@gmail.com" class="text-prune underline">vangitparis@gmail.com</a></p>
+              <p>📧 Email : <a href="mailto:contact@masophro.fr" class="text-prune underline">contact@masophro.fr</a></p>
               <p>📞 Téléphone : <a href="tel:+33612345678" class="text-prune underline">06 12 34 56 78</a></p>
               <p>🗓️ Vous pouvez également réserver votre séance via le bouton ci-dessous.</p>
             `,
@@ -180,7 +180,7 @@ ${message}`);
                 id="prenom"
                 name="prenom"
                 required
-                pattern="^[A-Za-zÀ-ÿ' -]{2,30}$"
+                pattern="^[A-Za-zÀ-ÿ \-]{2,30}$"
                 title="Veuillez entrer un prénom valide (lettres uniquement)"
                 className="w-full p-2 border rounded"
               />
