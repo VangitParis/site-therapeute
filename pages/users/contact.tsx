@@ -17,6 +17,7 @@ export default function Contact({ locale = 'fr' }) {
     image: '',
     titreH2: '',
     titreTarifs: '',
+    emailDestination: '',
   });
 
   const applyThemeToDOM = (theme: any) => {
@@ -52,6 +53,7 @@ export default function Contact({ locale = 'fr' }) {
           image: contact.image || '',
           titreH2: contact.titreH2 || '',
           titreTarifs: contact.titreTarifs || '',
+          emailDestination: contact.emailDestination || 'contact@masophro.fr',
         });
         applyThemeToDOM(raw.theme);
       }
@@ -145,8 +147,28 @@ export default function Contact({ locale = 'fr' }) {
                 form.reportValidity();
                 return;
               }
-              alert('✅ Formulaire soumis (à connecter à un service réel)');
-              form.reset();
+              
+              // Récupération des données du formulaire
+              const formData = new FormData(form);
+              const prenom = formData.get('prenom');
+              const email = formData.get('email');
+              const message = formData.get('message');
+              
+              // Construction de l'email mailto
+              const subject = encodeURIComponent(`Message de ${prenom} - Site Sophrologie`);
+              const body = encodeURIComponent(`Prénom: ${prenom}
+Email: ${email}
+
+Message:
+${message}`);
+              
+              // Ouverture du client email
+              window.location.href = `mailto:${data.emailDestination}?subject=${subject}&body=${body}`;
+              
+              // Reset du formulaire après un délai
+              setTimeout(() => {
+                form.reset();
+              }, 1000);
             }}
           >
             <div>
