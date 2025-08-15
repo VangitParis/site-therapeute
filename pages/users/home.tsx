@@ -57,12 +57,12 @@ export default function HomePage({ locale = 'fr' }) {
   const applyThemeToDOM = (theme: any) => {
     if (!theme) return;
 
-    console.log('🎨 Application du thème:', theme);
+    // console.log('🎨 Application du thème:', theme);
 
     const root = document.documentElement;
     if (theme.background) {
       root.style.setProperty('--color-bg', theme.background);
-      console.log('🎨 Background appliqué:', theme.background);
+      // console.log('🎨 Background appliqué:', theme.background);
     }
     if (theme.primary) root.style.setProperty('--color-primary', theme.primary);
     if (theme.accent) root.style.setProperty('--color-accent', theme.accent);
@@ -77,7 +77,7 @@ export default function HomePage({ locale = 'fr' }) {
   const loadFromFirestore = async (docId: string) => {
     try {
       setIsLoadingFirestore(true);
-      console.log('📥 Chargement depuis Firestore pour UID:', docId);
+      // console.log('📥 Chargement depuis Firestore pour UID:', docId);
 
       const snap = await getDoc(doc(db, 'content', docId));
 
@@ -126,7 +126,7 @@ export default function HomePage({ locale = 'fr' }) {
           },
         };
 
-        console.log('✅ Données Firestore chargées:', firestoreData);
+        // console.log('✅ Données Firestore chargées:', firestoreData);
         setFormData(firestoreData);
 
         // Si on n'est pas en mode admin, utiliser ces données directement
@@ -153,10 +153,10 @@ export default function HomePage({ locale = 'fr' }) {
     // 🔥 Gestionnaire des messages en mode admin
     const handleMessage = (event: MessageEvent) => {
       if (isAdminMode && event.data?.type === 'UPDATE_FORMDATA') {
-        console.log('📨 Message reçu en mode admin:', event.data);
+        // console.log('📨 Message reçu en mode admin:', event.data);
         const updatedData = event.data.payload;
 
-        console.log('🔄 Données temps réel reçues, theme:', updatedData.theme);
+        // console.log('🔄 Données temps réel reçues, theme:', updatedData.theme);
         setLiveData(updatedData);
         setDataSource('live');
 
@@ -165,7 +165,7 @@ export default function HomePage({ locale = 'fr' }) {
           applyThemeToDOM(updatedData.theme);
         }, 10);
 
-        console.log('🔄 Mise à jour des données temps réel appliquée');
+        // console.log('🔄 Mise à jour des données temps réel appliquée');
       }
     };
 
@@ -185,13 +185,13 @@ export default function HomePage({ locale = 'fr' }) {
   // 🔥 Déterminer quelles données utiliser
   const getDisplayData = () => {
     if (isAdminMode && liveData) {
-      console.log('🎯 Utilisation des données temps réel');
+      // console.log('🎯 Utilisation des données temps réel');
       return liveData;
     } else if (formData) {
-      console.log('🗃️ Utilisation des données Firestore');
+      // console.log('🗃️ Utilisation des données Firestore');
       return formData;
     } else {
-      console.log('⏳ Données par défaut');
+      // console.log('⏳ Données par défaut');
       return {
         layout: { nom: '', titre: '', footer: '', liens: [] },
         theme: DEFAULT_THEME,
@@ -235,7 +235,7 @@ export default function HomePage({ locale = 'fr' }) {
   // 🔥 useEffect pour appliquer le thème quand les données changent
   useEffect(() => {
     if (data?.theme) {
-      console.log('🎨 Application du thème depuis useEffect:', data.theme);
+      // console.log('🎨 Application du thème depuis useEffect:', data.theme);
       applyThemeToDOM(data.theme);
     }
   }, [data?.theme, dataSource]);
@@ -366,7 +366,7 @@ export default function HomePage({ locale = 'fr' }) {
         {/* Section À propos */}
         {/* <section className="mb-16 bg-white p-8 rounded-xl shadow max-w-7xl"> */}
         <AnimatedSection
-          animation="animate-fadeZoom"
+          animation=""
           className="mb-16 p-8 bg-white rounded-3xl shadow-xl max-w-7xl"
         >
           <TitreMultiligne

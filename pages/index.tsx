@@ -264,13 +264,14 @@ export default function Home({ locale = 'fr' }) {
             </div>
           </section>
           {/* {Contact Section} */}
-          <section className="flex flex-col items-center  bg-white" id="contact">
-            <div className="container">
+          <section className="flex flex-col items-center templates bg-white" id="contact">
+            <div className="container text-center">
               <h2>Contactez-nous</h2>
               <p>Si vous doutez encore n'hésitez pas à nous envoyer un message pour qu'on s'assure que votre projet est possible</p>
             </div>
             <div>
-              <ContactForm/>
+             <p>📧 Email : <a href="mailto:vangitparis@gmail.com" className="text-prune underline">vangitparis@gmail.com</a></p>
+              {/* <ContactForm/> */}
               </div>
           </section>
 </main>

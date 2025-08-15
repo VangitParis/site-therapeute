@@ -12,6 +12,7 @@ import PasswordChanger from './PassWordChanger';
 import ContactEditor from './ContactEditor';
 import MentionsAdminEditor from './MentionsAdminEditor';
 import AdminTarifsEditor from './AdminTarifsEditor';
+import PublishSiteComponent from './PublishSIteComponent';
 
 type Props = {
   formData: any;
@@ -128,6 +129,7 @@ export default function AdminSidebar({
         </button>
         {message && <p className="text-center text-green-600 mt-2 text-sm">{message}</p>}
       </div>
+       {/* <PublishSiteComponent/> */}
       {/* <PasswordChanger /> */}
     </div>
   );
