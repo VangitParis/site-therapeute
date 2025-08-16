@@ -246,6 +246,7 @@ export default function Live() {
     setFormData(fn);
   };
 
+  // ici quand on est en attente-validation on ne doit pas acceder à cette page
   if (!formData) return <p className="text-center p-6">Chargement…</p>;
 
   return (

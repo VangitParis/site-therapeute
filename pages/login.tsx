@@ -17,7 +17,7 @@ export default function AuthInterface() {
   const [userType, setUserType] = useState('user');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
- 
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -67,49 +67,49 @@ export default function AuthInterface() {
   };
 
   const handleUserAuth = async () => {
-  try {
-    setLoading(true);
-    let result;
+    try {
+      setLoading(true);
+      let result;
 
-    if (isLogin) {
-      result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      setUser(result.user);
-      setError('');
-      router.push(`/admin/live?uid=${result.user.uid}&t=${Date.now()}`);
-    } else {
-      result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = result.user;
+      if (isLogin) {
+        result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        setUser(result.user);
+        setError('');
+        router.push(`/admin/live?uid=${result.user.uid}&t=${Date.now()}`);
+      } else {
+        result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        const user = result.user;
 
-      await duplicateContentForUser(user.uid);
-      await setDoc(doc(db, 'clients', user.uid), {
-        email: user.email,
-        nom: formData.nom,
-        isClient: false,
-        createdAt: new Date(),
-      });
+        await duplicateContentForUser(user.uid);
+        await setDoc(doc(db, 'clients', user.uid), {
+          email: user.email,
+          nom: formData.nom,
+          isClient: false,
+          createdAt: new Date(),
+        });
 
-      setUser(user);
-      setError('');
-      router.push('/users/paiement');
+        setUser(user);
+        setError('');
+        router.push('/paiement');
+      }
+    } catch (err: any) {
+      console.error('Erreur auth:', err);
+      switch (err.code) {
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+          setError('Email ou mot de passe invalide, ou compte inexistant.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Trop de tentatives, réessaye plus tard.');
+          break;
+        default:
+          setError(err.message || 'Erreur de connexion.');
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    console.error('Erreur auth:', err);
-    switch (err.code) {
-      case 'auth/invalid-credential':
-      case 'auth/wrong-password':
-      case 'auth/user-not-found':
-        setError("Email ou mot de passe invalide, ou compte inexistant.");
-        break;
-      case 'auth/too-many-requests':
-        setError("Trop de tentatives, réessaye plus tard.");
-        break;
-      default:
-        setError(err.message || 'Erreur de connexion.');
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleAdminAuth = async () => {
     setLoading(true);
@@ -217,7 +217,9 @@ export default function AuthInterface() {
     setError('');
     setIsLogin(true);
   };
-  {error && <Toast message={error} type="error" />}
+  {
+    error && <Toast message={error} type="error" />;
+  }
 
   return (
     <div className="app min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">

@@ -16,7 +16,9 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
   const isPreview = router.query.admin === 'true';
 
   // Vérifier si on doit afficher la landing page
-  const shouldShowLanding = !uidParam && !isDev && !isPreview && router.pathname === '/' || router.pathname === '/attente-validation';
+  const shouldShowLanding =
+    (!uidParam && !isDev && !isPreview && router.pathname === '/') ||
+    router.pathname === '/attente-validation';
 
   const finalUidParam = uidParam ? `?uid=${uidParam}` : isDev ? '?frdev=1' : '';
 
@@ -122,7 +124,10 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
         {!isAdminPage && !shouldShowLanding && layout && (
           <footer className="bg-white border-t mt-12 text-center py-6 text-xs sm:text-sm text-gray-500">
             {layout.footer} |{' '}
-            <a href={`/users/mentions_legales${finalUidParam}`} className="text-prune hover:underline">
+            <a
+              href={`/users/mentions_legales${finalUidParam}`}
+              className="text-prune hover:underline"
+            >
               Mentions légales
             </a>
             {/* Liens sociaux */}

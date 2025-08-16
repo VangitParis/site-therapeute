@@ -1,7 +1,7 @@
 // pages/attente-validation.tsx
 import React from 'react';
 import { useState } from 'react';
-import Link  from 'next/link';
+import Link from 'next/link';
 
 export default function AttenteValidation() {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -37,7 +37,9 @@ export default function AttenteValidation() {
           La validation est effectuée sous <strong>24 heures</strong>. Vous recevrez un email ou une
           notification dès que votre site sera activé.
         </p>
-        <Link className="text-white" href='/'>⬅ Retour à l’accueil</Link>
+        <Link className="text-white" href="/">
+          ⬅ Retour à l’accueil
+        </Link>
       </div>
     </div>
   );

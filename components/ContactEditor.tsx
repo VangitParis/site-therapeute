@@ -41,7 +41,7 @@ export default function ContactEditor({ formData, setFormData }: Props) {
           />
         </label>
       </div>
-      
+
       <div>
         <span className="block font-medium">📝 Texte de présentation</span>
         <RichTextEditor
@@ -50,7 +50,7 @@ export default function ContactEditor({ formData, setFormData }: Props) {
           onChange={(val) => handleChange('texte', val)}
         />
       </div>
-      
+
       <div>
         <label htmlFor="titreH2">
           <span className="block font-medium">📝 Titre des Tarifs</span>
@@ -73,7 +73,7 @@ export default function ContactEditor({ formData, setFormData }: Props) {
           placeholder="exemple@monsite.fr"
         />
       </label>
-      
+
       <label>
         <span className="block font-medium">🔗 Lien vers la prise de rendez-vous</span>
         <input

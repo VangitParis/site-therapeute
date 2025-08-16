@@ -125,156 +125,164 @@ export default function Home({ locale = 'fr' }) {
             </nav>
           </header>
           <main>
-          {/* Hero Section */}
-          <section className="hero">
-            <div className="floating-elements">
-              <div className="floating-element"></div>
-              <div className="floating-element"></div>
-              <div className="floating-element"></div>
-            </div>
-            <div className="hero-content">
-              <h1>Créez votre site de thérapeute</h1>
-              <p>
-                Construisez un site web professionnel pour votre pratique thérapeutique en quelques
-                minutes. Parfait pour sophrologues, psychologues, coachs et tous praticiens du
-                bien-être.
-              </p>
-              <button className="cta-button" onClick={startBuilding}>
-                Créer mon site maintenant
-              </button>
-            </div>
-          </section>
+            {/* Hero Section */}
+            <section className="hero">
+              <div className="floating-elements">
+                <div className="floating-element"></div>
+                <div className="floating-element"></div>
+                <div className="floating-element"></div>
+              </div>
+              <div className="hero-content">
+                <h1>Créez votre site de thérapeute</h1>
+                <p>
+                  Construisez un site web professionnel pour votre pratique thérapeutique en
+                  quelques minutes. Parfait pour sophrologues, psychologues, coachs et tous
+                  praticiens du bien-être.
+                </p>
+                <button className="cta-button" onClick={startBuilding}>
+                  Créer mon site maintenant
+                </button>
+              </div>
+            </section>
 
-          {/* Features Section */}
-          <section className="features" id="features">
-            <div className="container">
-              <h2>Parfait pour les thérapeutes</h2>
-              <div className="features-grid">
-                <div className="feature-card">
-                  <div className="feature-icon">🧘‍♀️</div>
-                  <h3>Templates Thérapie</h3>
-                  <p>
-                    Templates spécialement conçus pour sophrologues, psychologues, coachs et
-                    praticiens du bien-être.
-                  </p>
-                </div>
-                <div className="feature-card">
-                  <div className="feature-icon">📅</div>
-                  <h3>Prise de RDV</h3>
-                  <p>
-                    Intégration facile avec Calendly et autres systèmes de réservation en ligne.
-                  </p>
-                </div>
-                <div className="feature-card">
-                  <div className="feature-icon">🎨</div>
-                  <h3>Design Apaisant</h3>
-                  <p>
-                    Couleurs et designs pensés pour inspirer confiance et sérénité à vos clients.
-                  </p>
-                </div>
-                <div className="feature-card">
-                  <div className="feature-icon">📱</div>
-                  <h3>Mobile-First</h3>
-                  <p>
-                    Vos clients peuvent vous trouver et prendre RDV depuis leur téléphone
-                    facilement.
-                  </p>
-                </div>
-                <div className="feature-card">
-                  <div className="feature-icon">⚡</div>
-                  <h3>Création Rapide</h3>
-                  <p>
-                    Votre site professionnel prêt en moins de 30 minutes, sans compétences
-                    techniques.
-                  </p>
-                </div>
-                <div className="feature-card">
-                  <div className="feature-icon">🔒</div>
-                  <h3>Sécurisé</h3>
-                  <p>
-                    Protection des données de vos clients et conformité aux standards du secteur
-                    médical.
-                  </p>
+            {/* Features Section */}
+            <section className="features" id="features">
+              <div className="container">
+                <h2>Parfait pour les thérapeutes</h2>
+                <div className="features-grid">
+                  <div className="feature-card">
+                    <div className="feature-icon">🧘‍♀️</div>
+                    <h3>Templates Thérapie</h3>
+                    <p>
+                      Templates spécialement conçus pour sophrologues, psychologues, coachs et
+                      praticiens du bien-être.
+                    </p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">📅</div>
+                    <h3>Prise de RDV</h3>
+                    <p>
+                      Intégration facile avec Calendly et autres systèmes de réservation en ligne.
+                    </p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">🎨</div>
+                    <h3>Design Apaisant</h3>
+                    <p>
+                      Couleurs et designs pensés pour inspirer confiance et sérénité à vos clients.
+                    </p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">📱</div>
+                    <h3>Mobile-First</h3>
+                    <p>
+                      Vos clients peuvent vous trouver et prendre RDV depuis leur téléphone
+                      facilement.
+                    </p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">⚡</div>
+                    <h3>Création Rapide</h3>
+                    <p>
+                      Votre site professionnel prêt en moins de 30 minutes, sans compétences
+                      techniques.
+                    </p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">🔒</div>
+                    <h3>Sécurisé</h3>
+                    <p>
+                      Protection des données de vos clients et conformité aux standards du secteur
+                      médical.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Templates Preview */}
-          <section className="templates" id="templates">
-            <div className="container">
-              <h2>Templates pour thérapeutes</h2>
-              <div className="templates-grid">
-                <div className="template-card">
-                  <div className="template-preview">
-                    <div className="template-mockup sophrologie">
-                      <div className="mockup-header"></div>
-                      <div className="mockup-content">
-                        <div className="mockup-title">Sophrologie</div>
-                        <div className="mockup-text"></div>
-                        <div className="mockup-button"></div>
+            {/* Templates Preview */}
+            <section className="templates" id="templates">
+              <div className="container">
+                <h2>Templates pour thérapeutes</h2>
+                <div className="templates-grid">
+                  <div className="template-card">
+                    <div className="template-preview">
+                      <div className="template-mockup sophrologie">
+                        <div className="mockup-header"></div>
+                        <div className="mockup-content">
+                          <div className="mockup-title">Sophrologie</div>
+                          <div className="mockup-text"></div>
+                          <div className="mockup-button"></div>
+                        </div>
                       </div>
                     </div>
+                    <h3>Template Sophrologie</h3>
+                    <p>Design zen et apaisant pour les sophrologues</p>
                   </div>
-                  <h3>Template Sophrologie</h3>
-                  <p>Design zen et apaisant pour les sophrologues</p>
-                </div>
-                <div className="template-card">
-                  <div className="template-preview">
-                    <div className="template-mockup psychologie">
-                      <div className="mockup-header"></div>
-                      <div className="mockup-content">
-                        <div className="mockup-title">Psychologie</div>
-                        <div className="mockup-text"></div>
-                        <div className="mockup-button"></div>
+                  <div className="template-card">
+                    <div className="template-preview">
+                      <div className="template-mockup psychologie">
+                        <div className="mockup-header"></div>
+                        <div className="mockup-content">
+                          <div className="mockup-title">Psychologie</div>
+                          <div className="mockup-text"></div>
+                          <div className="mockup-button"></div>
+                        </div>
                       </div>
                     </div>
+                    <h3>Template Psychologue</h3>
+                    <p>Professionnel et rassurant pour les psychologues</p>
                   </div>
-                  <h3>Template Psychologue</h3>
-                  <p>Professionnel et rassurant pour les psychologues</p>
-                </div>
-                <div className="template-card">
-                  <div className="template-preview">
-                    <div className="template-mockup coaching">
-                      <div className="mockup-header"></div>
-                      <div className="mockup-content">
-                        <div className="mockup-title">Coaching</div>
-                        <div className="mockup-text"></div>
-                        <div className="mockup-button"></div>
+                  <div className="template-card">
+                    <div className="template-preview">
+                      <div className="template-mockup coaching">
+                        <div className="mockup-header"></div>
+                        <div className="mockup-content">
+                          <div className="mockup-title">Coaching</div>
+                          <div className="mockup-text"></div>
+                          <div className="mockup-button"></div>
+                        </div>
                       </div>
                     </div>
+                    <h3>Template Coach</h3>
+                    <p>Dynamique et motivant pour les coachs de vie</p>
                   </div>
-                  <h3>Template Coach</h3>
-                  <p>Dynamique et motivant pour les coachs de vie</p>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* CTA Section */}
-          <section className="cta-section">
-            <div className="container">
-              <h2>Prêt à lancer votre pratique en ligne ?</h2>
-              <p>
-                Rejoignez des centaines de thérapeutes qui ont déjà créé leur site professionnel
-              </p>
-              <button className="cta-button-secondary" onClick={startBuilding}>
-                Commencer gratuitement
-              </button>
-            </div>
-          </section>
-          {/* {Contact Section} */}
-          <section className="flex flex-col items-center templates bg-white" id="contact">
-            <div className="container text-center">
-              <h2>Contactez-nous</h2>
-              <p>Si vous doutez encore n'hésitez pas à nous envoyer un message pour qu'on s'assure que votre projet est possible</p>
-            </div>
-            <div>
-             <p>📧 Email : <a href="mailto:vangitparis@gmail.com" className="text-prune underline">vangitparis@gmail.com</a></p>
-              {/* <ContactForm/> */}
+            {/* CTA Section */}
+            <section className="cta-section">
+              <div className="container">
+                <h2>Prêt à lancer votre pratique en ligne ?</h2>
+                <p>
+                  Rejoignez des centaines de thérapeutes qui ont déjà créé leur site professionnel
+                </p>
+                <button className="cta-button-secondary" onClick={startBuilding}>
+                  Commencer gratuitement
+                </button>
               </div>
-          </section>
-</main>
+            </section>
+            {/* {Contact Section} */}
+            <section className="flex flex-col items-center templates bg-white" id="contact">
+              <div className="container text-center">
+                <h2>Contactez-nous</h2>
+                <p>
+                  Si vous doutez encore n'hésitez pas à nous envoyer un message pour qu'on s'assure
+                  que votre projet est possible
+                </p>
+              </div>
+              <div>
+                <p>
+                  📧 Email :{' '}
+                  <a href="mailto:vangitparis@gmail.com" className="text-prune underline">
+                    vangitparis@gmail.com
+                  </a>
+                </p>
+                {/* <ContactForm/> */}
+              </div>
+            </section>
+          </main>
           {/* Footer */}
           <footer className="footer">
             <div className="container">

@@ -41,7 +41,8 @@ const PublishSiteComponent: React.FC = () => {
   };
 
   const validateDomain = (domain: string): boolean => {
-    const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
+    const domainRegex =
+      /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
     return domainRegex.test(domain);
   };
 
@@ -50,11 +51,11 @@ const PublishSiteComponent: React.FC = () => {
       const response = await fetch(`/api/vercel/add-domain`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain, uid: user?.uid })
+        body: JSON.stringify({ domain, uid: user?.uid }),
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'ajout du domaine à Vercel');
+        throw new Error("Erreur lors de l'ajout du domaine à Vercel");
       }
 
       return await response.json();
@@ -68,7 +69,7 @@ const PublishSiteComponent: React.FC = () => {
       await fetch('/api/send-dns-instructions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, domain, uid: user?.uid })
+        body: JSON.stringify({ email, domain, uid: user?.uid }),
       });
     } catch (error) {
       console.error('Erreur envoi email:', error);
@@ -94,7 +95,7 @@ const PublishSiteComponent: React.FC = () => {
         customDomain: customDomain.toLowerCase(),
         isPublished: true,
         publishedAt: new Date(),
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       });
 
       if (user?.email) {
@@ -122,13 +123,13 @@ const PublishSiteComponent: React.FC = () => {
       await fetch('/api/vercel/remove-domain', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain: currentDomain, uid: user?.uid })
+        body: JSON.stringify({ domain: currentDomain, uid: user?.uid }),
       });
 
       await updateDoc(doc(db, 'clients', user!.uid), {
         customDomain: '',
         isPublished: false,
-        unpublishedAt: new Date()
+        unpublishedAt: new Date(),
       });
 
       setIsPublished(false);
@@ -145,36 +146,60 @@ const PublishSiteComponent: React.FC = () => {
   };
 
   const getDNSInstructions = () => (
-    <div className="dns-instructions" style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginTop: '15px' }}>
+    <div
+      className="dns-instructions"
+      style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginTop: '15px' }}
+    >
       <h4>📋 Instructions DNS pour {currentDomain}</h4>
-      <p><strong>Chez votre registraire de domaine, ajoutez :</strong></p>
-      <div style={{ fontFamily: 'monospace', background: '#fff', padding: '10px', borderRadius: '4px' }}>
-        <div>Type: <strong>A</strong> | Nom: <strong>@</strong> | Valeur: <strong>76.76.19.61</strong></div>
-        <div>Type: <strong>CNAME</strong> | Nom: <strong>www</strong> | Valeur: <strong>cname.vercel-dns.com</strong></div>
+      <p>
+        <strong>Chez votre registraire de domaine, ajoutez :</strong>
+      </p>
+      <div
+        style={{
+          fontFamily: 'monospace',
+          background: '#fff',
+          padding: '10px',
+          borderRadius: '4px',
+        }}
+      >
+        <div>
+          Type: <strong>A</strong> | Nom: <strong>@</strong> | Valeur: <strong>76.76.19.61</strong>
+        </div>
+        <div>
+          Type: <strong>CNAME</strong> | Nom: <strong>www</strong> | Valeur:{' '}
+          <strong>cname.vercel-dns.com</strong>
+        </div>
       </div>
-      <p><small>⏱️ La propagation DNS peut prendre jusqu'à 24h</small></p>
+      <p>
+        <small>⏱️ La propagation DNS peut prendre jusqu'à 24h</small>
+      </p>
     </div>
   );
 
   // ✅ Rendu conditionnel pour le chargement utilisateur
   if (loadingUser) {
     return (
-      <div className="publish-section" style={{
-        border: '1px solid #e1e5e9',
-        borderRadius: '8px',
-        padding: '24px',
-        backgroundColor: '#ffffff'
-      }}>
+      <div
+        className="publish-section"
+        style={{
+          border: '1px solid #e1e5e9',
+          borderRadius: '8px',
+          padding: '24px',
+          backgroundColor: '#ffffff',
+        }}
+      >
         <div style={{ textAlign: 'center', padding: '20px' }}>
-          <div style={{
-            width: '20px',
-            height: '20px',
-            border: '2px solid #f3f3f3',
-            borderTop: '2px solid #3b82f6',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 10px'
-          }}></div>
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid #f3f3f3',
+              borderTop: '2px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 10px',
+            }}
+          ></div>
           <p>Chargement...</p>
         </div>
       </div>
@@ -182,22 +207,27 @@ const PublishSiteComponent: React.FC = () => {
   }
 
   return (
-    <div className="publish-section" style={{
-      border: '1px solid #e1e5e9',
-      borderRadius: '8px',
-      padding: '24px',
-      backgroundColor: '#ffffff'
-    }}>
+    <div
+      className="publish-section"
+      style={{
+        border: '1px solid #e1e5e9',
+        borderRadius: '8px',
+        padding: '24px',
+        backgroundColor: '#ffffff',
+      }}
+    >
       <h3 style={{ marginBottom: '20px', color: '#2d3748' }}>🌐 Publier mon site</h3>
 
       {error && (
-        <div style={{
-          color: '#e53e3e',
-          background: '#fed7d7',
-          padding: '12px',
-          borderRadius: '6px',
-          marginBottom: '16px'
-        }}>
+        <div
+          style={{
+            color: '#e53e3e',
+            background: '#fed7d7',
+            padding: '12px',
+            borderRadius: '6px',
+            marginBottom: '16px',
+          }}
+        >
           ⚠️ {error}
         </div>
       )}
@@ -205,7 +235,9 @@ const PublishSiteComponent: React.FC = () => {
       {!isPublished ? (
         <div>
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Nom de domaine :</label>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+              Nom de domaine :
+            </label>
             <input
               type="text"
               placeholder="mon-domaine.com"
@@ -217,7 +249,7 @@ const PublishSiteComponent: React.FC = () => {
                 padding: '12px',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
-                fontSize: '16px'
+                fontSize: '16px',
               }}
             />
           </div>
@@ -233,14 +265,23 @@ const PublishSiteComponent: React.FC = () => {
               borderRadius: '6px',
               fontSize: '16px',
               cursor: loading ? 'not-allowed' : 'pointer',
-              marginBottom: '12px'
+              marginBottom: '12px',
             }}
           >
             {loading ? '⏳ Publication...' : '🚀 Publier mon site'}
           </button>
 
-          <div style={{ background: '#eff6ff', padding: '16px', borderRadius: '6px', fontSize: '14px' }}>
-            <p><strong>📝 Instructions :</strong></p>
+          <div
+            style={{
+              background: '#eff6ff',
+              padding: '16px',
+              borderRadius: '6px',
+              fontSize: '14px',
+            }}
+          >
+            <p>
+              <strong>📝 Instructions :</strong>
+            </p>
             <ol style={{ margin: '8px 0', paddingLeft: '20px' }}>
               <li>Achetez d'abord votre domaine chez un registraire</li>
               <li>Entrez le nom de domaine ci-dessus</li>
@@ -251,12 +292,14 @@ const PublishSiteComponent: React.FC = () => {
         </div>
       ) : (
         <div>
-          <div style={{
-            background: '#d1fae5',
-            padding: '16px',
-            borderRadius: '6px',
-            marginBottom: '16px'
-          }}>
+          <div
+            style={{
+              background: '#d1fae5',
+              padding: '16px',
+              borderRadius: '6px',
+              marginBottom: '16px',
+            }}
+          >
             <p style={{ margin: 0, color: '#065f46' }}>
               ✅ <strong>Site publié :</strong>
               <a
@@ -283,7 +326,7 @@ const PublishSiteComponent: React.FC = () => {
               borderRadius: '6px',
               fontSize: '14px',
               cursor: loading ? 'not-allowed' : 'pointer',
-              marginTop: '16px'
+              marginTop: '16px',
             }}
           >
             {loading ? '⏳ Dépublication...' : '🗑️ Dépublier'}

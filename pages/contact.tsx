@@ -52,7 +52,9 @@ export default function Contact() {
     }
 
     if (!phoneRegex.test(formData.phone)) {
-      setStatusMessage('Le numéro de téléphone ne doit contenir que des chiffres et des symboles autorisés.');
+      setStatusMessage(
+        'Le numéro de téléphone ne doit contenir que des chiffres et des symboles autorisés.'
+      );
       setStatusClass('text-red-600');
       return;
     }
@@ -93,11 +95,12 @@ export default function Contact() {
         <title>Contact - SiteBuilder Team</title>
       </Head>
       <main className="max-w-6xl mx-auto px-4 py-10">
-
         <div className="flex flex-col items-center gap-8">
           <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg">
             <div className="mb-6">
-              <label htmlFor="name" className="block mb-2 font-medium text-gray-700">Nom</label>
+              <label htmlFor="name" className="block mb-2 font-medium text-gray-700">
+                Nom
+              </label>
               <input
                 type="text"
                 id="name"
@@ -110,7 +113,9 @@ export default function Contact() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="email" className="block mb-2 font-medium text-gray-700">Adresse e-mail</label>
+              <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
+                Adresse e-mail
+              </label>
               <input
                 type="email"
                 id="email"
@@ -123,7 +128,9 @@ export default function Contact() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="phone" className="block mb-2 font-medium text-gray-700">Numéro de téléphone</label>
+              <label htmlFor="phone" className="block mb-2 font-medium text-gray-700">
+                Numéro de téléphone
+              </label>
               <input
                 type="tel"
                 id="phone"
@@ -136,7 +143,9 @@ export default function Contact() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="subject" className="block mb-2 font-medium text-gray-700">Titre du projet</label>
+              <label htmlFor="subject" className="block mb-2 font-medium text-gray-700">
+                Titre du projet
+              </label>
               <input
                 type="text"
                 id="subject"
@@ -149,7 +158,9 @@ export default function Contact() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="message" className="block mb-2 font-medium text-gray-700">Détails du projet</label>
+              <label htmlFor="message" className="block mb-2 font-medium text-gray-700">
+                Détails du projet
+              </label>
               <textarea
                 id="message"
                 name="message"
@@ -179,13 +190,9 @@ export default function Contact() {
             </button>
 
             {statusMessage && (
-              <p className={`mt-4 text-center text-lg ${statusClass}`}>
-                {statusMessage}
-              </p>
+              <p className={`mt-4 text-center text-lg ${statusClass}`}>{statusMessage}</p>
             )}
           </form>
-
-        
         </div>
       </main>
     </>

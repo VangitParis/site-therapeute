@@ -6,7 +6,6 @@ import Link from 'next/link';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useState, ChangeEvent, FormEvent } from 'react';
 
-
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
@@ -17,19 +16,17 @@ export default function ContactForm() {
     // recaptcha: '',
   });
 
-//   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  //   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-//   if (!recaptchaSiteKey) {
-//     console.error(
-//       "La clé reCAPTCHA est manquante dans les variables d'environnement."
-//     );
-//   }
+  //   if (!recaptchaSiteKey) {
+  //     console.error(
+  //       "La clé reCAPTCHA est manquante dans les variables d'environnement."
+  //     );
+  //   }
 
   const [statusMessage, setStatusMessage] = useState('');
   const [statusClass, setStatusClass] = useState('');
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -39,8 +36,8 @@ export default function ContactForm() {
 
   const handleRecaptchaChange = (value: string | null) => {
     //   setFormData({ ...formData, recaptcha: value || '' });
-      setFormData({ ...formData});
-};
+    setFormData({ ...formData });
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,9 +54,7 @@ export default function ContactForm() {
     const phoneRegex = /^[0-9\s\-\+\(\)]+$/;
 
     if (!nameRegex.test(formData.name)) {
-      setStatusMessage(
-        'Le nom ne doit contenir que des lettres et des espaces.'
-      );
+      setStatusMessage('Le nom ne doit contenir que des lettres et des espaces.');
       setStatusClass('error');
       return;
     }
@@ -92,7 +87,7 @@ export default function ContactForm() {
           phone: '',
           subject: '',
           message: '',
-        //   recaptcha: '',
+          //   recaptcha: '',
         });
       } else {
         setStatusMessage(result.message || "Erreur lors de l'envoi du message");
@@ -109,11 +104,9 @@ export default function ContactForm() {
       <Head>
         <title>Contact - SiteBuilder</title>
       </Head>
-      
+
       <div className="form-container">
-        <h4 className="xl:text-4xl lg:text-3xl text-2xl text-white">
-          Envoyez-nous un e-mail
-        </h4>
+        <h4 className="xl:text-4xl lg:text-3xl text-2xl text-white">Envoyez-nous un e-mail</h4>
         <div className="grid lg:grid-cols-1">
           <form className="form" onSubmit={handleSubmit}>
             <div className="formGroup">
@@ -190,7 +183,7 @@ export default function ContactForm() {
             <div className={`statusMessage text-xl ${statusClass}`}>
               {statusMessage && <p>{statusMessage}</p>}
             </div>
-          </form>      
+          </form>
         </div>
       </div>
     </>

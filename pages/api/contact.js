@@ -18,9 +18,7 @@ export default async function handler(req, res) {
     const emailPass = process.env.EMAIL_PASS;
 
     if (!emailUser || !emailPass) {
-      return res
-        .status(500)
-        .json({ message: 'Erreur de configuration du serveur.' });
+      return res.status(500).json({ message: 'Erreur de configuration du serveur.' });
     }
 
     if (!name || !email || !phone || !subject || !message || !recaptcha) {

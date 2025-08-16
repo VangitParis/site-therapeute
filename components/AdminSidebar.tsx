@@ -129,7 +129,7 @@ export default function AdminSidebar({
         </button>
         {message && <p className="text-center text-green-600 mt-2 text-sm">{message}</p>}
       </div>
-       {/* <PublishSiteComponent/> */}
+      {/* <PublishSiteComponent/> */}
       {/* <PasswordChanger /> */}
     </div>
   );
