@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/router';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '../lib/firebaseClient';
 
 const PublishSiteComponent: React.FC = () => {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [customDomain, setCustomDomain] = useState<string>('');
   const [isPublished, setIsPublished] = useState<boolean>(false);
@@ -20,6 +22,8 @@ const PublishSiteComponent: React.FC = () => {
         loadPublishStatus(currentUser.uid);
       }
       setLoadingUser(false);
+      //   à mettre ne place plus tard
+      //   router.push('/paiement');
     });
 
     return () => unsubscribe();
