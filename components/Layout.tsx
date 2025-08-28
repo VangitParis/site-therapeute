@@ -10,7 +10,7 @@ export default function Layout({ children, uid }: { children: ReactNode; uid?: s
   const { layout, theme } = useLiveLayout();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isAdminPage = router.pathname.startsWith('/admin') || router.pathname.startsWith('/login');
+  const isAdminPage = router.pathname.startsWith('/admin') || router.pathname.startsWith('/login') || router.pathname.startsWith('/contact') || router.pathname.startsWith('/paiement'); 
   const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
   const isDev = router.query.frdev === '1';
   const isPreview = router.query.admin === 'true';
