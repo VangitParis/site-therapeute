@@ -9,7 +9,7 @@ export default function PaiementPage() {
   const isPromo = router.query.promo === '1';
 
   const standardLink = 'https://py.pl/1nWRFX'; // 1250 € http://localhost:3000/paiement
-  const promoLink = 'https://py.pl/2CYNA6q3Y98'; // 150 € http://localhost:3000/paiement?promo=1?
+  const promoLink = 'https://py.pl/2CYNA6q3Y98'; // 750 € http://localhost:3000/paiement?promo=1?
 
   return (
     <>
@@ -36,7 +36,7 @@ export default function PaiementPage() {
           <p className="text-gray-700 mb-4">✅ Zéro abonnement, 100% à vous</p>
 
           <p className="text-lg font-bold mb-6">
-            Prix : {isPromo ? '🎉 150 € (promo -88%)' : '1250 €'}
+            Prix : {isPromo ? '🎉 750 € (promo -88%)' : '1250 €'}
           </p>
 
           <a
