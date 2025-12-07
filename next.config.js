@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack(config, { isServer }) {
-    config.infrastructureLogging = {
-      ...config.infrastructureLogging,
-      level: 'error',
-    };
+  webpack: (config) => {
     return config;
   },
+  experimental: {
+    turbopack: false
+  }
 };
 
 module.exports = nextConfig;
