@@ -1,7 +1,17 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebaseClient';
+import { applyTemplateVariant } from './templateVariants';
 
-export async function duplicateContentForUser(uid: string) {
+type DuplicateOptions = {
+  displayName?: string;
+  email?: string;
+};
+
+export async function duplicateContentForUser(
+  uid: string,
+  templateId?: string,
+  options: DuplicateOptions = {}
+) {
   try {
     const defaultDoc = doc(db, 'content', 'fr');
     const userDoc = doc(db, 'content', uid);
@@ -21,8 +31,25 @@ export async function duplicateContentForUser(uid: string) {
 
     const defaultData = defaultSnap.data();
 
+    const baseClone = JSON.parse(JSON.stringify(defaultData));
+    baseClone.templateId = templateId || 'sophrologie';
+    const dataToSave = applyTemplateVariant(baseClone, templateId);
+
+    if (options.displayName) {
+      dataToSave.layout = dataToSave.layout || {};
+      dataToSave.layout.nom = options.displayName;
+      if (dataToSave.accueil) {
+        dataToSave.accueil.titre = dataToSave.accueil.titre || options.displayName;
+      }
+    }
+
+    if (options.email) {
+      dataToSave.contact = dataToSave.contact || {};
+      dataToSave.contact.lien = `mailto:${options.email}`;
+    }
+
     // Crée le document personnalisé de l'utilisateur
-    await setDoc(userDoc, defaultData);
+    await setDoc(userDoc, dataToSave);
     console.log(`Contenu copié vers content/${uid}`);
   } catch (error) {
     console.error('Erreur lors de la duplication du contenu :', error);

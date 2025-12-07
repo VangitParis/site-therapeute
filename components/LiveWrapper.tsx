@@ -21,6 +21,14 @@ export default function LiveWrapper({ children }) {
     setIsDevMode(isFRDev);
 
     if (isFRDev) {
+      const session =
+        typeof window !== 'undefined' ? sessionStorage.getItem('admin_auth') : null;
+      if (session === 'true') {
+        setAuthenticated(true);
+        setChecking(false);
+        return;
+      }
+
       const checkAdmin = async () => {
         const snap = await getDoc(doc(db, 'config', 'admin'));
         if (!snap.exists()) {
@@ -66,6 +74,9 @@ export default function LiveWrapper({ children }) {
         const isValid = password === MASTER_PWD || (await bcrypt.compare(password, storedHash));
 
         if (isValid) {
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('admin_auth', 'true');
+          }
           setAuthenticated(true);
         } else {
           setError('Mot de passe incorrect ❌');
@@ -85,6 +96,9 @@ export default function LiveWrapper({ children }) {
 
   const handleLogout = async () => {
     await signOut(auth);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('admin_auth');
+    }
     setAuthenticated(false);
     router.push('/');
   };

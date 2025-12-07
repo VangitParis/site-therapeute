@@ -7,6 +7,7 @@ import AdminSidebar from '../../components/AdminSidebar';
 import SitePreview from '../../components/SitePreview';
 import LiveWrapper from '../../components/LiveWrapper';
 import { ImageUploadRef } from '../../components/ImageUploadField';
+import { applyTemplateVariant } from '../../lib/templateVariants';
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -108,16 +109,23 @@ export default function Live() {
 
           if (snap.exists()) {
             const raw = snap.data();
-            const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
+            const previewTemplate = router.query.template as string | undefined;
+            const sourceData = JSON.parse(JSON.stringify(raw));
+            const templatedData =
+              isDev && previewTemplate
+                ? applyTemplateVariant(sourceData, previewTemplate)
+                : sourceData;
+            const services =
+              templatedData.services || { titre: '', liste: [], image: '', bouton: '' };
 
             services.liste = services.liste.map((s: any) =>
               typeof s === 'string' ? { text: s, image: '' } : s
             );
 
             setFormData({
-              layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
-              theme: { ...DEFAULT_THEME, ...raw.theme },
-              accueil: raw.accueil || {
+              layout: templatedData.layout || { nom: '', titre: '', footer: '', liens: [] },
+              theme: { ...DEFAULT_THEME, ...templatedData.theme },
+              accueil: templatedData.accueil || {
                 titre: '',
                 texte: '',
                 bouton: '',
@@ -135,11 +143,11 @@ export default function Live() {
                 SectionContactDescription: '',
                 SectionContactCTA: '',
               },
-              aPropos: raw.aPropos || { titre: '', texte: '', image: '', bouton: '' },
+              aPropos: templatedData.aPropos || { titre: '', texte: '', image: '', bouton: '' },
               services,
-              testimonials: raw.testimonials || [],
-              testimonialsButton: raw.testimonialsButton || '',
-              contact: raw.contact || {
+              testimonials: templatedData.testimonials || [],
+              testimonialsButton: templatedData.testimonialsButton || '',
+              contact: templatedData.contact || {
                 titre: '',
                 texte: '',
                 bouton: '',

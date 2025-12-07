@@ -12,6 +12,7 @@ import {
   DEFAULT_SERVICES,
   DEFAULT_TESTIMONIALS,
 } from '../../utils/default';
+import { applyTemplateVariant } from '../../lib/templateVariants';
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -83,17 +84,24 @@ export default function HomePage({ locale = 'fr' }) {
 
       if (snap.exists()) {
         const raw = snap.data();
+        const previewTemplate =
+          router.query.frdev === '1' ? (router.query.template as string | undefined) : undefined;
+        const sourceData = JSON.parse(JSON.stringify(raw));
+        const templatedData =
+          previewTemplate && router.query.frdev === '1'
+            ? applyTemplateVariant(sourceData, previewTemplate)
+            : sourceData;
 
         // Normaliser les services
-        const services = raw.services || { titre: '', liste: [], image: '', bouton: '' };
+        const services = templatedData.services || { titre: '', liste: [], image: '', bouton: '' };
         services.liste = services.liste.map((s: any) =>
           typeof s === 'string' ? { text: s, image: '' } : s
         );
 
         const firestoreData = {
-          layout: raw.layout || { nom: '', titre: '', footer: '', liens: [] },
-          theme: raw.theme || DEFAULT_THEME,
-          accueil: raw.accueil || {
+          layout: templatedData.layout || { nom: '', titre: '', footer: '', liens: [] },
+          theme: templatedData.theme || DEFAULT_THEME,
+          accueil: templatedData.accueil || {
             titre: '',
             texte: '',
             bouton: '',
@@ -111,11 +119,11 @@ export default function HomePage({ locale = 'fr' }) {
             SectionContactDescription: '',
             SectionContactCTA: '',
           },
-          aPropos: raw.aPropos || { titre: '', texte: '', image: '', bouton: '' },
+          aPropos: templatedData.aPropos || { titre: '', texte: '', image: '', bouton: '' },
           services,
-          testimonials: raw.testimonials || [],
-          testimonialsButton: raw.testimonialsButton || '',
-          contact: raw.contact || {
+          testimonials: templatedData.testimonials || [],
+          testimonialsButton: templatedData.testimonialsButton || '',
+          contact: templatedData.contact || {
             titre: '',
             texte: '',
             bouton: '',

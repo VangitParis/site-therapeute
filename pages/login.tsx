@@ -27,6 +27,7 @@ export default function AuthInterface() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  const selectedTemplate = (router.query.template as string) || 'sophrologie';
 
   // ✅ Réactiver cet useEffect - il est nécessaire pour la redirection
   useEffect(() => {
@@ -80,11 +81,15 @@ export default function AuthInterface() {
         result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
         const user = result.user;
 
-        await duplicateContentForUser(user.uid);
+        await duplicateContentForUser(user.uid, selectedTemplate, {
+          displayName: formData.nom,
+          email: formData.email,
+        });
         await setDoc(doc(db, 'clients', user.uid), {
           email: user.email,
           nom: formData.nom,
           isClient: false,
+          templateId: selectedTemplate,
           createdAt: new Date(),
         });
 
