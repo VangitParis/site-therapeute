@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
-import { db } from '../lib/firebaseClient';
-import { doc, getDoc } from 'firebase/firestore';
-import bcrypt from 'bcryptjs';
+// components/AdminAuth.js
+//
+// Le mot de passe n'est plus jamais vérifié dans le navigateur : on poste au
+// serveur (/api/admin-login), qui compare le hash bcrypt côté serveur et pose
+// un cookie de session httpOnly signé. Ce composant ne lit plus jamais
+// config/admin ni ne fait de bcrypt.compare côté client.
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function AdminAuth({ children }) {
@@ -9,80 +12,36 @@ export default function AdminAuth({ children }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [storedHash, setStoredHash] = useState('');
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const session = sessionStorage.getItem('admin_auth');
-    if (session === 'true') {
-      setAuthenticated(true);
-      setLoading(false);
-      return;
-    }
-
-    const fetchPasswordHash = async () => {
-      try {
-        const snap = await getDoc(doc(db, 'config', 'admin'));
-        if (snap.exists()) {
-          setStoredHash(snap.data().password);
-        } else {
-          setError('Aucun mot de passe configuré');
-        }
-      } catch (err) {
-        setError('Erreur de connexion à Firestore');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPasswordHash();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setError('');
-    const MASTER_PWD = process.env.NEXT_PUBLIC_MASTER_PWD;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
 
-    if (!storedHash && password !== MASTER_PWD) {
-      setError('Mot de passe non initialisé ou indisponible');
-      return;
-    }
-
-    const isValid = password === MASTER_PWD || (await bcrypt.compare(password, storedHash));
-
-    if (isValid) {
-      sessionStorage.setItem('admin_auth', 'true');
-
-      // Si on voulait accéder à ?frdev=1 sans être authentifié, on redirige maintenant
-      const query = new URLSearchParams(window.location.search);
-      if (query.get('frdev') === '1') {
-        localStorage.setItem('FORCE_FR', 'true');
-        window.location.href = window.location.pathname; // recharge sans query
-        return;
+      if (res.ok) {
+        setAuthenticated(true);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || 'Mot de passe incorrect ❌');
       }
-
-      setAuthenticated(true);
-    } else {
-      setError('Mot de passe incorrect ❌');
+    } catch (err) {
+      setError('Erreur de connexion au serveur');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('admin_auth');
-    localStorage.removeItem('FORCE_FR');
+  const handleLogout = async () => {
+    await fetch('/api/admin-logout', { method: 'POST' });
     setAuthenticated(false);
     setPassword('');
   };
-
-  const disableForceFR = () => {
-    handleLogout();
-    window.location.href = '/';
-  };
-
-  if (loading) {
-    return <p className="text-center p-6">⏳ Connexion à Firestore...</p>;
-  }
 
   if (!authenticated) {
     return (
@@ -97,9 +56,10 @@ export default function AdminAuth({ children }) {
         />
         <button
           onClick={handleLogin}
-          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
+          disabled={loading}
+          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
         >
-          Se connecter
+          {loading ? 'Connexion…' : 'Se connecter'}
         </button>
         {error && <p className="mt-3 text-red-500">{error}</p>}
       </div>
@@ -115,11 +75,6 @@ export default function AdminAuth({ children }) {
         >
           🔒 Se déconnecter
         </button>
-        {localStorage.getItem('FORCE_FR') === 'true' && (
-          <button onClick={disableForceFR} className="text-sm text-orange-600 underline">
-            🔁 Quitter le mode dev
-          </button>
-        )}
       </div>
       {children}
     </div>

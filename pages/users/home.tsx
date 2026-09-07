@@ -2,6 +2,17 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebaseClient';
+import type { GetServerSideProps } from 'next';
+import { checkTenantActive } from '../../lib/checkTenantActive';
+
+// Bloque l'accès public au site d'une cliente tant que son compte n'a pas
+// été activé (paiement confirmé) — avant, cette vérification n'existait nulle
+// part côté public, seulement sur l'éditeur privé.
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const gate = await checkTenantActive(context);
+  if (gate.redirect) return { redirect: gate.redirect };
+  return { props: {} };
+};
 import TitreMultiligne from '../../components/TitreMultiligne';
 import UserLink from '../../components/UserLinks';
 import AnimatedSection from '../../components/AnimatedSection';
@@ -29,7 +40,16 @@ const DEFAULT_THEME = {
 const DEFAULT_IMAGE =
   'https://res.cloudinary.com/dwadzodje/image/upload/v1750498500/assets/image_defaut.png';
 
-export default function HomePage({ locale = 'fr' }) {
+export default function HomePage({
+  locale = 'fr',
+  overrideUid,
+}: {
+  locale?: string;
+  // Passé par pages/[slug].tsx : fait de cette page le contenu de
+  // /<slug> tout en gardant cette URL lisible affichée dans le navigateur
+  // (pas de redirection vers ?uid=...). Prioritaire sur router.query.uid.
+  overrideUid?: string;
+}) {
   const router = useRouter();
 
   // États pour la gestion des données
@@ -39,7 +59,7 @@ export default function HomePage({ locale = 'fr' }) {
   const [dataSource, setDataSource] = useState('loading');
 
   // Paramètres URL
-  const uid = router.query.uid as string;
+  const uid = overrideUid ?? (router.query.uid as string);
   const isDev = router.query.frdev === '1';
   const isAdminMode = router.query.admin === 'true';
 

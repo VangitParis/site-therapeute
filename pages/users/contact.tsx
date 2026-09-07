@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import TarifsCards from '../../components/TarifsCards';
+import type { GetServerSideProps } from 'next';
+import { checkTenantActive } from '../../lib/checkTenantActive';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const gate = await checkTenantActive(context);
+  if (gate.redirect) return { redirect: gate.redirect };
+  return { props: {} };
+};
 
 export default function Contact({ locale = 'fr' }) {
   const router = useRouter();

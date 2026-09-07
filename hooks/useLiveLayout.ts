@@ -23,13 +23,17 @@ const applyThemeToDOM = (theme: any) => {
   console.log('[DOM] couleurs appliquées', theme);
 };
 
-export default function useLiveLayout() {
+// overrideUid : passé par Layout quand la page hôte a déjà résolu un uid
+// autrement que via ?uid= dans l'URL — le cas de /[slug].tsx (site-therapeute
+// .vercel.app/marie-dupont), où on veut l'en-tête/nav de SA cliente sans que
+// l'URL affichée ne porte jamais ?uid=.
+export default function useLiveLayout(overrideUid?: string) {
   const router = useRouter();
   const [layout, setLayout] = useState<any>(null);
   const [theme, setTheme] = useState<any>({});
   const hasReceivedMessage = useRef(false);
   const isPreview = router.query.admin === 'true';
-  const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
+  const uidParam = overrideUid ?? (typeof router.query.uid === 'string' ? router.query.uid : null);
 
   useEffect(() => {
     let docId = 'fr';
@@ -81,7 +85,7 @@ export default function useLiveLayout() {
 
     init();
     return () => unsubFns.forEach((fn) => fn());
-  }, [router.query]);
+  }, [router.query, overrideUid]);
 
   return { layout, theme };
 }

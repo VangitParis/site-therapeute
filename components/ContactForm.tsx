@@ -13,16 +13,14 @@ export default function ContactForm() {
     phone: '',
     subject: '',
     message: '',
-    // recaptcha: '',
+    recaptcha: '',
   });
 
-  //   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  //   if (!recaptchaSiteKey) {
-  //     console.error(
-  //       "La clé reCAPTCHA est manquante dans les variables d'environnement."
-  //     );
-  //   }
+  if (!recaptchaSiteKey) {
+    console.error("La clé reCAPTCHA est manquante dans les variables d'environnement.");
+  }
 
   const [statusMessage, setStatusMessage] = useState('');
   const [statusClass, setStatusClass] = useState('');
@@ -35,19 +33,18 @@ export default function ContactForm() {
   };
 
   const handleRecaptchaChange = (value: string | null) => {
-    //   setFormData({ ...formData, recaptcha: value || '' });
-    setFormData({ ...formData });
+    setFormData({ ...formData, recaptcha: value || '' });
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Vérifier si reCAPTCHA est rempli
-    // if (!formData.recaptcha) {
-    //   setStatusMessage('Veuillez vérifier que vous êtes un humain.');
-    //   setStatusClass('error');
-    //   return;
-    // }
+    if (!formData.recaptcha) {
+      setStatusMessage('Veuillez vérifier que vous êtes un humain.');
+      setStatusClass('error');
+      return;
+    }
 
     // Validation du nom et du téléphone
     const nameRegex = /^[a-zA-Z\s]+$/;
@@ -87,7 +84,7 @@ export default function ContactForm() {
           phone: '',
           subject: '',
           message: '',
-          //   recaptcha: '',
+          recaptcha: '',
         });
       } else {
         setStatusMessage(result.message || "Erreur lors de l'envoi du message");
@@ -164,19 +161,13 @@ export default function ContactForm() {
                 required
               ></textarea>
             </div>
-            {/* <div className="formGroup">
+            <div className="formGroup">
               {recaptchaSiteKey ? (
-                <ReCAPTCHA
-                  sitekey={recaptchaSiteKey}
-                  onChange={handleRecaptchaChange}
-                />
+                <ReCAPTCHA sitekey={recaptchaSiteKey} onChange={handleRecaptchaChange} />
               ) : (
-                <p>
-                  Erreur : Clé reCAPTCHA manquante. Veuillez contacter
-                  l'administrateur du site.
-                </p>
+                <p>Erreur : Clé reCAPTCHA manquante. Veuillez contacter l'administrateur du site.</p>
               )}
-            </div> */}
+            </div>
             <button type="submit" className="submitButton ">
               SOUMETTRE
             </button>

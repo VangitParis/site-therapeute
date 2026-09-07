@@ -5,15 +5,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.1",
+    "cookie": "^1.0.2",
     "dompurify": "^3.2.6",
     "firebase": "^11.9.0",
-    "formidable": "^3.5.4",
+    "firebase-admin": "^13.0.2",
     "framer": "^2.4.1",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.523.0",
     "motion": "^12.16.0",
     "next": "^16.0.7",
@@ -29,13 +33,17 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/react": "19.1.6",
     "@types/react-slick": "^0.23.13",
+    "@vitest/coverage-v8": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "eslint-config-prettier": "^10.1.5",
+    "node-mocks-http": "^1.18.1",
     "postcss": "^8.5.4",
     "prettier": "^3.5.3",
     "tailwindcss": "^4.1.8",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "^4.1.11"
   }
 }

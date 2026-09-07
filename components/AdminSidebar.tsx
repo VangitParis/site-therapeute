@@ -12,11 +12,12 @@ import PasswordChanger from './PassWordChanger';
 import ContactEditor from './ContactEditor';
 import MentionsAdminEditor from './MentionsAdminEditor';
 import AdminTarifsEditor from './AdminTarifsEditor';
-// import PublishSiteComponent from './PublishSiteComponent';
+import PublishSiteComponent from './PublishSiteComponent';
 
 type Props = {
   formData: any;
   setFormData: (fn: (prev: any) => any) => void;
+  isAdminDev?: boolean;
   imageFieldRef: React.RefObject<ImageUploadRef>;
   imageFieldAProposRef: React.RefObject<ImageUploadRef>;
   imageFieldTestimonialsRef: React.RefObject<ImageUploadRef>;
@@ -30,6 +31,7 @@ type Props = {
 export default function AdminSidebar({
   formData,
   setFormData,
+  isAdminDev,
   imageFieldRef,
   imageFieldAProposRef,
   imageFieldTestimonialsRef,
@@ -64,6 +66,15 @@ export default function AdminSidebar({
       </p>
 
       <h2 className="text-xl font-bold text-indigo-700 text-center">⚙️ Administration</h2>
+
+      {/* Bien visible, jamais caché dans un accordéon replié : c'est ce
+          qu'une cliente vient chercher en premier. N'a pas de sens pour le
+          template admin (?frdev=1), qui n'est pas un vrai compte cliente. */}
+      {!isAdminDev && (
+        <div className="mb-4">
+          <PublishSiteComponent />
+        </div>
+      )}
 
       <AccordionSection title="🧩 En-tête et navigation">
         <LayoutEditor formData={formData} setFormData={setFormData} />
@@ -129,7 +140,6 @@ export default function AdminSidebar({
         </button>
         {message && <p className="text-center text-green-600 mt-2 text-sm">{message}</p>}
       </div>
-      {/*<PublishSiteComponent />*/}
       {/* <PasswordChanger /> */}
     </div>
   );

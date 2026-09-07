@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# secrets accidentellement téléchargés à la racine (clé de compte de service
+# Firebase) — leur contenu vit dans .env.local / Vercel, jamais ici
+*firebase-adminsdk*.json
+*serviceAccount*.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

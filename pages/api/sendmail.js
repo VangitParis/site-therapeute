@@ -1,9 +1,15 @@
 import nodemailer from 'nodemailer';
+import { checkRateLimit, getClientIp } from '../../lib/rateLimit';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+
+  // 5 envois / 10 minutes / IP : limite le spam via les identifiants SMTP du site.
+  if (!checkRateLimit(`sendmail:${getClientIp(req)}`, 5, 10 * 60_000)) {
+    return res.status(429).json({ error: 'Trop de messages envoyés, réessaie plus tard.' });
   }
 
   const { prenom, email, message } = req.body;

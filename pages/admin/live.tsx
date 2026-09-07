@@ -8,6 +8,18 @@ import SitePreview from '../../components/SitePreview';
 import LiveWrapper from '../../components/LiveWrapper';
 import { ImageUploadRef } from '../../components/ImageUploadField';
 import { applyTemplateVariant } from '../../lib/templateVariants';
+import { adminLiveGetServerSideProps } from '../../lib/adminLiveGuard';
+import { canWriteOwnContent } from '../../lib/contentOwnership';
+
+// Vérifie le cookie admin_session côté serveur AVANT que la page ne soit
+// rendue : quand ?frdev=1 est présent sans session admin valide, on redirige
+// vers /login plutôt que de laisser le JS client décider (l'ancienne
+// vérification reposait uniquement sur sessionStorage, modifiable depuis les
+// devtools). L'accès des clientes ordinaires (via leur uid Firebase Auth)
+// n'est pas concerné par ce contrôle et continue de passer par le SDK client.
+// Logique extraite dans lib/adminLiveGuard.ts pour pouvoir la tester sans
+// importer tout l'arbre de composants de cette page.
+export const getServerSideProps = adminLiveGetServerSideProps;
 
 const DEFAULT_THEME = {
   background: '#f4f0fa',
@@ -20,7 +32,7 @@ const DEFAULT_THEME = {
   textButton: '#FFFFFF',
 };
 
-export default function Live() {
+export default function Live({ isAdminSession = false }: { isAdminSession?: boolean }) {
   const router = useRouter();
   const [formData, setFormData] = useState(null);
   const [message, setMessage] = useState('');
@@ -207,46 +219,63 @@ export default function Live() {
   }, [formData]); // Se déclenche à chaque modification de formData
 
   const handleSave = async () => {
-    console.log('💾 Sauvegarde des données:', formData);
     const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
     const isAdminDev = router.query.frdev === '1';
+    const dataToSave = { ...formData };
 
-    let docId = 'fr';
+    // Mode admin (?frdev=1) : la session a déjà été vérifiée côté serveur
+    // (getServerSideProps) pour afficher cette page, mais l'écriture elle-même
+    // repasse par une route serveur qui revérifie le cookie avant d'utiliser
+    // firebase-admin — le document content/fr n'accepte plus aucune écriture
+    // directe depuis le client (voir firestore.rules).
+    if (isAdminDev) {
+      try {
+        const res = await fetch('/api/admin-save-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: dataToSave }),
+        });
+        if (!res.ok) throw new Error('Échec de la sauvegarde admin');
+        setHasUnsavedChanges(false);
+        setMessage('✅ Modifications enregistrées.');
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde admin:', error);
+        setMessage('❌ Erreur lors de la sauvegarde.');
+      }
+      return;
+    }
 
-    if (isAdminDev && !uidParam) {
-      docId = 'fr';
-    } else if (!isAdminDev && uidParam) {
-      docId = uidParam;
-    } else if (!isAdminDev && !uidParam) {
-      await new Promise<void>((resolve) => {
+    // Cliente ordinaire : on résout le uid ciblé, puis on vérifie qu'il
+    // correspond bien à l'utilisatrice Firebase Auth actuellement connectée
+    // avant d'écrire quoi que ce soit — l'ancienne version faisait confiance
+    // au paramètre d'URL ?uid= sans jamais comparer avec auth.currentUser.uid,
+    // ce qui permettait à n'importe quelle cliente connectée de sauvegarder
+    // par-dessus le site d'une autre en changeant juste l'URL.
+    let docId = uidParam;
+    if (!docId) {
+      docId = await new Promise<string | null>((resolve) => {
         const unsub = onAuthStateChanged(auth, (user) => {
-          if (user) docId = user.uid;
           unsub();
-          resolve();
+          resolve(user?.uid ?? null);
         });
       });
     }
 
-    const ref = doc(db, 'content', docId);
-
-    // Préparer les données à sauvegarder
-    let dataToSave = { ...formData };
-
-    // N'ajouter adminToken que pour le document 'fr' ou en mode dev
-    if (docId === 'fr' || isAdminDev) {
-      dataToSave.adminToken = 'admin';
+    if (!canWriteOwnContent(auth.currentUser?.uid, docId)) {
+      setMessage("❌ Vous n'êtes pas autorisée à modifier ce site.");
+      return;
     }
+
+    const ref = doc(db, 'content', docId);
 
     try {
       await updateDoc(ref, dataToSave);
-      // Une fois sauvegardé, marquer comme sauvé
       setHasUnsavedChanges(false);
       setMessage('✅ Modifications enregistrées.');
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       setMessage('❌ Erreur lors de la sauvegarde.');
     }
-    console.log('✅ Sauvegarde terminée');
   };
 
   const wrappedSetFormData = (fn: (prev: any) => any) => {
@@ -258,7 +287,7 @@ export default function Live() {
   if (!formData) return <p className="text-center p-6">Chargement…</p>;
 
   return (
-    <LiveWrapper>
+    <LiveWrapper isAdminSession={isAdminSession}>
       <div className="flex h-screen">
         {sidebarVisible && (
           <div className="w-[30%] min-w-[320px] border-r overflow-y-scroll relative">
@@ -272,6 +301,7 @@ export default function Live() {
               imageFieldBgRef={imageFieldBgRef}
               handleSave={handleSave}
               message={message}
+              isAdminDev={router.query.frdev === '1'}
               onClose={() => setSidebarVisible(false)}
             />
           </div>
@@ -293,6 +323,7 @@ export default function Live() {
               <SitePreview
                 formData={formData}
                 uid={docId}
+                isAdminDev={router.query.frdev === '1'}
                 hasUnsavedChanges={hasUnsavedChanges}
                 onSave={handleSave}
               />

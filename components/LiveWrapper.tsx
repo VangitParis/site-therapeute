@@ -3,9 +3,18 @@ import { useRouter } from 'next/router';
 import { auth, db } from '../lib/firebaseClient';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import bcrypt from 'bcryptjs';
+import { getAuthErrorMessage } from '../lib/authErrorMessages';
 
-export default function LiveWrapper({ children }) {
+type LiveWrapperProps = {
+  children: React.ReactNode;
+  // Passé par pages/admin/live.tsx depuis getServerSideProps : true seulement
+  // si le cookie admin_session a été vérifié côté serveur pour cette requête
+  // (?frdev=1). Sans ce cookie valide, la page a déjà redirigé vers /login
+  // avant même que ce composant ne s'affiche.
+  isAdminSession?: boolean;
+};
+
+export default function LiveWrapper({ children, isAdminSession = false }: LiveWrapperProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,24 +30,13 @@ export default function LiveWrapper({ children }) {
     setIsDevMode(isFRDev);
 
     if (isFRDev) {
-      const session =
-        typeof window !== 'undefined' ? sessionStorage.getItem('admin_auth') : null;
-      if (session === 'true') {
-        setAuthenticated(true);
-        setChecking(false);
-        return;
-      }
-
-      const checkAdmin = async () => {
-        const snap = await getDoc(doc(db, 'config', 'admin'));
-        if (!snap.exists()) {
-          setError('⚠️ Aucun mot de passe admin configuré.');
-          setChecking(false);
-          return;
-        }
-        setChecking(false);
-      };
-      checkAdmin();
+      // La vérification a déjà eu lieu côté serveur (cookie admin_session,
+      // voir getServerSideProps) avant que cette page ne soit rendue : si on
+      // arrive ici avec isAdminSession=false, quelque chose ne va pas (par ex.
+      // navigation client-side sans rechargement) — on ne fait plus jamais
+      // confiance à un flag sessionStorage pour trancher.
+      setAuthenticated(isAdminSession);
+      setChecking(false);
       return;
     }
 
@@ -67,37 +65,24 @@ export default function LiveWrapper({ children }) {
     setError('');
 
     if (isDevMode) {
-      try {
-        const snap = await getDoc(doc(db, 'config', 'admin'));
-        const storedHash = snap.data()?.password;
-        const MASTER_PWD = process.env.NEXT_PUBLIC_MASTER_PWD;
-        const isValid = password === MASTER_PWD || (await bcrypt.compare(password, storedHash));
+      // Le mode admin est validé côté serveur avant l'affichage de la page —
+      // il n'y a plus de formulaire de mot de passe à traiter ici.
+      return;
+    }
 
-        if (isValid) {
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('admin_auth', 'true');
-          }
-          setAuthenticated(true);
-        } else {
-          setError('Mot de passe incorrect ❌');
-        }
-      } catch (e) {
-        setError('Erreur de connexion à Firestore');
-      }
-    } else {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        setAuthenticated(true);
-      } catch (e) {
-        setError('Email ou mot de passe incorrect.');
-      }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setAuthenticated(true);
+    } catch (e) {
+      console.error('Erreur connexion cliente:', e);
+      setError(getAuthErrorMessage(e));
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('admin_auth');
+    if (isDevMode) {
+      await fetch('/api/admin-logout', { method: 'POST' });
     }
     setAuthenticated(false);
     router.push('/');

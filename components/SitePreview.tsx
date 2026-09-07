@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { buildSitePreviewUrl } from '../lib/sitePreviewUrl';
 
 type Props = {
   formData: Record<string, any> | null;
   uid?: string;
+  isAdminDev?: boolean;
   hasUnsavedChanges?: boolean;
   onSave?: () => void;
 };
 
-export default function SitePreview({ formData, uid, hasUnsavedChanges, onSave }: Props) {
+export default function SitePreview({ formData, uid, isAdminDev, hasUnsavedChanges, onSave }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isIframeLoaded, setIsIframeLoaded] = useState(false);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
@@ -151,7 +153,7 @@ export default function SitePreview({ formData, uid, hasUnsavedChanges, onSave }
     }
   }, []);
 
-  const iframeSrc = uid ? `/users/home/?admin=true&uid=${uid}` : `/users/home/?admin=true`;
+  const iframeSrc = buildSitePreviewUrl({ uid, isAdminDev });
 
   // Envoi des données de formulaire à l'iframe
   useEffect(() => {

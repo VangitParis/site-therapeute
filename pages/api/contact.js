@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import xss from 'xss';
+import { checkRateLimit, getClientIp } from '../../lib/rateLimit';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,10 +13,18 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    let { name, email, phone, subject, message } = req.body;
+    // 5 envois / 10 minutes / IP : limite le spam, en plus du reCAPTCHA.
+    if (!checkRateLimit(`contact:${getClientIp(req)}`, 5, 10 * 60_000)) {
+      return res.status(429).json({ message: 'Trop de messages envoyés, réessaie plus tard.' });
+    }
 
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
+    let { name, email, phone, subject, message, recaptcha } = req.body;
+
+    // Même compte Gmail que /api/sendmail — inutile de dupliquer les
+    // identifiants dans deux variables d'environnement différentes
+    // (EMAIL_USER/EMAIL_PASS n'ont jamais été configurées).
+    const emailUser = process.env.SMTP_USER;
+    const emailPass = process.env.SMTP_PASS;
 
     if (!emailUser || !emailPass) {
       return res.status(500).json({ message: 'Erreur de configuration du serveur.' });
@@ -25,17 +34,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    // const recaptchaResponse = await fetch(
-    //   `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
-    //   { method: 'POST' }
-    // );
-    // const recaptchaData = await recaptchaResponse.json();
+    if (!process.env.RECAPTCHA_SECRET_KEY) {
+      console.error('contact.js: RECAPTCHA_SECRET_KEY manquant');
+      return res.status(500).json({ message: 'Erreur de configuration du serveur.' });
+    }
 
-    // if (!recaptchaData.success) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: 'Échec de la vérification reCAPTCHA.' });
-    // }
+    try {
+      const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptcha,
+        }),
+      });
+      const recaptchaData = await recaptchaResponse.json();
+
+      if (!recaptchaData.success) {
+        return res.status(400).json({ message: 'Échec de la vérification reCAPTCHA.' });
+      }
+    } catch (err) {
+      console.error('contact.js: erreur de vérification reCAPTCHA', err);
+      return res.status(400).json({ message: 'Échec de la vérification reCAPTCHA.' });
+    }
 
     name = xss(name);
     email = xss(email);

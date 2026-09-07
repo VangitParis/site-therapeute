@@ -7,11 +7,14 @@ import UserLink from './UserLinks';
 
 export default function Layout({ children, uid }: { children: ReactNode; uid?: string }) {
   const router = useRouter();
-  const { layout, theme } = useLiveLayout();
+  const { layout, theme } = useLiveLayout(uid);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isAdminPage = router.pathname.startsWith('/admin') || router.pathname.startsWith('/login') || router.pathname.startsWith('/contact') || router.pathname.startsWith('/paiement'); 
-  const uidParam = typeof router.query.uid === 'string' ? router.query.uid : null;
+  const isAdminPage = router.pathname.startsWith('/admin') || router.pathname.startsWith('/login') || router.pathname.startsWith('/contact') || router.pathname.startsWith('/paiement');
+  // `uid` vient de pages/[slug].tsx (via _app.tsx) quand la page hôte a déjà
+  // résolu la cliente autrement que par ?uid= dans l'URL — sinon on retombe
+  // sur le comportement existant.
+  const uidParam = uid ?? (typeof router.query.uid === 'string' ? router.query.uid : null);
   const isDev = router.query.frdev === '1';
   const isPreview = router.query.admin === 'true';
 

@@ -4,6 +4,14 @@ import { useRouter } from 'next/router';
 import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import UserLink from '../../components/UserLinks';
+import type { GetServerSideProps } from 'next';
+import { checkTenantActive } from '../../lib/checkTenantActive';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const gate = await checkTenantActive(context);
+  if (gate.redirect) return { redirect: gate.redirect };
+  return { props: {} };
+};
 
 export default function Testimonials({ locale = 'fr' }) {
   const [buttonText, setButtonText] = useState<string>('');

@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ✅ Document public : content/fr (template par défaut, édité par l'admin)
+    //
+    // AVANT : `allow write: if request.resource.data.adminToken == "admin"`
+    // acceptait n'importe quelle écriture, authentifiée ou non, du moment que
+    // la donnée envoyée contenait le champ `adminToken: "admin"` — une chaîne
+    // fixe visible dans le code source de l'app, donc devinable/copiable par
+    // n'importe qui sans jamais se connecter. Les écritures sur ce document
+    // passent maintenant exclusivement par /api/admin-save-content, qui
+    // vérifie un cookie de session admin signé côté serveur puis écrit via
+    // firebase-admin (qui contourne ces règles) — le client n'a donc plus
+    // besoin, et n'a plus le droit, d'écrire ici directement.
+    match /content/fr {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 🌐 Sites publics/privés : content/{userId}
+    match /content/{userId} {
+      // LECTURE : tout le monde peut voir les sites (visiteurs) — c'est
+      // volontaire, ce sont des sites vitrine publics. L'activation
+      // post-paiement (clients/{userId}.isActive) est vérifiée séparément
+      // par les pages publiques elles-mêmes (getServerSideProps), pas ici.
+      allow read: if true;
+
+      // ÉCRITURE : seulement la propriétaire authentifiée. Le contournement
+      // `adminToken` a été retiré (voir commentaire ci-dessus) — il n'y a
+      // plus d'admin "magique" au niveau des règles, uniquement via
+      // firebase-admin côté serveur.
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 👤 Collection users - ACCÈS PERSONNEL
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 🔐 Clients - ACCÈS PERSONNEL, avec les champs d'autorisation protégés
+    match /clients/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Création de son propre document : uniquement en repartant d'un état
+      // non activé — une cliente ne peut pas s'auto-créer déjà "isClient" ou
+      // "isActive".
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.isClient == false
+                    && request.resource.data.isActive == false;
+
+      // Mise à jour de son propre document : autorisée, SAUF sur les champs
+      // qui déterminent l'accès à l'éditeur privé et la visibilité publique
+      // du site. Avant cette règle, une cliente pouvait s'auto-activer en
+      // faisant elle-même updateDoc(clients/{uid}, {isClient: true}) ou
+      // {isActive: true}) depuis la console du navigateur, sans jamais payer
+      // — isClient/isActive ne doivent être basculés que par un admin, via
+      // firebase-admin (qui contourne ces règles).
+      // 'slug' est aussi protégé : il est réservé via /api/claim-slug (qui
+      // vérifie l'unicité dans la collection slugs/ avant d'écrire), jamais
+      // en s'auto-éditant — sinon deux clientes pourraient afficher le même
+      // slug dans leur document sans que la résolution /{slug} (qui ne fait
+      // confiance qu'à slugs/{slug}) ne les traite pareil, source de confusion.
+      // 'slugChangedAt' aussi : sinon une cliente pourrait le reculer dans le
+      // temps depuis le SDK client pour contourner la limite d'une
+      // modification de lien par 24h imposée par /api/claim-slug.
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys()
+                         .hasAny(['isClient', 'isActive', 'isPaid', 'slug', 'slugChangedAt']);
+
+      allow delete: if false;
+    }
+
+    // 🔗 slugs/{slug} → { uid } : table de correspondance pour les URL
+    // lisibles (site-therapeute.vercel.app/marie-dupont). Entièrement
+    // gérée par /api/claim-slug via firebase-admin (unicité vérifiée dans
+    // une transaction) — ni lue ni écrite par le client, la résolution
+    // /pages/[slug].tsx passe aussi par firebase-admin côté serveur.
+    match /slugs/{slug} {
+      allow read, write: if false;
+    }
+
+    // 🔓 Config - ACCÈS ADMIN UNIQUEMENT
+    //
+    // AVANT : `allow read: if true` exposait le hash bcrypt du mot de passe
+    // admin (config/admin.password) à quiconque visitait le site — le code
+    // app ne lit plus jamais ce document depuis le navigateur
+    // (/api/admin-login le lit désormais côté serveur via firebase-admin),
+    // donc plus aucun accès client n'est nécessaire ici.
+    match /config/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

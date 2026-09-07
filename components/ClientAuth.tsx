@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { auth, db } from '../lib/firebaseClient';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import bcrypt from 'bcryptjs';
+import { getAuthErrorMessage } from '../lib/authErrorMessages';
 
 export default function ClientAuth({ children }) {
   const router = useRouter();
@@ -18,17 +18,13 @@ export default function ClientAuth({ children }) {
 
   useEffect(() => {
     const isFRDev = router.query.frdev === '1';
-    const session = typeof window !== 'undefined' ? sessionStorage.getItem('admin_auth') : null;
-
-    if (isFRDev && session !== 'true') {
-      sessionStorage.removeItem('admin_auth');
-      router.replace('/');
-      return;
-    }
-
     setIsDevMode(isFRDev);
 
-    if (isFRDev && session === 'true') {
+    // Le mode admin (?frdev=1) est désormais protégé côté serveur par
+    // getServerSideProps sur la page /admin/live (cookie de session httpOnly) :
+    // si on arrive jusqu'ici avec frdev=1, la page hôte a déjà validé la
+    // session. On ne stocke plus rien dans sessionStorage.
+    if (isFRDev) {
       setAuthenticated(true);
       setChecking(false);
       return;
@@ -63,33 +59,24 @@ export default function ClientAuth({ children }) {
     setError('');
 
     if (isDevMode) {
-      try {
-        const snap = await getDoc(doc(db, 'config', 'admin'));
-        const storedHash = snap.data()?.password;
-        const MASTER_PWD = process.env.NEXT_PUBLIC_MASTER_PWD;
-        const isValid = password === MASTER_PWD || (await bcrypt.compare(password, storedHash));
+      // Ce cas ne devrait plus se présenter : frdev=1 n'atteint ce composant
+      // que si la page l'a déjà validé côté serveur (voir plus haut).
+      return;
+    }
 
-        if (isValid) {
-          sessionStorage.setItem('admin_auth', 'true');
-          setAuthenticated(true);
-        } else {
-          setError('Mot de passe incorrect ❌');
-        }
-      } catch (e) {
-        setError('Erreur de connexion à Firestore');
-      }
-    } else {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (e) {
-        setError('Email ou mot de passe incorrect.');
-      }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      console.error('Erreur connexion cliente:', e);
+      setError(getAuthErrorMessage(e));
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
-    sessionStorage.removeItem('admin_auth');
+    if (isDevMode) {
+      await fetch('/api/admin-logout', { method: 'POST' });
+    }
     setAuthenticated(false);
   };
 

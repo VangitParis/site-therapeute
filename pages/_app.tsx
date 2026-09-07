@@ -12,8 +12,11 @@ export default function App({ Component, pageProps }: AppProps) {
   if ((Component as any).getInitialProps) {
     delete (Component as any).getInitialProps;
   }
+  // pages/[slug].tsx est la seule page dont getServerSideProps renvoie `uid`
+  // dans pageProps — Layout s'en sert pour afficher l'en-tête/nav de la bonne
+  // cliente sans jamais faire apparaître ?uid= dans l'URL /marie-dupont.
   return (
-    <Layout>
+    <Layout uid={pageProps?.uid}>
       <Component {...pageProps} />
     </Layout>
   );

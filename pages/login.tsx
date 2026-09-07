@@ -3,12 +3,16 @@ import { useRouter } from 'next/router';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth, db } from '../lib/firebaseClient';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { duplicateContentForUser } from '../lib/duplicateContent';
-import bcrypt from 'bcryptjs';
+import { getAuthErrorMessage } from '../lib/authErrorMessages';
+import { buildPasswordResetSettings } from '../lib/passwordResetSettings';
+import { claimSlug } from '../lib/claimSlugClient';
+import { slugify } from '../lib/slugify';
 import { User, Shield, Mail, Lock, Eye, EyeOff, ArrowRight, Settings } from 'lucide-react';
 import Toast from '../components/Toast';
 
@@ -26,6 +30,13 @@ export default function AuthInterface() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetSending, setResetSending] = useState(false);
+  // Proposé depuis formData.nom, mais modifiable avant de valider —
+  // certaines clientes veulent un nom de marque différent de leur nom
+  // personnel (ex. "cabinet-serenite" plutôt que "marie-dupont").
+  const [slugDraft, setSlugDraft] = useState('');
+  const [slugTouched, setSlugTouched] = useState(false);
   const [user, setUser] = useState(null);
   const selectedTemplate = (router.query.template as string) || 'sophrologie';
 
@@ -64,7 +75,18 @@ export default function AuthInterface() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (e.target.name === 'nom' && !slugTouched) {
+      setSlugDraft(slugify(e.target.value));
+    }
     setError('');
+    setResetMessage('');
+  };
+
+  const handleSlugChange = (e) => {
+    setSlugTouched(true);
+    setSlugDraft(e.target.value);
+    setError('');
+    setResetMessage('');
   };
 
   const handleUserAuth = async () => {
@@ -89,30 +111,75 @@ export default function AuthInterface() {
           email: user.email,
           nom: formData.nom,
           isClient: false,
+          isActive: false, // bascule à true uniquement par un admin, après paiement confirmé
           templateId: selectedTemplate,
           createdAt: new Date(),
         });
+
+        // Réserver son lien lisible (site-therapeute.vercel.app/marie-dupont
+        // ou tout autre nom de marque choisi dans le champ ci-dessous).
+        const slugResult = await claimSlug(user, {
+          customSlug: slugify(slugDraft || formData.nom),
+        });
+        if (slugResult.error) {
+          // Non bloquant : le compte est créé, elle pourra choisir son lien
+          // depuis son espace d'édition si celui proposé était déjà pris.
+          console.error("claimSlug à l'inscription:", slugResult.error);
+        }
 
         setUser(user);
         setError('');
         router.push('/paiement');
       }
     } catch (err: any) {
+      // Le détail technique (code Firebase, message brut) reste dans la
+      // console pour le débogage — jamais affiché à la cliente.
       console.error('Erreur auth:', err);
-      switch (err.code) {
-        case 'auth/invalid-credential':
-        case 'auth/wrong-password':
-        case 'auth/user-not-found':
-          setError('Email ou mot de passe invalide, ou compte inexistant.');
-          break;
-        case 'auth/too-many-requests':
-          setError('Trop de tentatives, réessaye plus tard.');
-          break;
-        default:
-          setError(err.message || 'Erreur de connexion.');
-      }
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError('');
+    setResetMessage('');
+
+    if (!formData.email || !formData.email.trim()) {
+      setError('Renseigne ton adresse e-mail ci-dessus, puis clique à nouveau sur ce lien.');
+      return;
+    }
+
+    setResetSending(true);
+    try {
+      // Sans ActionCodeSettings, la page d'action Firebase par défaut affiche
+      // juste "mot de passe réinitialisé" sans aucun moyen de revenir sur le
+      // site. `url` (continueUrl) fait apparaître un bouton "Continuer" vers
+      // /login sur cette page par défaut — pas besoin de page personnalisée.
+      // (site-therapeute.vercel.app a été ajouté aux domaines autorisés
+      // Firebase Auth pour que ce lien fonctionne en production.)
+      await sendPasswordResetEmail(
+        auth,
+        formData.email,
+        buildPasswordResetSettings(window.location.origin)
+      );
+      setResetMessage(
+        '📩 Si un compte existe avec cette adresse, un e-mail de réinitialisation vient de lui être envoyé.'
+      );
+    } catch (err: any) {
+      // Ne jamais révéler si le compte existe ou non : un e-mail inconnu
+      // affiche exactement la même confirmation qu'un envoi réussi. Seules
+      // les vraies erreurs (format invalide, panne réseau…) sont distinguées.
+      if (err?.code === 'auth/user-not-found') {
+        setResetMessage(
+          '📩 Si un compte existe avec cette adresse, un e-mail de réinitialisation vient de lui être envoyé.'
+        );
+      } else {
+        console.error('Erreur réinitialisation mot de passe:', err);
+        setError(getAuthErrorMessage(err));
+      }
+    } finally {
+      setResetSending(false);
     }
   };
 
@@ -121,40 +188,24 @@ export default function AuthInterface() {
     setError('');
 
     try {
-      // Récupérer le hash depuis Firestore
-      const snap = await getDoc(doc(db, 'config', 'admin'));
-      let storedHash = '';
+      // Le mot de passe n'est plus jamais comparé dans le navigateur : le
+      // serveur vérifie le hash bcrypt et pose un cookie de session httpOnly.
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: formData.password }),
+      });
 
-      if (snap.exists()) {
-        storedHash = snap.data().password;
-      }
-
-      const MASTER_PWD = process.env.NEXT_PUBLIC_MASTER_PWD;
-
-      if (!storedHash && formData.password !== MASTER_PWD) {
-        setError('Mot de passe non initialisé ou indisponible');
-        setLoading(false);
-        return;
-      }
-
-      const isValid =
-        formData.password === MASTER_PWD ||
-        (storedHash && (await bcrypt.compare(formData.password, storedHash)));
-
-      if (isValid) {
-        // Authentification réussie
-        sessionStorage.setItem('admin_auth', 'true');
-
-        // 🔥 Redirection avec timestamp pour éviter le cache
+      if (res.ok) {
         const redirectUrl = `/admin/live?frdev=1&t=${Date.now()}`;
-        console.log('🚀 Redirection admin vers:', redirectUrl);
         router.push(redirectUrl);
       } else {
-        setError('Mot de passe admin incorrect');
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || 'Mot de passe admin incorrect');
       }
     } catch (err) {
       console.error('Erreur auth admin:', err);
-      setError('Erreur de connexion à Firestore');
+      setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);
     }
@@ -163,6 +214,7 @@ export default function AuthInterface() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
+    setResetMessage('');
 
     // Validation pour les utilisateurs
     if (userType === 'user') {
@@ -220,6 +272,7 @@ export default function AuthInterface() {
       setFormData({ email: '', password: '', nom: '' });
     }
     setError('');
+    setResetMessage('');
     setIsLogin(true);
   };
   {
@@ -311,6 +364,29 @@ export default function AuthInterface() {
             </div>
           )}
 
+          {/* Lien du site (uniquement pour inscription utilisateur) — proposé
+              automatiquement depuis le nom, modifiable avant de valider */}
+          {!isLogin && userType === 'user' && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Lien de votre site</label>
+              <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+                <span className="pl-4 pr-1 py-3 bg-gray-50 text-gray-500 text-sm whitespace-nowrap">
+                  site-therapeute.vercel.app/
+                </span>
+                <input
+                  type="text"
+                  value={slugDraft}
+                  onChange={handleSlugChange}
+                  placeholder="votre-nom-ou-marque"
+                  className="flex-1 min-w-0 py-3 pr-4 focus:outline-none"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                Modifiable plus tard depuis votre espace (une fois toutes les 24h).
+              </p>
+            </div>
+          )}
+
           {/* Email (pas pour admin) */}
           {userType === 'user' && (
             <div className="space-y-2">
@@ -354,12 +430,31 @@ export default function AuthInterface() {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+            {userType === 'user' && isLogin && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={resetSending}
+                  className="text-sm text-purple-600 hover:text-purple-800 underline disabled:opacity-50"
+                >
+                  {resetSending ? 'Envoi en cours…' : 'Mot de passe oublié ?'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Message d'erreur */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
               {error}
+            </div>
+          )}
+
+          {/* Confirmation de réinitialisation */}
+          {resetMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-green-700 text-sm">
+              {resetMessage}
             </div>
           )}
 

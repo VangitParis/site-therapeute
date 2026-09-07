@@ -3,15 +3,34 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../lib/firebaseClient';
 import { doc, setDoc } from 'firebase/firestore';
 import { duplicateContentForUser } from '../lib/duplicateContent';
+import { getAuthErrorMessage } from '../lib/authErrorMessages';
+import { claimSlug } from '../lib/claimSlugClient';
+import { slugify } from '../lib/slugify';
 import { useRouter } from 'next/router';
 
 export default function RegisterForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Proposé automatiquement depuis le nom, mais modifiable avant de valider —
+  // certaines clientes veulent un nom de marque différent de leur nom
+  // personnel (ex. "cabinet-serenite" plutôt que "marie-dupont").
+  const [slugDraft, setSlugDraft] = useState('');
+  const [slugTouched, setSlugTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setName(value);
+    if (!slugTouched) setSlugDraft(slugify(value));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSlugTouched(true);
+    setSlugDraft(e.target.value);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,13 +49,28 @@ export default function RegisterForm() {
         email: user.email,
         name: name,
         isClient: false,
+        isActive: false, // bascule à true uniquement par un admin, après paiement confirmé
         createdAt: new Date(),
       });
+
+      // 2bis. Réserver son lien lisible (site-therapeute.vercel.app/marie-dupont
+      // ou tout autre nom de marque choisi ci-dessous).
+      const finalSlug = slugify(slugDraft || name);
+      const slugResult = await claimSlug(user, { customSlug: finalSlug });
+      if (slugResult.error) {
+        // Non bloquant : le compte est créé, elle pourra choisir son lien
+        // depuis son espace d'édition si celui proposé était déjà pris.
+        console.error('claimSlug à l\'inscription:', slugResult.error);
+      }
 
       // 3. Rediriger
       router.push('/admin');
     } catch (err: any) {
-      setError(err.message);
+      // Avant : setError(err.message) affichait par ex.
+      // "Firebase: Error (auth/email-already-in-use)." tel quel à la
+      // cliente. Le détail technique reste en console, jamais à l'écran.
+      console.error('Erreur inscription:', err);
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -52,10 +86,30 @@ export default function RegisterForm() {
         <input
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
           required
           className="border p-2 w-full"
         />
+      </div>
+
+      {/* Lien du site — proposé automatiquement, modifiable */}
+      <div>
+        <label className="block text-sm font-medium">Lien de votre site</label>
+        <div className="flex items-center border rounded overflow-hidden">
+          <span className="px-2 py-2 bg-gray-100 text-gray-500 text-sm whitespace-nowrap">
+            site-therapeute.vercel.app/
+          </span>
+          <input
+            type="text"
+            value={slugDraft}
+            onChange={handleSlugChange}
+            placeholder="votre-nom-ou-marque"
+            className="flex-1 p-2 min-w-0"
+          />
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          Vous pourrez le changer plus tard depuis votre espace (une fois toutes les 24h).
+        </p>
       </div>
 
       {/* Email */}

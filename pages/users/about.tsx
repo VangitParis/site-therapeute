@@ -5,6 +5,14 @@ import { db } from '../../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
 import { appendQueryParams } from '../../utils/appendQueryParams';
 import UserLink from '../../components/UserLinks';
+import type { GetServerSideProps } from 'next';
+import { checkTenantActive } from '../../lib/checkTenantActive';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const gate = await checkTenantActive(context);
+  if (gate.redirect) return { redirect: gate.redirect };
+  return { props: {} };
+};
 
 export default function About({ locale = 'fr' }) {
   const [data, setData] = useState<{
